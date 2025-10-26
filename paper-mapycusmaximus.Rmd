@@ -1,0 +1,121 @@
+---
+title: "Focus-Glue-Context Fisheye Transformations for Spatial Visualization"
+date: "2022-11-09"
+abstract: >
+  An abstract of less than 250 words.
+draft: true
+author:  
+  - name: Cuong Nguyen
+    affiliation: Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Melbourne, Australia
+    url: https://alex-nguyen-vn.github.io
+    orcid: 0000-0000-0000-0000
+    email:  qquo@ulm.edu
+  - name: Michael Lydeamore
+    affiliation:
+    - Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Melbourne, Australia
+    url: https://www.michaellydeamore.com
+    email: michael.lydeamore@monash.edu
+    orcid: 0000-0001-6515-827X
+  - name: Dianne Cook
+    affiliation:
+    - Monash University
+    address:
+    - Department of Econometrics and Business Statistics
+    - Melbourne, Australia
+    url: https://www.dicook.org
+    email: dicook@monash.edu
+    orcid: 0000-0002-3813-7155
+type: package
+output: 
+  rjtools::rjournal_article:
+    self_contained: yes
+    toc: no
+bibliography: paper-mapycusmaximus.bib
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyr)
+library(ggplot2)
+library(mapycusmaximus)
+library(plotly)
+library(palmerpenguins)
+```
+
+# Introduction
+
+HERE YOU NEED TO GIVE MOTIVATION AND SOME LITERATURE REVIEW
+
+Interactive data graphics provides plots that allow users to interact them. One of the most basic types of interaction is through tooltips, where users are provided additional information about elements in the plot by moving the cursor over the plot.
+
+This paper will first review some R packages on interactive graphics and their tooltip implementations. A new package \CRANpkg{ToOoOlTiPs} that provides customized tooltips for plot, is introduced. Some example plots will then be given to showcase how these tooltips help users to better read the graphics. 
+
+# Background
+
+HERE YOU NEED TO DISCUSS SOME RELATED PACKAGES LIKE CARTOGRAMS and HEXAGON TILE MAPS
+
+Some packages on interactive graphics include \CRANpkg{plotly} [@plotly] that interfaces with Javascript for web-based interactive graphics, \CRANpkg{crosstalk} [@crosstalk] that specializes cross-linking elements across individual graphics.  The recent R Journal paper \CRANpkg{tsibbletalk} [@RJ-2021-050] provides a good example of including interactive graphics into an article for the journal. It has both a set of linked plots, and also an animated gif example, illustrating linking between time series plots and feature summaries.
+
+# Focus-Glue-Context Transformation
+
+HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE PARTS. USE A SIMPLE EXAMPLE LIKE THE RECTANGLE OF DOTS TO EXPLAIN
+
+## Algorithm
+
+## Parameters
+
+## Common choices
+
+\pkg{ToOoOlTiPs} is a packages for customizing tooltips in interactive graphics, it features these possibilities.
+
+
+The \CRANpkg{palmerpenguins} data [@palmerpenguins]  features three penguin species which has a lovely illustration by Alison Horst in Figure \@ref(fig:penguins-alison). 
+
+```{r penguins-alison, out.width = "100%", out.height = "30%", fig.cap = "Artwork by \\@allison\\_horst", fig.alt="A picture of three different penguins with their species: Chinstrap, Gentoo, and Adelie. "}
+knitr::include_graphics("figures/penguins.png")
+```
+
+Table `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\@ref(tab:penguins-tab-interactive)', '\\@ref(tab:penguins-tab-static)'))` prints at the first few rows of the `penguins` data:
+
+```{r penguins-tab-interactive, eval = knitr::is_html_output(), layout = "l-body-outset"}
+knitr::kable(head(penguins), format = "html", caption = "A basic table")
+```
+
+```{r penguins-tab-static, eval = knitr::is_latex_output()}
+knitr::kable(head(penguins), format = "latex", caption = "A basic table") %>% 
+  kableExtra::kable_styling(font_size = 7)
+```   
+
+Figure `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\@ref(fig:penguins-plotly)', '\\@ref(fig:penguins-ggplot)'))` shows an `r ifelse(knitr::is_html_output(), 'interactive', '')` plot of the penguins data, made using the `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\CRANpkg{plotly}', '\\CRANpkg{ggplot2}'))` package. 
+
+```{r penguins-plotly, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive plot made with the plotly package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. When hovering on a point, a tooltip will show the exact value of the bill depth and length for that point, along with the species name.", include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.alt = "A scatterplot of bill length against bill depth, both measured in millimetre. The three species are shown in different colours and loosely forms three clusters. Adelie has small bill length and large bill depth, Gentoo has small bill depth but large bill length, and Chinstrap has relatively large bill depth and bill length."}
+p <- penguins %>% 
+  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
+             color = species)) + 
+  geom_point()
+ggplotly(p)
+```
+
+```{r penguins-ggplot, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic non-interactive plot made with the ggplot2 package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. Visit the online article to access the interactive version made with the plotly package.", include=knitr::is_latex_output(), eval=knitr::is_latex_output()}
+penguins %>% 
+  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
+             color = species)) + 
+  geom_point()
+```
+
+# Examples of use
+
+SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map with hospital locations, map with transfers, map with convex hulls, map with two focal points, then maybe a raster map
+
+# Discussion
+
+HERE YOU SUMMARISE WHAT THE PAPER CONTRIBUTED IN ONE PARAGRAPH AND SUGGEST NEW WORK THAT MIGHT BE DONE THAT YOU DIDN'T HAVE TIME TO DO
+
+We have displayed various tooltips that are available in the package \pkg{ToOoOlTiPs}. 

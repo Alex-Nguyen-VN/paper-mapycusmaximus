@@ -1,0 +1,124 @@
+% !TeX root = RJwrapper.tex
+\title{Focus-Glue-Context Fisheye Transformations for Spatial Visualization}
+
+
+\author{by Cuong Nguyen, Michael Lydeamore, and Dianne Cook}
+
+\maketitle
+
+\abstract{%
+An abstract of less than 250 words.
+}
+
+\section{Introduction}\label{introduction}
+
+HERE YOU NEED TO GIVE MOTIVATION AND SOME LITERATURE REVIEW
+
+Interactive data graphics provides plots that allow users to interact them. One of the most basic types of interaction is through tooltips, where users are provided additional information about elements in the plot by moving the cursor over the plot.
+
+This paper will first review some R packages on interactive graphics and their tooltip implementations. A new package \CRANpkg{ToOoOlTiPs} that provides customized tooltips for plot, is introduced. Some example plots will then be given to showcase how these tooltips help users to better read the graphics.
+
+\section{Background}\label{background}
+
+HERE YOU NEED TO DISCUSS SOME RELATED PACKAGES LIKE CARTOGRAMS and HEXAGON TILE MAPS
+
+Some packages on interactive graphics include \CRANpkg{plotly} \citep{plotly} that interfaces with Javascript for web-based interactive graphics, \CRANpkg{crosstalk} \citep{crosstalk} that specializes cross-linking elements across individual graphics. The recent R Journal paper \CRANpkg{tsibbletalk} \citep{RJ-2021-050} provides a good example of including interactive graphics into an article for the journal. It has both a set of linked plots, and also an animated gif example, illustrating linking between time series plots and feature summaries.
+
+\section{Focus-Glue-Context Transformation}\label{focus-glue-context-transformation}
+
+HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE PARTS. USE A SIMPLE EXAMPLE LIKE THE RECTANGLE OF DOTS TO EXPLAIN
+
+\subsection{Algorithm}\label{algorithm}
+
+\subsection{Parameters}\label{parameters}
+
+\subsection{Common choices}\label{common-choices}
+
+\pkg{ToOoOlTiPs} is a packages for customizing tooltips in interactive graphics, it features these possibilities.
+
+The \CRANpkg{palmerpenguins} data \citep{palmerpenguins} features three penguin species which has a lovely illustration by Alison Horst in Figure \ref{fig:penguins-alison}.
+
+\begin{figure}
+\includegraphics[width=1\linewidth,height=0.3\textheight,alt={A picture of three different penguins with their species: Chinstrap, Gentoo, and Adelie. }]{figures/penguins} \caption{Artwork by \@allison\_horst}\label{fig:penguins-alison}
+\end{figure}
+
+Table \ref{tab:penguins-tab-static} prints at the first few rows of the \texttt{penguins} data:
+
+\begin{table}
+\centering
+\caption{\label{tab:penguins-tab-static}A basic table}
+\centering
+\fontsize{7}{9}\selectfont
+\begin{tabular}[t]{l|l|r|r|r|r|l|r}
+\hline
+species & island & bill\_length\_mm & bill\_depth\_mm & flipper\_length\_mm & body\_mass\_g & sex & year\\
+\hline
+Adelie & Torgersen & 39.1 & 18.7 & 181 & 3750 & male & 2007\\
+\hline
+Adelie & Torgersen & 39.5 & 17.4 & 186 & 3800 & female & 2007\\
+\hline
+Adelie & Torgersen & 40.3 & 18.0 & 195 & 3250 & female & 2007\\
+\hline
+Adelie & Torgersen & NA & NA & NA & NA & NA & 2007\\
+\hline
+Adelie & Torgersen & 36.7 & 19.3 & 193 & 3450 & female & 2007\\
+\hline
+Adelie & Torgersen & 39.3 & 20.6 & 190 & 3650 & male & 2007\\
+\hline
+\end{tabular}
+\end{table}
+
+Figure \ref{fig:penguins-ggplot} shows an plot of the penguins data, made using the \CRANpkg{ggplot2} package.
+
+\begin{verbatim}
+penguins %>% 
+  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
+             color = species)) + 
+  geom_point()
+\end{verbatim}
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/penguins-ggplot-1} \caption{A basic non-interactive plot made with the ggplot2 package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. Visit the online article to access the interactive version made with the plotly package.}\label{fig:penguins-ggplot}
+\end{figure}
+
+\section{Examples of use}\label{examples-of-use}
+
+SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map with hospital locations, map with transfers, map with convex hulls, map with two focal points, then maybe a raster map
+
+\section{Discussion}\label{discussion}
+
+HERE YOU SUMMARISE WHAT THE PAPER CONTRIBUTED IN ONE PARAGRAPH AND SUGGEST NEW WORK THAT MIGHT BE DONE THAT YOU DIDN'T HAVE TIME TO DO
+
+We have displayed various tooltips that are available in the package \pkg{ToOoOlTiPs}.
+
+\bibliography{paper-mapycusmaximus.bib}
+
+\address{%
+Cuong Nguyen\\
+Monash University\\%
+Department of Econometrics and Business Statistics\\ Melbourne, Australia\\
+%
+\url{https://alex-nguyen-vn.github.io}\\%
+\textit{ORCiD: \href{https://orcid.org/0000-0000-0000-0000}{0000-0000-0000-0000}}\\%
+\href{mailto:qquo@ulm.edu}{\nolinkurl{qquo@ulm.edu}}%
+}
+
+\address{%
+Michael Lydeamore\\
+Monash University\\%
+Department of Econometrics and Business Statistics\\ Melbourne, Australia\\
+%
+\url{https://www.michaellydeamore.com}\\%
+\textit{ORCiD: \href{https://orcid.org/0000-0001-6515-827X}{0000-0001-6515-827X}}\\%
+\href{mailto:michael.lydeamore@monash.edu}{\nolinkurl{michael.lydeamore@monash.edu}}%
+}
+
+\address{%
+Dianne Cook\\
+Monash University\\%
+Department of Econometrics and Business Statistics\\ Melbourne, Australia\\
+%
+\url{https://www.dicook.org}\\%
+\textit{ORCiD: \href{https://orcid.org/0000-0002-3813-7155}{0000-0002-3813-7155}}\\%
+\href{mailto:dicook@monash.edu}{\nolinkurl{dicook@monash.edu}}%
+}
