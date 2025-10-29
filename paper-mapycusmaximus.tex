@@ -2,29 +2,55 @@
 \title{Focus-Glue-Context Fisheye Transformations for Spatial Visualization}
 
 
-\author{by Cuong Nguyen, Michael Lydeamore, and Dianne Cook}
+\author{by Thanh Cuong Nguyen, Michael Lydeamore, and Dianne Cook}
 
 \maketitle
 
 \abstract{%
-An abstract of less than 250 words.
+Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus--Glue--Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus (r\_in), a smooth transitional glue zone (r\_out), and a fixed exterior. Distances expand or compress via a zoom factor and power-law squeeze, with an optional angular twist enhancing continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (e.g., GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st\_transform\_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf\_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
 }
 
 \section{Introduction}\label{introduction}
 
-HERE YOU NEED TO GIVE MOTIVATION AND SOME LITERATURE REVIEW
+Maps that reveal fine local structure without losing broader context face a persistent challenge: zooming in hides regional patterns, while small-scale views suppress local detail. Traditional solutions---insets, multi-panel displays, aggressive generalization---break spatial continuity and increase cognitive load. What if we could smoothly magnify a metropolitan core \emph{while keeping it embedded} in its state-level context?
 
-Interactive data graphics provides plots that allow users to interact them. One of the most basic types of interaction is through tooltips, where users are provided additional information about elements in the plot by moving the cursor over the plot.
+This package implements a Focus--Glue--Context (FGC) fisheye transformation that continuously warps geographic space: a chosen focus region magnifies, surrounding areas compress into a ``glue'' transition zone, and outer context remains stable. Unlike discrete zoom levels or disconnected insets, the transformation operates directly on vector geometry coordinates, preserving topology and enabling reproducible, pipeline-friendly cartography within R's sf and ggplot2 ecosystem.
 
-This paper will first review some R packages on interactive graphics and their tooltip implementations. A new package \CRANpkg{ToOoOlTiPs} that provides customized tooltips for plot, is introduced. Some example plots will then be given to showcase how these tooltips help users to better read the graphics.
+The intellectual lineage of focus+context visualization traces back to \citet{furnas1986}'s \emph{degree-of-interest} function, which formalized how to prioritize salient regions while retaining global structure. \citet{sarkar1992} and \citet{sarkar1994} extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Subsequent innovations explored diverse lenses: hyperbolic geometry for hierarchies \citep{lamping1995}, distortion-view frameworks \citep{carpendale2001}, and ``magic lens'' overlays \citep{bier1993}. By 2008, \citet{cockburn2008}'s comprehensive review synthesized two decades of research across overview+detail, zooming, and focus+context paradigms.
 
-\section{Background}\label{background}
+In cartography, the need for nonlinear magnification emerged independently. \citet{snyder1987} developed ``magnifying-glass'' azimuthal projections with variable radial scales---mathematical foundations still cited today. \citet{harrie2002} created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. The crucial breakthrough came from \citet{yamamoto2009} and \citet{yamamoto2012}: their \textbf{Focus+Glue+Context model} introduced an intermediate ``glue'' region that absorbs distortion, preventing the excessively warped roads and boundaries that plagued earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
 
-HERE YOU NEED TO DISCUSS SOME RELATED PACKAGES LIKE CARTOGRAMS and HEXAGON TILE MAPS
+Parallel developments in statistical graphics tackled the ``crowding problem''---high-dimensional data collapsing into projection centers. \citet{JMLR:v9:vandermaaten08a}'s t-SNE uses heavy-tailed distributions to spread points, while \citet{mcinnes2020umapuniformmanifoldapproximation}'s UMAP leverages topological methods. Most relevant to our geometric approach: \citet{laa2020} applies \emph{radial transformations} to tour projections, maintaining the interpretability of linear methods while mitigating overplotting. Implemented in R's tourr package, it demonstrates how well-designed radial warps can reveal structure without the distortions of fully nonlinear embeddings.
 
-Some packages on interactive graphics include \CRANpkg{plotly} \citep{plotly} that interfaces with Javascript for web-based interactive graphics, \CRANpkg{crosstalk} \citep{crosstalk} that specializes cross-linking elements across individual graphics. The recent R Journal paper \CRANpkg{tsibbletalk} \citep{RJ-2021-050} provides a good example of including interactive graphics into an article for the journal. It has both a set of linked plots, and also an animated gif example, illustrating linking between time series plots and feature summaries.
+Within R's spatial ecosystem, sf \citep{RJ-2018-009} provides robust vector handling and CRS transformations, while ggplot2 \citep{wickham2016} offers declarative visualization grammar. Yet a gap remained: existing tools addressed \emph{related} distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
 
-\section{Focus-Glue-Context Transformation}\label{focus-glue-context-transformation}
+\section{Background: Alternative Approaches to the Detail-Context Problem}\label{background-alternative-approaches-to-the-detail-context-problem}
+
+Before diving into fisheye mechanics, it's worth understanding how R's spatial ecosystem currently handles the detail-versus-context tradeoff---and why those solutions, while valuable, leave room for continuous lens-based warping.
+
+\textbf{Cartograms: Thematic distortion.} The cartogram family \citep{gastner2004} intentionally distorts geographic areas to encode variables---population density reshapes regions so area becomes proportional to demographic weight.
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf}}
+
+This fundamentally differs from focus+context: cartograms \emph{substitute} spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. A population cartogram makes California balloon while Wyoming shrinks, trading geographic fidelity for thematic insight. FGC fisheye, conversely, preserves relative positions and topology while magnifying a \emph{chosen} spatial region, not a data-driven variable. The use cases diverge: cartograms answer ``how does this variable dominate space?'' while fisheye lenses answer ``what local detail exists within this broader geography?''
+
+\textbf{Hexagon tile maps: Discrete abstraction.} Packages like \texttt{geogrid} and visualizations using \texttt{sf::st\_make\_grid()} replace irregular polygons with regular hexagonal or square tiles, each representing an administrative unit.
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf}}
+
+As seen in the plot above, tile maps \emph{abstracts away} precise geography entirely, treating space as a topology-preserving tessellation where ``neighbors touch'' matters more than accurate boundaries. Tile maps excel at avoiding size bias (Mildura gets equal visual weight to Yarra) and creating aesthetic, clutter-free layouts. However, they abandon continuous spatial relationships: you cannot identify precise locations, measure distances, or overlay point data meaningfully. Hexbin aggregation for point data (via \texttt{ggplot2::geom\_hex()}) serves a different purpose---density estimation---rather than focus+context navigation.
+
+\textbf{Multi-panel approaches: Spatial separation.} Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} create side-by-side views: one panel shows overview, another shows zoomed detail.
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf}}
+
+These are effective for static reports but require viewers to mentally integrate separate views, and they don't preserve the \emph{embedded} relationship between focus and context within a single continuous geography. Futhermore, if you introduce one or more elements into the plot like filling value equal to a variable, the audience will have a hard time identify the zoomed detail.
+
+\textbf{Why FGC fisheye offers something distinct.} None of these approaches provide \emph{continuous geometric magnification within a single, topology-preserving map}. Cartograms distort for data, not user-chosen focus. Tile maps abstract away geography. Multi-panel tools spatially separate context. The fisheye lens keeps everything in one frame---roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric \emph{warp} rather than a data-driven \emph{substitution} or panel-based \emph{separation}. This matters for use cases like: examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
+
+With this landscape established, we now turn to the technical implementation: how does the Focus--Glue--Context transformation actually work, and how does this package make it accessible within R's spatial workflows?
+
+\section{Focus--Glue--Context Transformation}\label{focusgluecontext-transformation}
 
 HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE PARTS. USE A SIMPLE EXAMPLE LIKE THE RECTANGLE OF DOTS TO EXPLAIN
 
@@ -34,53 +60,6 @@ HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE 
 
 \subsection{Common choices}\label{common-choices}
 
-\pkg{ToOoOlTiPs} is a packages for customizing tooltips in interactive graphics, it features these possibilities.
-
-The \CRANpkg{palmerpenguins} data \citep{palmerpenguins} features three penguin species which has a lovely illustration by Alison Horst in Figure \ref{fig:penguins-alison}.
-
-\begin{figure}
-\includegraphics[width=1\linewidth,height=0.3\textheight,alt={A picture of three different penguins with their species: Chinstrap, Gentoo, and Adelie. }]{figures/penguins} \caption{Artwork by \@allison\_horst}\label{fig:penguins-alison}
-\end{figure}
-
-Table \ref{tab:penguins-tab-static} prints at the first few rows of the \texttt{penguins} data:
-
-\begin{table}
-\centering
-\caption{\label{tab:penguins-tab-static}A basic table}
-\centering
-\fontsize{7}{9}\selectfont
-\begin{tabular}[t]{l|l|r|r|r|r|l|r}
-\hline
-species & island & bill\_length\_mm & bill\_depth\_mm & flipper\_length\_mm & body\_mass\_g & sex & year\\
-\hline
-Adelie & Torgersen & 39.1 & 18.7 & 181 & 3750 & male & 2007\\
-\hline
-Adelie & Torgersen & 39.5 & 17.4 & 186 & 3800 & female & 2007\\
-\hline
-Adelie & Torgersen & 40.3 & 18.0 & 195 & 3250 & female & 2007\\
-\hline
-Adelie & Torgersen & NA & NA & NA & NA & NA & 2007\\
-\hline
-Adelie & Torgersen & 36.7 & 19.3 & 193 & 3450 & female & 2007\\
-\hline
-Adelie & Torgersen & 39.3 & 20.6 & 190 & 3650 & male & 2007\\
-\hline
-\end{tabular}
-\end{table}
-
-Figure \ref{fig:penguins-ggplot} shows an plot of the penguins data, made using the \CRANpkg{ggplot2} package.
-
-\begin{verbatim}
-penguins %>% 
-  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
-\end{verbatim}
-
-\begin{figure}
-\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/penguins-ggplot-1} \caption{A basic non-interactive plot made with the ggplot2 package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. Visit the online article to access the interactive version made with the plotly package.}\label{fig:penguins-ggplot}
-\end{figure}
-
 \section{Examples of use}\label{examples-of-use}
 
 SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map with hospital locations, map with transfers, map with convex hulls, map with two focal points, then maybe a raster map
@@ -89,18 +68,16 @@ SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map
 
 HERE YOU SUMMARISE WHAT THE PAPER CONTRIBUTED IN ONE PARAGRAPH AND SUGGEST NEW WORK THAT MIGHT BE DONE THAT YOU DIDN'T HAVE TIME TO DO
 
-We have displayed various tooltips that are available in the package \pkg{ToOoOlTiPs}.
-
 \bibliography{paper-mapycusmaximus.bib}
 
 \address{%
-Cuong Nguyen\\
+Thanh Cuong Nguyen\\
 Monash University\\%
 Department of Econometrics and Business Statistics\\ Melbourne, Australia\\
 %
 \url{https://alex-nguyen-vn.github.io}\\%
 \textit{ORCiD: \href{https://orcid.org/0000-0000-0000-0000}{0000-0000-0000-0000}}\\%
-\href{mailto:qquo@ulm.edu}{\nolinkurl{qquo@ulm.edu}}%
+\href{mailto:thanhcuong10091992@gmail.com}{\nolinkurl{thanhcuong10091992@gmail.com}}%
 }
 
 \address{%

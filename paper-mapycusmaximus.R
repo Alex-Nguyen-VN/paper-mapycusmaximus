@@ -3,37 +3,189 @@
 
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(mapycusmaximus)
-library(plotly)
-library(palmerpenguins)
+library(geogrid)
+library(sf)
+library(units)
+library(ggthemes)
+library(cowplot)
+library(RColorBrewer)
+library(cartogram)
 
 
-## ----penguins-alison, out.width = "100%", out.height = "30%", fig.cap = "Artwork by \\@allison\\_horst", fig.alt="A picture of three different penguins with their species: Chinstrap, Gentoo, and Adelie. "----
-knitr::include_graphics("figures/penguins.png")
+## ----data-cart, include=FALSE-------------------------------------------------
+# Library
+# Load the population per states (source: https://www.census.gov/data/tables/2017/demo/popest/nation-total.html)
+pop <- read.table("https://raw.githubusercontent.com/holtzy/R-graph-gallery/master/DATA/pop_US.csv", sep = ",", header = T)
+pop$pop <- pop$pop / 1000000
+
+# merge both
+my_sf <- read_sf("https://andrew.carto.com/api/v2/sql?filename=us_states_hexgrid&q=select+*+from+andrew.us_states_hexgrid&format=geojson&bounds=&api_key=")
+my_sf <- my_sf %>%
+  mutate(google_name = gsub(" \\(United States\\)", "", google_name))
+my_sf <- my_sf %>% left_join(., pop, by = c("google_name" = "state"))
+
+# Compute the cartogram, using this population information
+# First we need to change the projection, we use Mercator (AKA Google Maps, EPSG 3857)
+my_sf_merc <- st_transform(my_sf, 3857)
+cartogram <- cartogram_cont(my_sf_merc, "pop")
+
+# Back to original projection
+cartogram <- st_transform(cartogram, st_crs(my_sf))
 
 
-## ----penguins-tab-interactive, eval = knitr::is_html_output(), layout = "l-body-outset"----
-# knitr::kable(head(penguins), format = "html", caption = "A basic table")
+## ----plot-cart, echo=FALSE----------------------------------------------------
+ggplot(cartogram) +
+  geom_sf(aes(fill = pop), linewidth = 0.05, alpha = 0.9, color = "black") +
+  scale_fill_gradientn(
+    colours = brewer.pal(7, "BuPu"), name = "population (in M)",
+    labels = scales::label_comma(),
+    guide = guide_legend(
+      keyheight = unit(3, units = "mm"),
+      keywidth = unit(12, units = "mm"),
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  geom_sf_text(aes(label = iso3166_2), color = "white", size = 3, alpha = 0.8) +
+  theme_void() +
+  ggtitle("Another look on the US population") +
+  theme(
+    legend.position = c(0.5, 0.9),
+    legend.direction = "horizontal",
+    text = element_text(color = "#22211d"),
+    plot.background = element_rect(fill = "#f5f5f9", color = NA),
+    panel.background = element_rect(fill = "#f5f5f9", color = NA),
+    legend.background = element_rect(fill = "#f5f5f9", color = NA),
+    plot.title = element_text(size = 22, hjust = 0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+  )
 
 
-## ----penguins-tab-static, eval = knitr::is_latex_output()---------------------
-knitr::kable(head(penguins), format = "latex", caption = "A basic table") %>% 
-  kableExtra::kable_styling(font_size = 7)
+## ----data-geo-grid, include=FALSE---------------------------------------------
+
+vic <- vic |> st_transform(3111)
+vic <- vic |> 
+ mutate(
+  LGA_ABBR = case_when(
+   LGA_NAME == "CARDINIA" ~ "CAR",
+   LGA_NAME == "NILLUMBIK" ~ "NIL",
+   LGA_NAME == "MITCHELL" ~ "MIT",
+   LGA_NAME == "HUME" ~ "HUM",
+   LGA_NAME == "MOIRA" ~ "MOI",
+   LGA_NAME == "MURRINDINDI" ~ "MUR",
+   LGA_NAME == "LODDON" ~ "LOD",
+   LGA_NAME == "GLEN EIRA" ~ "GE",
+   LGA_NAME == "GREATER SHEPPARTON" ~ "GS",
+   LGA_NAME == "GANNAWARRA" ~ "GAN",
+   LGA_NAME == "SURF COAST" ~ "SC",
+   LGA_NAME == "WHITTLESEA" ~ "WHS",
+   LGA_NAME == "MACEDON RANGES" ~ "MR",
+   LGA_NAME == "GREATER DANDENONG" ~ "GD",
+   LGA_NAME == "BAYSIDE" ~ "BAY",
+   LGA_NAME == "MANSFIELD" ~ "MAN",
+   LGA_NAME == "WEST WIMMERA" ~ "WW",
+   LGA_NAME == "MILDURA" ~ "MIL",
+   LGA_NAME == "HINDMARSH" ~ "HIN",
+   LGA_NAME == "GOLDEN PLAINS" ~ "GP",
+   LGA_NAME == "HORSHAM" ~ "HOR",
+   LGA_NAME == "PYRENEES" ~ "PYR",
+   LGA_NAME == "STRATHBOGIE" ~ "STR",
+   LGA_NAME == "HOBSONS BAY" ~ "HB",
+   LGA_NAME == "QUEENSCLIFFE" ~ "QUE",
+   LGA_NAME == "SWAN HILL" ~ "SH",
+   LGA_NAME == "MORNINGTON PENINSULA" ~ "MP",
+   LGA_NAME == "SOUTH GIPPSLAND" ~ "SG",
+   LGA_NAME == "SOUTHERN GRAMPIANS" ~ "SGR",
+   LGA_NAME == "GLENELG" ~ "GLE",
+   LGA_NAME == "CASEY" ~ "CAS",
+   LGA_NAME == "KNOX" ~ "KNO",
+   LGA_NAME == "NORTHERN GRAMPIANS" ~ "NG",
+   LGA_NAME == "MONASH" ~ "MON",
+   LGA_NAME == "BALLARAT" ~ "BAL",
+   LGA_NAME == "MOONEE VALLEY" ~ "MV",
+   LGA_NAME == "MERRI-BEK" ~ "MBK",
+   LGA_NAME == "GREATER BENDIGO" ~ "GB",
+   LGA_NAME == "CAMPASPE" ~ "CAM",
+   LGA_NAME == "WARRNAMBOOL" ~ "WAR",
+   LGA_NAME == "BASS COAST" ~ "BC",
+   LGA_NAME == "ALPINE" ~ "ALP",
+   LGA_NAME == "EAST GIPPSLAND" ~ "EG",
+   LGA_NAME == "YARRIAMBIACK" ~ "YAK",
+   LGA_NAME == "BULOKE" ~ "BUL",
+   LGA_NAME == "TOWONG" ~ "TOW",
+   LGA_NAME == "WODONGA" ~ "WOD",
+   LGA_NAME == "INDIGO" ~ "IND",
+   LGA_NAME == "HEPBURN" ~ "HEP",
+   LGA_NAME == "WYNDHAM" ~ "WYN",
+   LGA_NAME == "MOUNT ALEXANDER" ~ "MA",
+   LGA_NAME == "CENTRAL GOLDFIELDS" ~ "CG",
+   LGA_NAME == "WHITEHORSE" ~ "WH",
+   LGA_NAME == "KINGSTON" ~ "KIN",
+   LGA_NAME == "MARIBYRNONG" ~ "MAR",
+   LGA_NAME == "ARARAT" ~ "ARA",
+   LGA_NAME == "MOORABOOL" ~ "MOO",
+   LGA_NAME == "WELLINGTON" ~ "WEL",
+   LGA_NAME == "MAROONDAH" ~ "MARO",
+   LGA_NAME == "DAREBIN" ~ "DAR",
+   LGA_NAME == "MANNINGHAM" ~ "MANI",
+   LGA_NAME == "BRIMBANK" ~ "BRI",
+   LGA_NAME == "MELBOURNE" ~ "MEL",
+   LGA_NAME == "BOROONDARA" ~ "BOR",
+   LGA_NAME == "GREATER GEELONG" ~ "GEE",
+   LGA_NAME == "STONNINGTON" ~ "STO",
+   LGA_NAME == "BANYULE" ~ "BAN",
+   LGA_NAME == "LATROBE" ~ "LAT",
+   LGA_NAME == "YARRA" ~ "YAR",
+   LGA_NAME == "WANGARATTA" ~ "WAN",
+   LGA_NAME == "YARRA RANGES" ~ "YARAN",
+   LGA_NAME == "PORT PHILLIP" ~ "PP",
+   LGA_NAME == "MELTON" ~ "MELT",
+   LGA_NAME == "COLAC OTWAY" ~ "CO",
+   LGA_NAME == "CORANGAMITE" ~ "COR",
+   LGA_NAME == "MOYNE" ~ "MOY",
+   LGA_NAME == "FRANKSTON" ~ "FRA",
+   LGA_NAME == "BENALLA" ~ "BEN",
+   LGA_NAME == "BAW BAW" ~ "BB",
+   # Alpine resorts / unincorporated islands
+   grepl("ALPINE RESORT", LGA_NAME) ~ "AR",
+   grepl("ISLAND", LGA_NAME) ~ "ISL",
+   TRUE ~ NA_character_
+  ),
+  area_km2 = as.numeric(set_units(st_area(geometry), "km^2")))
 
 
-## ----penguins-plotly, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive plot made with the plotly package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. When hovering on a point, a tooltip will show the exact value of the bill depth and length for that point, along with the species name.", include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.alt = "A scatterplot of bill length against bill depth, both measured in millimetre. The three species are shown in different colours and loosely forms three clusters. Adelie has small bill length and large bill depth, Gentoo has small bill depth but large bill length, and Chinstrap has relatively large bill depth and bill length."----
-# p <- penguins %>%
-#   ggplot(aes(x = bill_depth_mm, y = bill_length_mm,
-#              color = species)) +
-#   geom_point()
-# ggplotly(p)
+original_shapes <- vic |> st_transform(27700)
+new_cells_reg <- calculate_grid(shape = original_shapes, grid_type = "regular", seed = 3)
+resultreg <- assign_polygons(original_shapes, new_cells_reg)
 
 
-## ----penguins-ggplot, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic non-interactive plot made with the ggplot2 package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. Visit the online article to access the interactive version made with the plotly package.", include=knitr::is_latex_output(), eval=knitr::is_latex_output()----
-penguins %>% 
-  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
+## ----geo-grid-plot, echo=FALSE------------------------------------------------
+ggplot(resultreg) +
+ geom_sf(aes(fill = area_km2)) +
+ geom_sf_label(aes(label = LGA_ABBR), size = 2) +
+ scale_fill_viridis_c() +
+ coord_sf() +
+ theme_map()
+
+
+## ----data-cow-plot, include=FALSE---------------------------------------------
+lga_inset <- vic[vic$LGA_NAME == "MELBOURNE", ]
+main_map <- ggplot() +
+ geom_sf(data = vic, fill = "lightgray", color = "white") +
+ geom_sf(data = lga_inset, fill = "red", color = "red") + # Highlight the inset area
+ theme_void() +
+ labs(title = "Victoria")
+inset_map <- ggplot() +
+ geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue") +
+ theme_void() +
+ labs(title = "Melbourne LGA")
+
+
+## ----cow-plot-plot, echo=FALSE------------------------------------------------
+final_map <- ggdraw() +
+ draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
+ draw_plot(inset_map, x = 0.7, y = 0.7, width = 0.25, height = 0.25) # Inset map position and size
+
+print(final_map)
 

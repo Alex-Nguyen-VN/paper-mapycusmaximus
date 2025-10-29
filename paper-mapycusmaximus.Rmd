@@ -1,18 +1,18 @@
 ---
 title: "Focus-Glue-Context Fisheye Transformations for Spatial Visualization"
-date: "2022-11-09"
+date: "2025-10-30"
 abstract: >
-  An abstract of less than 250 words.
+  Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus–Glue–Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus (r_in), a smooth transitional glue zone (r_out), and a fixed exterior. Distances expand or compress via a zoom factor and power-law squeeze, with an optional angular twist enhancing continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (e.g., GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st_transform_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
 draft: true
 author:  
-  - name: Cuong Nguyen
+  - name: Thanh Cuong Nguyen
     affiliation: Monash University
     address:
     - Department of Econometrics and Business Statistics
     - Melbourne, Australia
     url: https://alex-nguyen-vn.github.io
     orcid: 0000-0000-0000-0000
-    email:  qquo@ulm.edu
+    email:  thanhcuong10091992@gmail.com
   - name: Michael Lydeamore
     affiliation:
     - Monash University
@@ -37,33 +37,232 @@ output:
     self_contained: yes
     toc: no
 bibliography: paper-mapycusmaximus.bib
-
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(mapycusmaximus)
-library(plotly)
-library(palmerpenguins)
+library(geogrid)
+library(sf)
+library(units)
+library(ggthemes)
+library(cowplot)
+library(RColorBrewer)
+library(cartogram)
 ```
 
 # Introduction
 
-HERE YOU NEED TO GIVE MOTIVATION AND SOME LITERATURE REVIEW
+Maps that reveal fine local structure without losing broader context face a persistent challenge: zooming in hides regional patterns, while small-scale views suppress local detail. Traditional solutions—insets, multi-panel displays, aggressive generalization—break spatial continuity and increase cognitive load. What if we could smoothly magnify a metropolitan core *while keeping it embedded* in its state-level context?
 
-Interactive data graphics provides plots that allow users to interact them. One of the most basic types of interaction is through tooltips, where users are provided additional information about elements in the plot by moving the cursor over the plot.
+This package implements a Focus–Glue–Context (FGC) fisheye transformation that continuously warps geographic space: a chosen focus region magnifies, surrounding areas compress into a "glue" transition zone, and outer context remains stable. Unlike discrete zoom levels or disconnected insets, the transformation operates directly on vector geometry coordinates, preserving topology and enabling reproducible, pipeline-friendly cartography within R's sf and ggplot2 ecosystem.
 
-This paper will first review some R packages on interactive graphics and their tooltip implementations. A new package \CRANpkg{ToOoOlTiPs} that provides customized tooltips for plot, is introduced. Some example plots will then be given to showcase how these tooltips help users to better read the graphics. 
+The intellectual lineage of focus+context visualization traces back to @furnas1986's *degree-of-interest* function, which formalized how to prioritize salient regions while retaining global structure. @sarkar1992 and @sarkar1994 extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Subsequent innovations explored diverse lenses: hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. By 2008, @cockburn2008's comprehensive review synthesized two decades of research across overview+detail, zooming, and focus+context paradigms.
 
-# Background
+In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales—mathematical foundations still cited today. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. The crucial breakthrough came from @yamamoto2009 and @yamamoto2012: their **Focus+Glue+Context model** introduced an intermediate "glue" region that absorbs distortion, preventing the excessively warped roads and boundaries that plagued earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
 
-HERE YOU NEED TO DISCUSS SOME RELATED PACKAGES LIKE CARTOGRAMS and HEXAGON TILE MAPS
+Parallel developments in statistical graphics tackled the "crowding problem"—high-dimensional data collapsing into projection centers. @JMLR:v9:vandermaaten08a's t-SNE uses heavy-tailed distributions to spread points, while @mcinnes2020umapuniformmanifoldapproximation's UMAP leverages topological methods. Most relevant to our geometric approach: @laa2020 applies *radial transformations* to tour projections, maintaining the interpretability of linear methods while mitigating overplotting. Implemented in R's tourr package, it demonstrates how well-designed radial warps can reveal structure without the distortions of fully nonlinear embeddings.
 
-Some packages on interactive graphics include \CRANpkg{plotly} [@plotly] that interfaces with Javascript for web-based interactive graphics, \CRANpkg{crosstalk} [@crosstalk] that specializes cross-linking elements across individual graphics.  The recent R Journal paper \CRANpkg{tsibbletalk} [@RJ-2021-050] provides a good example of including interactive graphics into an article for the journal. It has both a set of linked plots, and also an animated gif example, illustrating linking between time series plots and feature summaries.
+Within R's spatial ecosystem, sf [@RJ-2018-009] provides robust vector handling and CRS transformations, while ggplot2 [@wickham2016] offers declarative visualization grammar. Yet a gap remained: existing tools addressed *related* distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
 
-# Focus-Glue-Context Transformation
+# Background: Alternative Approaches to the Detail-Context Problem
+
+Before diving into fisheye mechanics, it's worth understanding how R's spatial ecosystem currently handles the detail-versus-context tradeoff—and why those solutions, while valuable, leave room for continuous lens-based warping.
+
+**Cartograms: Thematic distortion.** The cartogram family [@gastner2004] intentionally distorts geographic areas to encode variables—population density reshapes regions so area becomes proportional to demographic weight. 
+
+```{r data-cart, include=FALSE}
+# Library
+# Load the population per states (source: https://www.census.gov/data/tables/2017/demo/popest/nation-total.html)
+pop <- read.table("https://raw.githubusercontent.com/holtzy/R-graph-gallery/master/DATA/pop_US.csv", sep = ",", header = T)
+pop$pop <- pop$pop / 1000000
+
+# merge both
+my_sf <- read_sf("https://andrew.carto.com/api/v2/sql?filename=us_states_hexgrid&q=select+*+from+andrew.us_states_hexgrid&format=geojson&bounds=&api_key=")
+my_sf <- my_sf %>%
+  mutate(google_name = gsub(" \\(United States\\)", "", google_name))
+my_sf <- my_sf %>% left_join(., pop, by = c("google_name" = "state"))
+
+# Compute the cartogram, using this population information
+# First we need to change the projection, we use Mercator (AKA Google Maps, EPSG 3857)
+my_sf_merc <- st_transform(my_sf, 3857)
+cartogram <- cartogram_cont(my_sf_merc, "pop")
+
+# Back to original projection
+cartogram <- st_transform(cartogram, st_crs(my_sf))
+```
+
+```{r plot-cart, echo=FALSE}
+ggplot(cartogram) +
+  geom_sf(aes(fill = pop), linewidth = 0.05, alpha = 0.9, color = "black") +
+  scale_fill_gradientn(
+    colours = brewer.pal(7, "BuPu"), name = "population (in M)",
+    labels = scales::label_comma(),
+    guide = guide_legend(
+      keyheight = unit(3, units = "mm"),
+      keywidth = unit(12, units = "mm"),
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  geom_sf_text(aes(label = iso3166_2), color = "white", size = 3, alpha = 0.8) +
+  theme_void() +
+  ggtitle("Another look on the US population") +
+  theme(
+    legend.position = c(0.5, 0.9),
+    legend.direction = "horizontal",
+    text = element_text(color = "#22211d"),
+    plot.background = element_rect(fill = "#f5f5f9", color = NA),
+    panel.background = element_rect(fill = "#f5f5f9", color = NA),
+    legend.background = element_rect(fill = "#f5f5f9", color = NA),
+    plot.title = element_text(size = 22, hjust = 0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+  )
+```
+
+This fundamentally differs from focus+context: cartograms *substitute* spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. A population cartogram makes California balloon while Wyoming shrinks, trading geographic fidelity for thematic insight. FGC fisheye, conversely, preserves relative positions and topology while magnifying a *chosen* spatial region, not a data-driven variable. The use cases diverge: cartograms answer "how does this variable dominate space?" while fisheye lenses answer "what local detail exists within this broader geography?"
+
+**Hexagon tile maps: Discrete abstraction.** Packages like `geogrid` and visualizations using `sf::st_make_grid()` replace irregular polygons with regular hexagonal or square tiles, each representing an administrative unit. 
+
+```{r data-geo-grid, include=FALSE}
+
+vic <- vic |> st_transform(3111)
+vic <- vic |> 
+ mutate(
+  LGA_ABBR = case_when(
+   LGA_NAME == "CARDINIA" ~ "CAR",
+   LGA_NAME == "NILLUMBIK" ~ "NIL",
+   LGA_NAME == "MITCHELL" ~ "MIT",
+   LGA_NAME == "HUME" ~ "HUM",
+   LGA_NAME == "MOIRA" ~ "MOI",
+   LGA_NAME == "MURRINDINDI" ~ "MUR",
+   LGA_NAME == "LODDON" ~ "LOD",
+   LGA_NAME == "GLEN EIRA" ~ "GE",
+   LGA_NAME == "GREATER SHEPPARTON" ~ "GS",
+   LGA_NAME == "GANNAWARRA" ~ "GAN",
+   LGA_NAME == "SURF COAST" ~ "SC",
+   LGA_NAME == "WHITTLESEA" ~ "WHS",
+   LGA_NAME == "MACEDON RANGES" ~ "MR",
+   LGA_NAME == "GREATER DANDENONG" ~ "GD",
+   LGA_NAME == "BAYSIDE" ~ "BAY",
+   LGA_NAME == "MANSFIELD" ~ "MAN",
+   LGA_NAME == "WEST WIMMERA" ~ "WW",
+   LGA_NAME == "MILDURA" ~ "MIL",
+   LGA_NAME == "HINDMARSH" ~ "HIN",
+   LGA_NAME == "GOLDEN PLAINS" ~ "GP",
+   LGA_NAME == "HORSHAM" ~ "HOR",
+   LGA_NAME == "PYRENEES" ~ "PYR",
+   LGA_NAME == "STRATHBOGIE" ~ "STR",
+   LGA_NAME == "HOBSONS BAY" ~ "HB",
+   LGA_NAME == "QUEENSCLIFFE" ~ "QUE",
+   LGA_NAME == "SWAN HILL" ~ "SH",
+   LGA_NAME == "MORNINGTON PENINSULA" ~ "MP",
+   LGA_NAME == "SOUTH GIPPSLAND" ~ "SG",
+   LGA_NAME == "SOUTHERN GRAMPIANS" ~ "SGR",
+   LGA_NAME == "GLENELG" ~ "GLE",
+   LGA_NAME == "CASEY" ~ "CAS",
+   LGA_NAME == "KNOX" ~ "KNO",
+   LGA_NAME == "NORTHERN GRAMPIANS" ~ "NG",
+   LGA_NAME == "MONASH" ~ "MON",
+   LGA_NAME == "BALLARAT" ~ "BAL",
+   LGA_NAME == "MOONEE VALLEY" ~ "MV",
+   LGA_NAME == "MERRI-BEK" ~ "MBK",
+   LGA_NAME == "GREATER BENDIGO" ~ "GB",
+   LGA_NAME == "CAMPASPE" ~ "CAM",
+   LGA_NAME == "WARRNAMBOOL" ~ "WAR",
+   LGA_NAME == "BASS COAST" ~ "BC",
+   LGA_NAME == "ALPINE" ~ "ALP",
+   LGA_NAME == "EAST GIPPSLAND" ~ "EG",
+   LGA_NAME == "YARRIAMBIACK" ~ "YAK",
+   LGA_NAME == "BULOKE" ~ "BUL",
+   LGA_NAME == "TOWONG" ~ "TOW",
+   LGA_NAME == "WODONGA" ~ "WOD",
+   LGA_NAME == "INDIGO" ~ "IND",
+   LGA_NAME == "HEPBURN" ~ "HEP",
+   LGA_NAME == "WYNDHAM" ~ "WYN",
+   LGA_NAME == "MOUNT ALEXANDER" ~ "MA",
+   LGA_NAME == "CENTRAL GOLDFIELDS" ~ "CG",
+   LGA_NAME == "WHITEHORSE" ~ "WH",
+   LGA_NAME == "KINGSTON" ~ "KIN",
+   LGA_NAME == "MARIBYRNONG" ~ "MAR",
+   LGA_NAME == "ARARAT" ~ "ARA",
+   LGA_NAME == "MOORABOOL" ~ "MOO",
+   LGA_NAME == "WELLINGTON" ~ "WEL",
+   LGA_NAME == "MAROONDAH" ~ "MARO",
+   LGA_NAME == "DAREBIN" ~ "DAR",
+   LGA_NAME == "MANNINGHAM" ~ "MANI",
+   LGA_NAME == "BRIMBANK" ~ "BRI",
+   LGA_NAME == "MELBOURNE" ~ "MEL",
+   LGA_NAME == "BOROONDARA" ~ "BOR",
+   LGA_NAME == "GREATER GEELONG" ~ "GEE",
+   LGA_NAME == "STONNINGTON" ~ "STO",
+   LGA_NAME == "BANYULE" ~ "BAN",
+   LGA_NAME == "LATROBE" ~ "LAT",
+   LGA_NAME == "YARRA" ~ "YAR",
+   LGA_NAME == "WANGARATTA" ~ "WAN",
+   LGA_NAME == "YARRA RANGES" ~ "YARAN",
+   LGA_NAME == "PORT PHILLIP" ~ "PP",
+   LGA_NAME == "MELTON" ~ "MELT",
+   LGA_NAME == "COLAC OTWAY" ~ "CO",
+   LGA_NAME == "CORANGAMITE" ~ "COR",
+   LGA_NAME == "MOYNE" ~ "MOY",
+   LGA_NAME == "FRANKSTON" ~ "FRA",
+   LGA_NAME == "BENALLA" ~ "BEN",
+   LGA_NAME == "BAW BAW" ~ "BB",
+   # Alpine resorts / unincorporated islands
+   grepl("ALPINE RESORT", LGA_NAME) ~ "AR",
+   grepl("ISLAND", LGA_NAME) ~ "ISL",
+   TRUE ~ NA_character_
+  ),
+  area_km2 = as.numeric(set_units(st_area(geometry), "km^2")))
+
+
+original_shapes <- vic |> st_transform(27700)
+new_cells_reg <- calculate_grid(shape = original_shapes, grid_type = "regular", seed = 3)
+resultreg <- assign_polygons(original_shapes, new_cells_reg)
+```
+
+```{r geo-grid-plot, echo=FALSE}
+ggplot(resultreg) +
+ geom_sf(aes(fill = area_km2)) +
+ geom_sf_label(aes(label = LGA_ABBR), size = 2) +
+ scale_fill_viridis_c() +
+ coord_sf() +
+ theme_map()
+```
+
+As seen in the plot above, tile maps *abstracts away* precise geography entirely, treating space as a topology-preserving tessellation where "neighbors touch" matters more than accurate boundaries. Tile maps excel at avoiding size bias (Mildura gets equal visual weight to Yarra) and creating aesthetic, clutter-free layouts. However, they abandon continuous spatial relationships: you cannot identify precise locations, measure distances, or overlay point data meaningfully. Hexbin aggregation for point data (via `ggplot2::geom_hex()`) serves a different purpose—density estimation—rather than focus+context navigation.
+
+**Multi-panel approaches: Spatial separation.** Tools like `cowplot::ggdraw()`[@cowplot] create side-by-side views: one panel shows overview, another shows zoomed detail.
+
+```{r data-cow-plot, include=FALSE}
+lga_inset <- vic[vic$LGA_NAME == "MELBOURNE", ]
+main_map <- ggplot() +
+ geom_sf(data = vic, fill = "lightgray", color = "white") +
+ geom_sf(data = lga_inset, fill = "red", color = "red") + # Highlight the inset area
+ theme_void() +
+ labs(title = "Victoria")
+inset_map <- ggplot() +
+ geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue") +
+ theme_void() +
+ labs(title = "Melbourne LGA")
+```
+
+```{r cow-plot-plot, echo=FALSE}
+final_map <- ggdraw() +
+ draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
+ draw_plot(inset_map, x = 0.7, y = 0.7, width = 0.25, height = 0.25) # Inset map position and size
+
+print(final_map)
+```
+
+These are effective for static reports but require viewers to mentally integrate separate views, and they don't preserve the *embedded* relationship between focus and context within a single continuous geography. Futhermore, if you introduce one or more elements into the plot like filling value equal to a variable, the audience will have a hard time identify the zoomed detail.
+
+**Why FGC fisheye offers something distinct.** None of these approaches provide *continuous geometric magnification within a single, topology-preserving map*. Cartograms distort for data, not user-chosen focus. Tile maps abstract away geography. Multi-panel tools spatially separate context. The fisheye lens keeps everything in one frame—roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases like: examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
+
+With this landscape established, we now turn to the technical implementation: how does the Focus–Glue–Context transformation actually work, and how does this package make it accessible within R's spatial workflows?
+
+# Focus–Glue–Context Transformation
 
 HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE PARTS. USE A SIMPLE EXAMPLE LIKE THE RECTANGLE OF DOTS TO EXPLAIN
 
@@ -73,43 +272,6 @@ HERE YOU EXPLAIN THE ALGORITHM AND INCLUDE SOME CODE FROM PACKAGE THAT DOES THE 
 
 ## Common choices
 
-\pkg{ToOoOlTiPs} is a packages for customizing tooltips in interactive graphics, it features these possibilities.
-
-
-The \CRANpkg{palmerpenguins} data [@palmerpenguins]  features three penguin species which has a lovely illustration by Alison Horst in Figure \@ref(fig:penguins-alison). 
-
-```{r penguins-alison, out.width = "100%", out.height = "30%", fig.cap = "Artwork by \\@allison\\_horst", fig.alt="A picture of three different penguins with their species: Chinstrap, Gentoo, and Adelie. "}
-knitr::include_graphics("figures/penguins.png")
-```
-
-Table `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\@ref(tab:penguins-tab-interactive)', '\\@ref(tab:penguins-tab-static)'))` prints at the first few rows of the `penguins` data:
-
-```{r penguins-tab-interactive, eval = knitr::is_html_output(), layout = "l-body-outset"}
-knitr::kable(head(penguins), format = "html", caption = "A basic table")
-```
-
-```{r penguins-tab-static, eval = knitr::is_latex_output()}
-knitr::kable(head(penguins), format = "latex", caption = "A basic table") %>% 
-  kableExtra::kable_styling(font_size = 7)
-```   
-
-Figure `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\@ref(fig:penguins-plotly)', '\\@ref(fig:penguins-ggplot)'))` shows an `r ifelse(knitr::is_html_output(), 'interactive', '')` plot of the penguins data, made using the `r knitr::asis_output(ifelse(knitr::is_html_output(), '\\CRANpkg{plotly}', '\\CRANpkg{ggplot2}'))` package. 
-
-```{r penguins-plotly, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive plot made with the plotly package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. When hovering on a point, a tooltip will show the exact value of the bill depth and length for that point, along with the species name.", include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.alt = "A scatterplot of bill length against bill depth, both measured in millimetre. The three species are shown in different colours and loosely forms three clusters. Adelie has small bill length and large bill depth, Gentoo has small bill depth but large bill length, and Chinstrap has relatively large bill depth and bill length."}
-p <- penguins %>% 
-  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
-ggplotly(p)
-```
-
-```{r penguins-ggplot, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic non-interactive plot made with the ggplot2 package on palmer penguin data. Three species of penguins are plotted with bill depth on the x-axis and bill length on the y-axis. Visit the online article to access the interactive version made with the plotly package.", include=knitr::is_latex_output(), eval=knitr::is_latex_output()}
-penguins %>% 
-  ggplot(aes(x = bill_depth_mm, y = bill_length_mm, 
-             color = species)) + 
-  geom_point()
-```
-
 # Examples of use
 
 SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map with hospital locations, map with transfers, map with convex hulls, map with two focal points, then maybe a raster map
@@ -118,4 +280,3 @@ SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map
 
 HERE YOU SUMMARISE WHAT THE PAPER CONTRIBUTED IN ONE PARAGRAPH AND SUGGEST NEW WORK THAT MIGHT BE DONE THAT YOU DIDN'T HAVE TIME TO DO
 
-We have displayed various tooltips that are available in the package \pkg{ToOoOlTiPs}. 
