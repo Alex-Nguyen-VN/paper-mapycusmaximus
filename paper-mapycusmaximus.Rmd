@@ -331,7 +331,9 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 
 ```{r fgc-zones, echo=FALSE, fig.cap="The three zones of an FGC transformation. Points inside the focus (red) expand radially; points in the glue (blue) compress toward the focus boundary; context points (gold) remain fixed."}
 
+grid <- create_test_grid()
 grid_df <- as_tibble(grid)
+transform <- fisheye_fgc(grid, cx = 0, cy = 0, r_in = 0.34, r_out = 0.5)
 transform_df <- as_tibble(transform) |>
   dplyr::mutate(
     zone = attr(transform, "zones"),
