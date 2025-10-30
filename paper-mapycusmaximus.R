@@ -12,6 +12,7 @@ library(ggthemes)
 library(cowplot)
 library(RColorBrewer)
 library(cartogram)
+library(patchwork)
 
 
 ## ----data-cart, include=FALSE--------------------
@@ -190,9 +191,7 @@ final_map <- ggdraw() +
 print(final_map)
 
 
-## ------------------------------------------------
-#| include: false
-#| eval: true
+## ----preparing-data, include=FALSE---------------
 
 plot_fisheye_fgc <- function(original_coords, transformed_coords, 
   cx = 0, cy = 0, r_in = 0.34, r_out = 0.5) {
@@ -253,7 +252,8 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 }
 
 
-## ----point-movement-plot, echo=FALSE-------------
+## ----fgc-zones, echo=FALSE, fig.cap="The three zones of an FGC transformation. Points inside the focus (red) expand radially; points in the glue (blue) compress toward the focus boundary; context points (gold) remain fixed."----
+
 grid_df <- as_tibble(grid)
 transform_df <- as_tibble(transform) |>
   dplyr::mutate(
@@ -298,7 +298,8 @@ ggplot() +
 
 
 
-## ------------------------------------------------
+## ----transformation-table, echo=FALSE------------
+# Table 1: Coordinate transformation across zones for selected points
 samples <- transform_df %>%
   group_by(zone) %>%
   slice_head(n = 3) %>% 
@@ -309,16 +310,206 @@ orig_samples <- grid_df %>%
   slice(idx)
 
 samples <- samples |>
-  cbind(orig_samples)
+  cbind(orig_samples) |>
+  select(x, y, x_new, y_new, zone, r_orig, r_new)
 
-samples <- samples |>
-  select(x_new, y_new, x, y, zone, r_orig, r_new)
+samples |>
+  knitr::kable(
+    caption = "Coordinate transformation across fisheye zones for selected points on a regular grid",
+    digits = 3
+  )
+
+
+## ----preparing-hosp-data-------------------------
+hosp_point <- conn_fish |>
+  st_drop_geometry() |>
+  select(destination, long_hosp, lat_hosp) |>
+  distinct() |>
+  st_as_sf(coords = c("long_hosp", "lat_hosp"), crs = 4326) |>
+  st_transform(crs = st_crs(vic))
+
+racf_point <- conn_fish |>
+  st_drop_geometry() |>
+  select(source, long_racf, lat_racf) |>
+  distinct() |>
+  st_as_sf(coords = c("long_racf", "lat_racf"), crs = 4326) |>
+  st_transform(crs = st_crs(vic))
+
+
+## ----hospitals-basic-plot------------------------
+# Standard plot
+plot_hosp <- ggplot(vic) + 
+  geom_sf(fill = "grey90") +
+  geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
+  ggtitle("Standard: Melbourne hospitals") +
+  theme_map()
+plot_racf <- ggplot(vic) + 
+  geom_sf(fill = "grey90") +
+  geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
+  ggtitle("Standard: Melbourne RACFs") +
+  theme_map()
+
+plot_hosp + plot_racf
+
+
+## ----connection-plot-----------------------------
+
+ggplot(vic_fish) +
+  geom_sf(fill = "grey90") +
+  geom_sf(data = conn_fish, color = "black", size = 0.3, aes(alpha = weight)) +
+  ggtitle("Melbourne hospitals and RACFs connection") +
+  theme_map()
+
+
+## ----fisheye-preparation-------------------------
+melbourne <- vic_fish |> filter(LGA_NAME == "MELBOURNE")
+hosp_point2 <- hosp_point %>%
+  mutate(type = "hospital") %>%
+  rename(id = destination)
+
+racf_point2 <- racf_point %>%
+  mutate(type = "racf") %>%
+  rename(id = source)
+
+all_points <- bind_rows(hosp_point2, racf_point2)
+
+all_points <- sf_fisheye(all_points, center = melbourne, zoom = 20, squeeze = 0.3, method = "expand")
+scale_radii <- 1 - (((st_bbox(vic)["xmax"] - st_bbox(vic)["xmin"])  - (st_bbox(all_points)["xmax"] - st_bbox(all_points)["xmin"])) / (st_bbox(vic)["xmax"] - st_bbox(vic)["xmin"]))
+vic_fisheye  <- sf_fisheye(vic, center = melbourne, r_in = 0.35 * scale_radii, r_out = 0.5 * scale_radii, zoom = 20, squeeze = 0.3, method = "expand")
+
+
+## ----fisheye-plot--------------------------------
+ggplot(vic_fisheye) +
+  geom_sf(data = filter(vic_fisheye, LGA_NAME != "MELBOURNE"), fill = "grey", linewidth = 0.5) +
+  geom_sf(data = filter(vic_fisheye, LGA_NAME == "MELBOURNE"), fill = "white", linewidth = 0.5) +
+  geom_sf_label(data = melbourne, aes(label = LGA_NAME), size = 2, alpha = 0.2) +
+  geom_sf(data = all_points, aes(color = type), size = 0.3, alpha = 0.5) +
+  scale_color_manual(
+  name = "Facility type",
+  values = c("hospital" = "red", "racf" = "blue"),
+  labels = c("Hospital", "RACF")) +
+  ggtitle("Melbourne hospitals and RACFs connection") +
+  theme_map()
 
 
 ## ------------------------------------------------
-samples |>
-  knitr::kable(
-    caption = "Comparison of coordinate",
-    digits = 3
+map<-sf::read_sf('https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg')
+
+# Create classes
+clean<-map%>%
+  mutate(clss=case_when(
+    value<18~"1",
+    value<20~"2",
+    value<22~"3",
+    value<24~"4",
+    value<26~"5",
+    TRUE~"6"
+  ))
+
+# Set color palette
+pal <- c("#bb3e03","#ee9b00","#e9d8a6","#94d2bd","#0a9396","#005f73")
+# Set color background
+bck <- "#001219"
+
+# Set theme 
+theme_custom <- theme_void()+
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5, color = "#ffffffff"),
+    plot.margin = margin(1,1,10,1,"pt"),
+    plot.background = element_rect(fill=bck,color=NA),
+    legend.position = "bottom",
+    legend.title = element_text(hjust=0.5,color="white",face="bold"),
+    legend.text = element_text(color="white")
   )
+
+# Make grid
+grd<-st_make_grid(
+    clean, # map name 
+    n = c(60,60) # number of cells per longitude/latitude
+  )%>%
+  # convert back to sf object
+  st_sf()%>%
+  # add a unique id to each cell 
+  # (will be useful later to get back centroids data)
+  mutate(id=row_number())
+  
+# Extract centroids
+cent<-grd%>%
+  st_centroid()
+
+# Intersect centroids with basemap
+cent_clean<-cent%>%
+  st_intersection(clean)
+
+# Make a centroid without geom
+# (convert from sf object to tibble)
+cent_no_geom <- cent_clean%>%
+  st_drop_geometry()
+
+# Join with grid thanks to id column
+grd_clean<-grd%>%
+  #filter(id%in%sel)%>%
+  left_join(cent_no_geom)
+
+grd_clean_fish <- sf_fisheye(grd_clean)
+cent_clean_fish <- sf_fisheye(cent_clean)
+
+
+
+## ------------------------------------------------
+plot_frc_1 <- ggplot() +
+  geom_sf(
+    grd_clean %>% drop_na(),
+    mapping = aes(geometry = geometry, fill = clss)
+  ) +
+  geom_sf(
+    cent_clean,
+    mapping = aes(geometry = geometry),
+    fill = NA, pch = 21, size = 0.5
+  ) +
+  labs(title = "Before fisheye",
+    fill="Percentage of population \nis a member of a sport association") +
+  scale_fill_manual(
+    values = pal,
+    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
+  ) +
+  guides(
+    fill = guide_legend(
+      nrow = 1,
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  theme_custom
+
+
+plot_frc_2 <- ggplot() +
+  geom_sf(
+    grd_clean_fish %>% drop_na(),
+    mapping = aes(geometry = geometry, fill = clss)
+  ) +
+  geom_sf(
+    cent_clean_fish,
+    mapping = aes(geometry = geometry),
+    fill = NA, pch = 21, size = 0.5
+  ) +
+  guides(
+    fill = guide_legend(
+      nrow = 1,
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  labs(title = "After fisheye",
+    fill="Percentage of population \nis a member of a sport association") +
+
+  scale_fill_manual(
+    values = pal,
+    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
+  ) +
+  theme_custom
+
+
+## ------------------------------------------------
+plot_frc_1 + plot_frc_2
 

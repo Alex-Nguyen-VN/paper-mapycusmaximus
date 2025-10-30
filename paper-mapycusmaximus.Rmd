@@ -53,6 +53,7 @@ library(ggthemes)
 library(cowplot)
 library(RColorBrewer)
 library(cartogram)
+library(patchwork)
 ```
 
 # Introduction
@@ -267,9 +268,7 @@ With this landscape established, we now turn to the technical implementation: ho
 
 # Focus–Glue–Context Transformation
 
-```{r}
-#| include: false
-#| eval: true
+```{r preparing-data, include=FALSE}
 
 plot_fisheye_fgc <- function(original_coords, transformed_coords, 
   cx = 0, cy = 0, r_in = 0.34, r_out = 0.5) {
@@ -330,7 +329,8 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 }
 ```
 
-```{r point-movement-plot, echo=FALSE}
+```{r fgc-zones, echo=FALSE, fig.cap="The three zones of an FGC transformation. Points inside the focus (red) expand radially; points in the glue (blue) compress toward the focus boundary; context points (gold) remain fixed."}
+
 grid_df <- as_tibble(grid)
 transform_df <- as_tibble(transform) |>
   dplyr::mutate(
@@ -382,8 +382,7 @@ coordinates intact, thereby preserving bearings and relative direction.
 
 ## Algorithm
 
-Let \((r, \theta)\) denote the polar form of \(P\) relative to \(C\). The transform defines a new
-radius \(r'\) via a piecewise function:
+Let $(r, \theta)$ denote the polar form of point $P = (x, y)$ relative to center $C = (c_x, c_y)$. The transformation defines a new radius $r'$ via a piecewise function:
 
 \[
  r' = 
@@ -423,94 +422,42 @@ parameters interactively to obtain the desired amount of magnification and compr
 transform behaves smoothly across the domain.
 
 ## Implementation
-### Coordinate workflows
 
-Spatial datasets vary widely in their coordinate reference systems (CRS), spatial extent, feature types, and attribute schemas. `mapycusmaximus` therefore follows a disciplined staged workflow: each geometric step is explicit, auditable, and invariant to input type (`sf` data frame vs `sfc` vector). Attribute columns are preserved whenever present.
+Spatial datasets vary widely in CRS, extent, feature types, and schemas. mapycusmaximus follows a disciplined staged workflow where each step is explicit, auditable, and invariant to input type. The architecture separates numeric mapping, spatial orchestration, and geometry reconstruction, allowing the core transform to remain small and testable while sf-specific concerns are isolated in thin wrappers.
 
-The preflight step sanitises input. Empty geometries are dropped; `sf::st_zm()` enforces 2D to avoid silent recycling in planar math. If a user supplies a centre, the package validates its form (numeric pair; `sf`/`sfc` geometry; or normalised pair) and records CRS for later alignment. Numeric centres without CRS are interpreted conservatively: assumed planar if not in lon–lat form; `sf`/`sfc` centres without CRS error explicitly.
+### Workflow and CRS handling
 
-Next, a working projected CRS is chosen. If `target_crs` is supplied, it is used directly. Otherwise:
+The pipeline proceeds: **sanitize input** → **select working CRS** → **normalize** → **warp** → **denormalize** → **restore original CRS**. Empty geometries are dropped and `sf::st_zm()` enforces 2D coordinates.
 
-\[
-\text{CRS}_{wrk} =
-\begin{cases}
-\text{UTM}(\text{centroid}(G)), & \text{if input is geographic} \\
-\text{EPSG:7855}, & \text{if layer lies in Victoria} \\
-\text{CRS}_{orig}, & \text{otherwise}
-\end{cases}
-\]
+The package automatically selects a projected working CRS when operating on geographic data: GDA2020/MGA Zone 55 (EPSG:7855) for Victoria, otherwise UTM inferred from the centroid. This ensures distances are measured in metres and parameters behave consistently. The original CRS is restored on return.
 
-Operating in metres ensures fisheye parameters have interpretable units. The original CRS is restored upon completion.
+A bounding box defines normalization. With `preserve_aspect = TRUE`, uniform scale $s = \max(s_x, s_y)$ is applied; otherwise axes scale independently. Center resolution occurs before normalization and implements precedence rules via `.resolve_center()`: sf/sfc geometries are reduced to a centroid and transformed to working CRS; numeric pairs with `center_crs` are transformed; numeric pairs without CRS use a lon/lat heuristic; `normalized_center = TRUE` interprets pairs in $[-1, 1]$ relative to bbox midpoint. If no center is given, the bbox midpoint serves as default.
 
-A bounding box defines normalisation. Let half-spans be \(s_x, s_y\) and midpoint \((x_0,y_0)\). With `preserve_aspect = TRUE`:
+### Core transformation
 
-\[
-(x,y) \mapsto \left( \frac{x - x_0}{s}, \frac{y - y_0}{s} \right), \qquad s = \max(s_x, s_y)
-\]
+At the heart of the package is `fisheye_fgc()`, a vectorized function mapping an $n \times 2$ coordinate matrix to a new $n \times 2$ matrix via the FGC rule. Its contract is minimal: numeric arrays and scalar parameters defining center, radii, magnification, compression, method, and revolution. Internally it converts to polar form, applies the piecewise radial map with smooth boundary conditions, optionally perturbs angle via bell-shaped rotation, and converts back to Cartesian. It attaches diagnostic attributes (zone labels, original and new radii) consumed by plotting utilities but not affecting geometry reconstruction.
 
-Otherwise axes scale independently: \((s_x, s_y)\). Degenerate spans use unit scale to avoid division by zero.
+Numeric stability at zone boundaries is ensured by clamping expansions in the focus so radii do not exceed $r_{in}$, and using smooth power curves in the glue so derivatives match across boundaries. The radial mapping is vectorized and runs in linear time in the number of vertices.
 
-Centre resolution occurs before normalisation because both numeric and geometry-supplied centres must be expressed in the working CRS. The internal helper `.resolve_center()` implements precedence and conversion rules: if `center` is an `sf`/`sfc` object, it is combined and reduced to a centroid when necessary, transformed to the working CRS, and converted to a numeric pair; if it is numeric with a declared `center_crs`, a trivial `st_transform()` is applied; if it is numeric without a CRS, a lon/lat heuristic is used; if `normalized_center = TRUE`, the pair is interpreted in \([-1, 1]\) relative to the bbox midpoint with either uniform or per-axis scaling in accordance with `preserve_aspect`. If no centre is given, the bbox midpoint serves as a sensible
-default that is stable under reprojection.
+### Geometry reconstruction
 
-After computing warped coordinates in unit space, `sf_fisheye()` delegates geometry rebuilding to an iterator `st_transform_custom()`. This function acts as a *drop-in analogue to `sf::st_transform()`* but applies an arbitrary user-supplied coordinate function instead of a CRS projection.
+Orchestration is handled by `sf_fisheye()`, which presents the user-facing interface while keeping the numeric core untouched. It validates input, selects working CRS, resolves center, constructs normalization closures, and invokes `st_transform_custom()` to rebuild geometries.
 
-The return path proceeds as follows:
+The geometry walker `st_transform_custom()` acts as a drop-in analogue to `sf::st_transform()` but applies an arbitrary coordinate function. For each feature, it extracts coordinates via `sf::st_coordinates()`, yielding a matrix with columns $(x, y, L1, L2, \dots)$ where L1 and L2 index polygon rings and multi-polygon parts. Geometries are split by type:
 
-**Extract raw coordinates** using `sf::st_coordinates()`, yielding a matrix with columns
-   [
-   (x, y, L1, L2, \dots)
-   ]
-   where `L1` and `L2` index polygon ring and multi-polygon part membership respectively.
+* **POINT**: direct warp
+* **LINESTRING**: warp each vertex, retain order  
+* **POLYGON**: process each ring (identified by L1) independently
+* **MULTIPOLYGON**: nested by (L1, L2) combinations
 
-**Split by geometry structure**
+After transformation, polygon rings are explicitly closed by forcing first and last vertices to equality: $(x_1', y_1') = (x_n', y_n')$. This prevents numerical drift when the warp changes ring curvature. Geometries are rebuilt using sf constructors (`st_point()`, `st_linestring()`, `st_polygon()`, `st_multipolygon()`), combined into an sfc with original CRS, and spliced back into an sf if appropriate. Attributes are preserved because only the geometry column is replaced.
 
-   * `POINT`: 1×2 row → direct warp
-   * `LINESTRING`: matrix of vertices → warp each row, retain order
-   * `POLYGON`: each ring identified by `L1` → process each ring independently
-   * `MULTIPOLYGON`: nested by `(L1, L2)` combinations
+Error handling is per-geometry: failures emit a warning, return an empty geometry of the correct type, and continue processing others. This makes the transform robust in batch pipelines without aborting map production on single malformed features.
 
-**Apply fisheye map to each vertex**
-   Because the warp is purely coordinate-wise (no topology inference), the original vertex ordering is preserved.
+Table 1 illustrates coordinate transformations across zones for a vertical transect, showing radial expansion in the focus, smooth compression in the glue, and identity mapping in the context.
 
-**Re-close polygon rings**
-   The first and last vertices of each ring are forced to equality post-warp to prevent numerical drift:
-   [
-   (x_1', y_1') = (x_n', y_n')
-   ]
-   This avoids sliver creation when the fisheye changes ring curvature.
-
-**Reassemble into an `sfc`** with:
-
-   * original geometry type
-   * original CRS restored
-   * original feature order and attributes untouched
-
-**Graceful error handling**
-   If a geometry fails to warp (e.g., corrupt ring orientation or invalid coordinate array), the function:
-
-   * emits a warning identifying the offending feature
-   * returns an *empty* geometry of the correct type
-   * continues processing others
-
-This makes the transform robust in large batch pipelines and avoids aborting map production on a single malformed feature.
-
-After transformation, the geometry column is reassembled into an `sfc` with the working CRS and then, if necessary, transformed back to the original CRS. Attributes are preserved by design for `sf` inputs because only the geometry column is replaced; row order and feature identity remain unchanged. This round trip affords a convenient invariant for testing—coordinates expressed in the original CRS match inputs in the context zone to within floating-point tolerance and for user mental models—plots accept the same code as before, simply rendering warped shapes.
-
-Two elements of robustness deserve emphasis. First, numeric stability at zone boundaries is addressed in `fisheye_fgc()` by clamping expansions in the focus so that radii do not exceed \(r_{\text{in}}\), and by using a smooth power curve in the glue so that derivatives match across boundaries. Second, per geometry error handling in `st_transform_custom()` prevents a single malformed feature from aborting the entire warp: failures yield an empty geometry of the appropriate family with a warning,
-allowing batch processing to continue while signalling the need for data repair.
-
-Performance concerns guided the choice to operate on plain matrices wherever possible and to minimise object churn. Coordinate extraction and reconstruction are the main overhead for large polygonal layers; the radial mapping itself is vectorised and runs in linear time in the number of vertices.
-
-For multi-layer maps, the same parameter set (centre, radii, zoom, squeeze, method, revolution) should be applied consistently to each layer to maintain spatial alignment; the pipeline ensures that doing so yields coincident warps provided the same working CRS and normalisation regime are used. In practice, analysts often capture the parameter set in a list and pass it to `sf_fisheye()` for each layer, simplifying reproducible workflows and parameter sweeps.
-
-### Software architecture
-
-The software architecture reflects a clear separation of responsibilities between numeric mapping, spatial orchestration, geometry reconstruction, and user-facing utilities. This separation allows the core transform to remain small, testable, and language-agnostic, while \pkg{sf}-specific concerns are isolated in thin wrappers. The following narrative describes the principal modules and their interactions, with attention to extension points and design trade-offs.
-
-At the heart of the package is `fisheye_fgc()`, a self-contained, vectorised function that maps an \(n\times 2\) matrix of planar coordinates to a new \(n\times 2\) matrix via the Focus-Glue-Context rule. Its contract is intentionally minimal: it accepts only numeric arrays and scalar parameters that define the centre, radii, magnification, compression, method, and revolution. 
-
-```{r}
+```{r transformation-table, echo=FALSE}
+# Table 1: Coordinate transformation across zones for selected points
 samples <- transform_df %>%
   group_by(zone) %>%
   slice_head(n = 3) %>% 
@@ -521,48 +468,27 @@ orig_samples <- grid_df %>%
   slice(idx)
 
 samples <- samples |>
-  cbind(orig_samples)
-
-samples <- samples |>
+  cbind(orig_samples) |>
   select(x, y, x_new, y_new, zone, r_orig, r_new)
-```
 
-```{r}
 samples |>
   knitr::kable(
-    caption = "Comparison of coordinate",
+    caption = "Coordinate transformation across fisheye zones for selected points on a regular grid",
     digits = 3
   )
 ```
 
-Internally it computes displacements from the centre, converts to polar form, applies a piecewise radial map with smooth boundary conditions, optionally perturbs the angle by a bell-shaped rotation in the glue, and then converts back to Cartesian coordinates. To support diagnostics, it attaches attributes to the returned matrix: the zone label for each point and the original and new radii. These attributes are consumed by plotting utilities and tests but do not affect downstream geometry reconstruction.
+### Design and extensibility
 
-The orchestration of CRS, normalisation, and geometry replacement is handled by `sf_fisheye()`. Its purpose is to present a single, idiomatic R interface for spatial analysts while keeping the numeric core untouched. The function performs: (i) input validation and sanitation; (ii) automatic or user-specified working CRS selection; (iii) centre resolution via the internal helper `.resolve_center()`, which encapsulates precedence rules and CRS conversion; (iv) definition of normalisation and denormalisation closures (uniform or per-axis); (v) construction of a small wrapper that applies normalise-warp-denormalise to any \(x,y\) matrix; and (vi) invocation of a
-geometry walker to apply that wrapper to every feature. The top-level class of the input is preserved, and the original CRS is restored on return. By design, `sf_fisheye()` never reaches into the internals of the numeric mapping; this keeps the transform portable and facilitates future experimentation with alternative warps.
+Utilities in `utils.R` provide `create_test_grid()` for diagnostics, `classify_zones()` for labeling, and `plot_fisheye_fgc()` for visualization. Dataset documentation in `data.R` accompanies example layers (vic, vic_fish, conn_fish) used in tests.
 
-Geometry walking is implemented in `st_transform_custom()` (module `sf_related.R`). The
-function accepts either an `sf` or `sfc` object plus a user-supplied coordinate transform
-`transform_fun`. For each feature, it inspects the geometry type and extracts coordinates via `sf::st_coordinates()`. POLYGON and MULTIPOLYGON types are split by ring and part indices (columns `L1`, `L2`) so that each ring is transformed independently. After transformation, the helper enforces explicit ring closure by setting the last vertex equal to the first, which is necessary because not all warps are vertex-preserving and because some upstream datasets omit the closing vertex convention. The output geometries are rebuilt using constructors from \pkg{sf} (`st_point()`, `st_linestring()`, `st_polygon()`, `st_multipolygon()`), combined into an `sfc` with the original CRS, and spliced back into an `sf` if appropriate. Error handling is per-geometry: failures raise a warning and yield an empty geometry of the same family, thus preserving list structure and indices while signalling problems to the user.
+The modular architecture enables straightforward extensions. Alternate radial profiles swap `fisheye_fgc()` while retaining the pipeline; additional geometry types extend `st_transform_custom()`; raster integration would follow a similar compute-map-resample pattern. Because modules communicate through simple contracts (matrices in, matrices out), evolutions can be undertaken incrementally and verified through the existing test scaffolding.
 
-Utilities live in `utils.R`. `create_test_grid()` generates dense regular grids for
-diagnostics and performance testing; `classify_zones()` labels points according to the FGC
-partition; and `plot_fisheye_fgc()` provides a side-by-side visualisation that mirrors the
-attributes attached by `fisheye_fgc()`. These helpers are deliberately simple and free of
-side-effects so that users can copy or modify them in downstream projects without incurring hidden dependencies. Dataset documentation in `data.R` accompanies example layers (`vic`, `vic_fish`, `conn_fish`) used in the article and tests.
+For multi-layer maps, apply the same parameter set (center, radii, zoom, squeeze, method, revolution) to each layer to maintain spatial alignment. The pipeline ensures coincident warps provided the same working CRS and normalization are used. In practice, analysts capture parameters in a list and pass to `sf_fisheye()` for each layer, simplifying reproducible workflows.
 
-Two internal design choices warrant discussion. First, the centre-resolution helper
-`.resolve_center()` concentrates all logic for interpreting `center` in different forms and CRS. Centralising this logic avoids subtle discrepancies that would otherwise arise if different call paths attempted to “do the right thing” in isolation. Second, normalisation occurs in closures that are constructed once per call to `sf_fisheye()`, avoiding repeated conditionals inside the hot loop of coordinate mapping and keeping the path to `fisheye_fgc()` as short as possible. Both choices contribute to clarity and performance without sacrificing flexibility.
+The test suite mirrors the modular structure, covering boundary behaviour, zone labeling, CRS round-trips, ring closure, and performance. Functions follow tidyverse conventions: verb names (`sf_fisheye()`, `plot_fisheye_fgc()`), snake_case parameters, small exported surface. Stability is guaranteed for `fisheye_fgc()`, `sf_fisheye()`, `st_transform_custom()`, and documented utilities.
 
-The test suite (`tests/testthat/`) mirrors the modular structure. Unit tests for
-`fisheye_fgc()` cover boundary behaviour (exactly on \(r_{\text{in}}\), \(r_{\text{out}}\)), zone labelling consistency, and the monotonicity of the radial map. Tests for `sf_fisheye()` verify CRS round-trips, centre precedence and conversion, and the invariants associated with aspect preservation. Geometry-walker tests assert that polygon rings are re-closed, that multi-part objects retain part counts, and that attribute columns in `sf` frames are untouched. Performance tests use synthetic grids and the packaged datasets to detect regressions in both runtime and memory allocation. Where appropriate, tests exercise error paths to confirm that warnings are issued and
-structure is preserved.
-
-From an API-design perspective, naming and argument defaults follow tidyverse conventions while prioritising explicitness. Functions are named with verbs (`sf_fisheye()`, `plot_fisheye_fgc()`) or descriptive nouns (`create_test_grid()`); parameters use snake_case and align across functions so that mental models transfer. Backward compatibility is maintained for users who prefer `cx, cy` centres; however, the `center` interface is encouraged because it supports normalized and CRS-aware specifications. The exported surface is intentionally small; the package does not expose low-level ring iterators or CRS heuristics to avoid freezing internals that may evolve. Instead, stability is guaranteed for `fisheye_fgc()`, `sf_fisheye()`, `st_transform_custom()`, and the three utilities documented in the API table.
-
-Finally, the architecture leaves room for extension without breaking existing code. Alternate radial profiles or anisotropic warps can be prototyped by swapping `fisheye_fgc()` in the wrapper while retaining the rest of the pipeline. Additional geometry types (e.g., CURVE, GEOMETRYCOLLECTION) can be supported by extending `st_transform_custom()` with corresponding extraction and rebuild logic. Integration with raster frameworks (e.g., \pkg{stars}) would follow a similar pattern: compute grid coordinates, apply the mapping, and resample values as needed. Because the modules are loosely coupled and communicate through simple contracts (matrices in, matrices out), such evolutions can be
-undertaken incrementally and verified through the existing test scaffolding.
-
-### Parameters
+## Parameters
 
 The principal user interface is `sf_fisheye()`, which accepts an `sf` or `sfc` object
 and returns an object of the same top-level class whose geometry has been warped in a projection-
@@ -636,7 +562,7 @@ coordinate matrix with attributes `"zones"`, `"original_radius"`, and `"new_radi
 these can be used to plot scale curves and verify parameter effects prior to applying the transform
 to complex geometries.
 
-### Common choices
+## Common choices
 
 Although the parameter space is continuous, certain regimes recur in practice and can serve as
 reliable starting points. We describe these regimes and articulate the trade-offs that motivate each
@@ -706,7 +632,213 @@ projections.
 
 # Examples of use
 
-SHOW THE WAYS THAT IT CAN BE USED FOR THE VICTORIAN AMBULANCE DATA: Just the map with hospital locations, map with transfers, map with convex hulls, map with two focal points, then maybe a raster map
+We demonstrate mapycusmaximus on Victorian ambulance dispatch data, progressively building complexity to show how the fisheye transformation reveals patterns invisible in standard plots.
+
+## Hospital locations within state context
+
+```{r preparing-hosp-data}
+hosp_point <- conn_fish |>
+  st_drop_geometry() |>
+  select(destination, long_hosp, lat_hosp) |>
+  distinct() |>
+  st_as_sf(coords = c("long_hosp", "lat_hosp"), crs = 4326) |>
+  st_transform(crs = st_crs(vic))
+
+racf_point <- conn_fish |>
+  st_drop_geometry() |>
+  select(source, long_racf, lat_racf) |>
+  distinct() |>
+  st_as_sf(coords = c("long_racf", "lat_racf"), crs = 4326) |>
+  st_transform(crs = st_crs(vic))
+```
+
+```{r hospitals-basic-plot}
+# Standard plot
+plot_hosp <- ggplot(vic) + 
+  geom_sf(fill = "grey90") +
+  geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
+  ggtitle("Standard: Melbourne hospitals") +
+  theme_map()
+plot_racf <- ggplot(vic) + 
+  geom_sf(fill = "grey90") +
+  geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
+  ggtitle("Standard: Melbourne RACFs") +
+  theme_map()
+
+plot_hosp + plot_racf
+```
+
+First, we can see that in normal approach, we can plot the location of each hospital and each Residential Aged Care Facilities (RACFs) in Melbourne. The map is a bit cluttered, and it is hard to see the relationship between hospitals and RACFs. However, we can still make some sense that the number of RACFs is quite overwhelming comparing to the number of hospitals. The clustering in the metropolitan area of Melbourne is overwhelming and if we put the two plot overlapping each other, then most of the hospitals and RACFs are not visible anymore. 
+
+```{r connection-plot}
+
+ggplot(vic_fish) +
+  geom_sf(fill = "grey90") +
+  geom_sf(data = conn_fish, color = "black", size = 0.3, aes(alpha = weight)) +
+  ggtitle("Melbourne hospitals and RACFs connection") +
+  theme_map()
+```
+
+We can go one step futher and displaying the connection or transportation between hospital and RACFs as linestring on the map, with the weight of the line representing the number of ambulance dispatches. The transparency of the line is also proportional to the weight. As we can see know, the central area of Melbourne now complete lost and we can no longer see the spacial structure underneath anymore. 
+
+```{r fisheye-preparation}
+melbourne <- vic_fish |> filter(LGA_NAME == "MELBOURNE")
+hosp_point2 <- hosp_point %>%
+  mutate(type = "hospital") %>%
+  rename(id = destination)
+
+racf_point2 <- racf_point %>%
+  mutate(type = "racf") %>%
+  rename(id = source)
+
+all_points <- bind_rows(hosp_point2, racf_point2)
+
+all_points <- sf_fisheye(all_points, center = melbourne, zoom = 20, squeeze = 0.3, method = "expand")
+scale_radii <- 1 - (((st_bbox(vic)["xmax"] - st_bbox(vic)["xmin"])  - (st_bbox(all_points)["xmax"] - st_bbox(all_points)["xmin"])) / (st_bbox(vic)["xmax"] - st_bbox(vic)["xmin"]))
+vic_fisheye  <- sf_fisheye(vic, center = melbourne, r_in = 0.35 * scale_radii, r_out = 0.5 * scale_radii, zoom = 20, squeeze = 0.3, method = "expand")
+```
+
+```{r fisheye-plot}
+ggplot(vic_fisheye) +
+  geom_sf(data = filter(vic_fisheye, LGA_NAME != "MELBOURNE"), fill = "grey", linewidth = 0.5) +
+  geom_sf(data = filter(vic_fisheye, LGA_NAME == "MELBOURNE"), fill = "white", linewidth = 0.5) +
+  geom_sf_label(data = melbourne, aes(label = LGA_NAME), size = 2, alpha = 0.2) +
+  geom_sf(data = all_points, aes(color = type), size = 0.3, alpha = 0.5) +
+  scale_color_manual(
+  name = "Facility type",
+  values = c("hospital" = "red", "racf" = "blue"),
+  labels = c("Hospital", "RACF")) +
+  ggtitle("Melbourne hospitals and RACFs connection") +
+  theme_map()
+```
+
+At zoom level at 20, we can directly zoom in and display the Melbourne region to show the number of hospital and RACFs in that LGA, but still reserving the map and the area around with the VIC map to show the spacial structure. Futhermore, since this is just still one `sf` object, multiple calculation that apply to a global context still can be procedd and will not be effected by the fisheye zoom effect.
+
+## France example
+
+```{r}
+map<-sf::read_sf('https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg')
+
+# Create classes
+clean<-map%>%
+  mutate(clss=case_when(
+    value<18~"1",
+    value<20~"2",
+    value<22~"3",
+    value<24~"4",
+    value<26~"5",
+    TRUE~"6"
+  ))
+
+# Set color palette
+pal <- c("#bb3e03","#ee9b00","#e9d8a6","#94d2bd","#0a9396","#005f73")
+# Set color background
+bck <- "#001219"
+
+# Set theme 
+theme_custom <- theme_void()+
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5, color = "#ffffffff"),
+    plot.margin = margin(1,1,10,1,"pt"),
+    plot.background = element_rect(fill=bck,color=NA),
+    legend.position = "bottom",
+    legend.title = element_text(hjust=0.5,color="white",face="bold"),
+    legend.text = element_text(color="white")
+  )
+
+# Make grid
+grd<-st_make_grid(
+    clean, # map name 
+    n = c(60,60) # number of cells per longitude/latitude
+  )%>%
+  # convert back to sf object
+  st_sf()%>%
+  # add a unique id to each cell 
+  # (will be useful later to get back centroids data)
+  mutate(id=row_number())
+  
+# Extract centroids
+cent<-grd%>%
+  st_centroid()
+
+# Intersect centroids with basemap
+cent_clean<-cent%>%
+  st_intersection(clean)
+
+# Make a centroid without geom
+# (convert from sf object to tibble)
+cent_no_geom <- cent_clean%>%
+  st_drop_geometry()
+
+# Join with grid thanks to id column
+grd_clean<-grd%>%
+  #filter(id%in%sel)%>%
+  left_join(cent_no_geom)
+
+grd_clean_fish <- sf_fisheye(grd_clean)
+cent_clean_fish <- sf_fisheye(cent_clean)
+
+```
+
+```{r}
+plot_frc_1 <- ggplot() +
+  geom_sf(
+    grd_clean %>% drop_na(),
+    mapping = aes(geometry = geometry, fill = clss)
+  ) +
+  geom_sf(
+    cent_clean,
+    mapping = aes(geometry = geometry),
+    fill = NA, pch = 21, size = 0.5
+  ) +
+  labs(title = "Before fisheye",
+    fill="Percentage of population \nis a member of a sport association") +
+  scale_fill_manual(
+    values = pal,
+    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
+  ) +
+  guides(
+    fill = guide_legend(
+      nrow = 1,
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  theme_custom
+
+
+plot_frc_2 <- ggplot() +
+  geom_sf(
+    grd_clean_fish %>% drop_na(),
+    mapping = aes(geometry = geometry, fill = clss)
+  ) +
+  geom_sf(
+    cent_clean_fish,
+    mapping = aes(geometry = geometry),
+    fill = NA, pch = 21, size = 0.5
+  ) +
+  guides(
+    fill = guide_legend(
+      nrow = 1,
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  labs(title = "After fisheye",
+    fill="Percentage of population \nis a member of a sport association") +
+
+  scale_fill_manual(
+    values = pal,
+    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
+  ) +
+  theme_custom
+```
+
+```{r}
+plot_frc_1 + plot_frc_2
+```
+
+
 
 # Discussion
 
