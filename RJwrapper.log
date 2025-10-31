@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  30 OCT 2025 17:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  31 OCT 2025 12:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -611,18 +611,19 @@ Package: longtable 2024-04-26 v4.20 Multi-page Table package (DPC)
 )
 \cslhangindent=\skip75
 \csllabelwidth=\skip76
+\cslentryspacingunit=\skip77
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count336
 \calc@Bcount=\count337
 \calc@Adimen=\dimen302
 \calc@Bdimen=\dimen303
-\calc@Askip=\skip77
-\calc@Bskip=\skip78
+\calc@Askip=\skip78
+\calc@Bskip=\skip79
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
 \calc@Ccount=\count338
-\calc@Cskip=\skip79
+\calc@Cskip=\skip80
 ) (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count339
@@ -630,24 +631,24 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 ) (./RJwrapper.aux)
 \openout1 = `RJwrapper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 54.
-LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 48.
+LaTeX Font Info:    ... okay on input line 48.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -690,21 +691,21 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \microtypecontext on input line 54.
-Package microtype Info: Applying patch `item' on input line 54.
-Package microtype Info: Applying patch `toc' on input line 54.
-Package microtype Info: Applying patch `eqnum' on input line 54.
+LaTeX Info: Redefining \microtypecontext on input line 48.
+Package microtype Info: Applying patch `item' on input line 48.
+Package microtype Info: Applying patch `toc' on input line 48.
+Package microtype Info: Applying patch `eqnum' on input line 48.
 
-Package microtype Warning: Unable to apply patch `footnote' on input line 54.
+Package microtype Warning: Unable to apply patch `footnote' on input line 48.
 
-Package microtype Info: Applying patch `verbatim' on input line 54.
+Package microtype Info: Applying patch `verbatim' on input line 48.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 54.
+LaTeX Info: Redefining \showhyphens on input line 48.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -713,8 +714,8 @@ File: mt-ppl.cfg 2005/11/16 v1.6 microtype config. file: Palatino (RS)
 ) (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/upquote/upquote.sty
 Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verbatim
 )
-Package backref Info: ** backref set up for natbib ** on input line 54.
-Package hyperref Info: Link coloring ON on input line 54.
+Package backref Info: ** backref set up for natbib ** on input line 48.
+Package hyperref Info: Link coloring ON on input line 48.
 (./RJwrapper.out) (./RJwrapper.out)
 \@outlinefile=\write5
 \openout5 = `RJwrapper.out'.
@@ -730,74 +731,79 @@ Package caption Info: End \AtBeginDocument code.
 [1{c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 ]
-<paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf, id=112, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf, id=113, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf  used on input line 33.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf  used on input line 35.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 33--34
+Overfull \hbox (86.41528pt too wide) in paragraph at lines 35--36
 [][] 
  []
 
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 37.
+
+
+[2 <./paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf>]
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 39.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.20004pt on input line 37.
+(Font)              scaled to size 10.20004pt on input line 39.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-<paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf, id=113, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf, id=132, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf  used on input line 39.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf  used on input line 41.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 39--40
+Overfull \hbox (86.41528pt too wide) in paragraph at lines 41--42
 [][] 
  []
 
-
-
-[2{c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc} <./paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf, id=134, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf, id=135, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf  used on input line 45.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf  used on input line 47.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 45--46
+Overfull \hbox (86.41528pt too wide) in paragraph at lines 47--48
 [][] 
  []
 
 
 
-[3 <./paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf> <./paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf, id=151, 469.755pt x 325.215pt>
+[3{c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc} <./paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf>]
+<paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf, id=148, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf  used on input line 57.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf  used on input line 60.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 61.
+
+Overfull \hbox (71.41528pt too wide) in paragraph at lines 60--61
+ [][] 
+ []
+
+LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 )
-LaTeX Font Info:    Trying to load font information for OML+zplm on input line 61.
+LaTeX Font Info:    Trying to load font information for OML+zplm on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/omlzplm.fd
 File: omlzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OML/zplm.
 )
-LaTeX Font Info:    Trying to load font information for OMS+zplm on input line 61.
+LaTeX Font Info:    Trying to load font information for OMS+zplm on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/omszplm.fd
 File: omszplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMS/zplm.
 )
-LaTeX Font Info:    Trying to load font information for OMX+zplm on input line 61.
+LaTeX Font Info:    Trying to load font information for OMX+zplm on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/omxzplm.fd
 File: omxzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMX/zplm.
 )
-LaTeX Font Info:    Trying to load font information for OT1+zplm on input line 61.
+LaTeX Font Info:    Trying to load font information for OT1+zplm on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/ot1zplm.fd
 File: ot1zplm.fd 2002/09/08 Fontinst v1.914 font definitions for OT1/zplm.
 )
@@ -806,115 +812,130 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 61.
+(Font)              scaled to size 10.42007pt on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 61.
+(Font)              scaled to size 7.91925pt on input line 64.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 61.
+(Font)              scaled to size 6.25204pt on input line 64.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 61.
+(Font)              scaled to size 10.42007pt on input line 64.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 61.
+(Font)              scaled to size 7.91925pt on input line 64.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 61.
+(Font)              scaled to size 6.25204pt on input line 64.
 
 
-[4 <./paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>]
+[4 <./paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>]
+
+[5 <./paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 113.
+            Default family used instead on input line 118.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (RS)
 )
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 113.
+            Default family used instead on input line 118.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 113.
+            Default family used instead on input line 118.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 113.
+            Default family used instead on input line 118.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 113.
+            Default family used instead on input line 118.
 
 
-[5]
-Underfull \hbox (badness 4024) in paragraph at lines 129--130
+[6]
+Underfull \hbox (badness 4024) in paragraph at lines 136--137
 []\T1/ppl/m/n/10 (+20) The ge-om-e-try walker \T1/zi4/m/n/10 st_transform_custom() \T1/ppl/m/n/10 (+20) acts as a drop-in ana-logue to
  []
 
 
-Underfull \hbox (badness 1314) in paragraph at lines 129--130
+Underfull \hbox (badness 1314) in paragraph at lines 136--137
 \T1/ppl/m/n/10 (+20) it ex-tracts co-or-di-nates via \T1/zi4/m/n/10 sf::st_coordinates()\T1/ppl/m/n/10 (+20) , yield-ing a ma-trix with columns
  []
 
-LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 134.
+LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 141.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/ts1ppl.fd
 File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 136--138
+Underfull \hbox (badness 10000) in paragraph at lines 143--145
 
  []
 
 
-
-[6]
 
 [7]
 
 [8]
 
 [9]
-<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=195, 469.755pt x 325.215pt>
+
+[10]
+<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=211, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf  used on input line 336.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf  used on input line 348.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf, id=196, 469.755pt x 325.215pt>
+
+Overfull \hbox (71.41528pt too wide) in paragraph at lines 348--349
+[] 
+ []
+
+<paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf, id=212, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf  used on input line 340.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf  used on input line 352.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 340--341
+Overfull \hbox (86.41528pt too wide) in paragraph at lines 352--353
 [][] 
  []
 
 
 
-[10 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf> <./paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=332, 469.755pt x 325.215pt>
+[11 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>]
+<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=223, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf  used on input line 344.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf  used on input line 356.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 344--345
+Overfull \hbox (86.41528pt too wide) in paragraph at lines 356--357
 [][] 
  []
 
-<paper-mapycusmaximus_files/figure-latex/unnamed-chunk-3-1.pdf, id=333, 469.755pt x 325.215pt>
-File: paper-mapycusmaximus_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
-<use paper-mapycusmaximus_files/figure-latex/unnamed-chunk-3-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/unnamed-chunk-3-1.pdf  used on input line 350.
+
+
+[12 <./paper-mapycusmaximus_files/figure-latex/connection-plot-1.pdf> <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
+<paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf, id=365, 469.755pt x 325.215pt>
+File: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf Graphic file (type pdf)
+<use paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf>
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf  used on input line 363.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
+Overfull \hbox (71.41528pt too wide) in paragraph at lines 363--364
+[] 
+ []
 
-[11 <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>] (./RJwrapper.bbl (./RJwrapper.brf)
+
+
+[13 <./paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf>] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
 \openout6 = `RJwrapper.brf'.
 
 
 
-[12 <./paper-mapycusmaximus_files/figure-latex/unnamed-chunk-3-1.pdf>]
+[14]
 Underfull \hbox (badness 1490) in paragraph at lines 67--67
 \T1/ppl/m/it/10 (+20) The R Jour-nal\T1/ppl/m/n/10 (+20) , 10:439--446, 2018.  ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
  []
@@ -922,15 +943,13 @@ Underfull \hbox (badness 1490) in paragraph at lines 67--67
 )
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 366.
+(Font)              using `T1/zi4/m/n' instead on input line 388.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 366.
+(Font)              scaled to size 10.20004pt on input line 388.
 )
 
-[13]
-
-[14] (./RJwrapper.aux)
+[15] (./RJwrapper.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-09-10>
@@ -944,18 +963,18 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: FF97C8BDEFF10718057B2DD11BA80609;880.
  ) 
 Here is how much of TeX's memory you used:
- 27133 strings out of 475478
- 499519 string characters out of 5773761
- 894109 words of memory out of 5000000
+ 27152 strings out of 475478
+ 499890 string characters out of 5773761
+ 894048 words of memory out of 5000000
  48955 multiletter control sequences out of 15000+600000
- 602225 words of font info for 283 fonts, out of 8000000 for 9000
+ 602310 words of font info for 285 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 117i,12n,131p,1194b,766s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,12n,131p,1194b,757s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (14 pages, 1140377 bytes).
+Output written on RJwrapper.pdf (15 pages, 1144339 bytes).
 PDF statistics:
- 465 PDF objects out of 1000 (max. 8388607)
- 408 compressed objects within 5 object streams
- 49 named destinations out of 1000 (max. 500000)
+ 486 PDF objects out of 1000 (max. 8388607)
+ 428 compressed objects within 5 object streams
+ 65 named destinations out of 1000 (max. 500000)
  56469 words of extra memory for PDF output out of 61914 (max. 10000000)
 

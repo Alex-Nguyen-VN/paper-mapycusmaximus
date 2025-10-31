@@ -84,9 +84,9 @@ pop$pop <- pop$pop / 1000000
 
 # merge both
 my_sf <- read_sf("https://andrew.carto.com/api/v2/sql?filename=us_states_hexgrid&q=select+*+from+andrew.us_states_hexgrid&format=geojson&bounds=&api_key=")
-my_sf <- my_sf %>%
+my_sf <- my_sf |>
   mutate(google_name = gsub(" \\(United States\\)", "", google_name))
-my_sf <- my_sf %>% left_join(., pop, by = c("google_name" = "state"))
+my_sf <- my_sf |> left_join(pop, by = c("google_name" = "state"))
 
 # Compute the cartogram, using this population information
 # First we need to change the projection, we use Mercator (AKA Google Maps, EPSG 3857)
@@ -460,13 +460,13 @@ Table 1 illustrates coordinate transformations across zones for a vertical trans
 
 ```{r transformation-table, echo=FALSE}
 # Table 1: Coordinate transformation across zones for selected points
-samples <- transform_df %>%
-  group_by(zone) %>%
-  slice_head(n = 3) %>% 
+samples <- transform_df |>
+  group_by(zone) |>
+  slice_head(n = 3) |> 
   ungroup()
 idx <- as.numeric(rownames(samples))
 
-orig_samples <- grid_df %>%
+orig_samples <- grid_df |>
   slice(idx)
 
 samples <- samples |>
@@ -634,7 +634,7 @@ projections.
 
 # Examples of use
 
-We demonstrate mapycusmaximus on Victorian ambulance dispatch data, progressively building complexity to show how the fisheye transformation reveals patterns invisible in standard plots.
+We present two applied scenarios to illustrate how the FGC fisheye clarifies local structure while retaining geographic context. The first uses Victorian hospital-RACF connections to demonstrate overplotting relief and alignment across multiple layers. The second reproduces a gridded choropleth over France to show how the transform improves legibility around dense urban cores while preserving national context.
 
 ## Hospital locations within state context
 
@@ -670,7 +670,7 @@ plot_racf <- ggplot(vic) +
 plot_hosp + plot_racf
 ```
 
-First, we can see that in normal approach, we can plot the location of each hospital and each Residential Aged Care Facilities (RACFs) in Melbourne. The map is a bit cluttered, and it is hard to see the relationship between hospitals and RACFs. However, we can still make some sense that the number of RACFs is quite overwhelming comparing to the number of hospitals. The clustering in the metropolitan area of Melbourne is overwhelming and if we put the two plot overlapping each other, then most of the hospitals and RACFs are not visible anymore. 
+Standard maps of hospital and RACF locations quickly become cluttered in metropolitan Melbourne. Points occlude one another, and the relationship between facilities is difficult to assess. The simple pair of small-scale views indicates relative counts (many RACFs, fewer hospitals) but masks local proximity patterns and neighbourhood coverage.
 
 ```{r connection-plot}
 
@@ -681,16 +681,16 @@ ggplot(vic_fish) +
   theme_map()
 ```
 
-We can go one step futher and displaying the connection or transportation between hospital and RACFs as linestring on the map, with the weight of the line representing the number of ambulance dispatches. The transparency of the line is also proportional to the weight. As we can see know, the central area of Melbourne now complete lost and we can no longer see the spacial structure underneath anymore. 
+Adding connections between RACFs and hospitals as weighted lines exacerbates overplotting: central corridors saturate, and the underlying administrative boundaries and urban fabric are no longer discernible. This is a typical failure mode for network overlays on dense urban cores at statewide scale.
 
 ```{r fisheye-preparation}
 melbourne <- vic_fish |> filter(LGA_NAME == "MELBOURNE")
-hosp_point2 <- hosp_point %>%
-  mutate(type = "hospital") %>%
+hosp_point2 <- hosp_point |>
+  mutate(type = "hospital") |>
   rename(id = destination)
 
-racf_point2 <- racf_point %>%
-  mutate(type = "racf") %>%
+racf_point2 <- racf_point |>
+  mutate(type = "racf") |>
   rename(id = source)
 
 all_points <- bind_rows(hosp_point2, racf_point2)
@@ -714,15 +714,15 @@ ggplot(vic_fisheye) +
   theme_map()
 ```
 
-At zoom level at 20, we can directly zoom in and display the Melbourne region to show the number of hospital and RACFs in that LGA, but still reserving the map and the area around with the VIC map to show the spacial structure. Futhermore, since this is just still one `sf` object, multiple calculation that apply to a global context still can be procedd and will not be effected by the fisheye zoom effect.
+Applying the fisheye to both features (points) and boundaries with a common centre (the MELBOURNE polygon) and shared parameters (`zoom = 20`, `squeeze = 0.3`, method = "expand") yields a single, continuous map in which the Melbourne LGA is magnified while the rest of Victoria remains readable. Because all layers undergo the same warp, overlays remain aligned. The result improves visual separation of facilities and reveals local hub structures without resorting to insets. All computations on attributes remain valid—the geometry is warped for display, but feature identity, CRS metadata, and table structure are preserved. As with any lens, distances and areas inside the focus and glue are not metric and should not be used for quantitative spatial inference.
 
 ## France example
 
-```{r}
+```{r france-preparation}
 map<-sf::read_sf('https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg')
 
 # Create classes
-clean<-map%>%
+clean <- map |>
   mutate(clss=case_when(
     value<18~"1",
     value<20~"2",
@@ -749,43 +749,46 @@ theme_custom <- theme_void()+
   )
 
 # Make grid
-grd<-st_make_grid(
+grd <- st_make_grid(
     clean, # map name 
     n = c(60,60) # number of cells per longitude/latitude
-  )%>%
+  )|>
   # convert back to sf object
-  st_sf()%>%
+  st_sf()|>
   # add a unique id to each cell 
   # (will be useful later to get back centroids data)
   mutate(id=row_number())
   
 # Extract centroids
-cent<-grd%>%
+cent<-grd|>
   st_centroid()
 
 # Intersect centroids with basemap
-cent_clean<-cent%>%
+cent_clean<-cent|>
   st_intersection(clean)
 
 # Make a centroid without geom
 # (convert from sf object to tibble)
-cent_no_geom <- cent_clean%>%
+cent_no_geom <- cent_clean|>
   st_drop_geometry()
 
 # Join with grid thanks to id column
-grd_clean<-grd%>%
-  #filter(id%in%sel)%>%
+grd_clean<-grd|>
+  #filter(id%in%sel)|>
   left_join(cent_no_geom)
+
+grd_clean <- grd_clean |> rename("geometry" = "st_make_grid.clean..n...c.60..60..")
+cent_clean <- cent_clean |> rename("geometry" = "st_make_grid.clean..n...c.60..60..")
 
 grd_clean_fish <- sf_fisheye(grd_clean)
 cent_clean_fish <- sf_fisheye(cent_clean)
 
 ```
 
-```{r}
+```{r france-plots}
 plot_frc_1 <- ggplot() +
   geom_sf(
-    grd_clean %>% drop_na(),
+    grd_clean |> drop_na(),
     mapping = aes(geometry = geometry, fill = clss)
   ) +
   geom_sf(
@@ -811,7 +814,7 @@ plot_frc_1 <- ggplot() +
 
 plot_frc_2 <- ggplot() +
   geom_sf(
-    grd_clean_fish %>% drop_na(),
+    grd_clean_fish |> drop_na(),
     mapping = aes(geometry = geometry, fill = clss)
   ) +
   geom_sf(
@@ -836,13 +839,19 @@ plot_frc_2 <- ggplot() +
   theme_custom
 ```
 
-```{r}
+```{r france-comparison}
 plot_frc_1 + plot_frc_2
 ```
 
-
+In the France example, the gridded choropleth is transformed with the same fisheye, yielding enhanced detail in the selected metropolitan region while preserving national context and class boundaries. Classification and legend semantics are unchanged because attributes are not altered; only the geometry is warped. The paired before/after view illustrates how the lens aids interpretation near dense urban centres without fragmenting the map or sacrificing continuity.
 
 # Discussion
 
-HERE YOU SUMMARISE WHAT THE PAPER CONTRIBUTED IN ONE PARAGRAPH AND SUGGEST NEW WORK THAT MIGHT BE DONE THAT YOU DIDN'T HAVE TIME TO DO
+**Contribution** mapycusmaximus provides an sf‑native implementation of the Focus–Glue–Context fisheye that is projection‑aware, parameterised in normalised units, and safe across points, lines, and polygons. The package separates radial mapping from geometry orchestration, exposes explicit controls over focus, glue, and context, and preserves attributes and CRS invariants for reproducible pipelines with ggplot2.
+
+**Relation to alternatives**.** Unlike cartograms (thematic distortion), hex/regular tile maps (discrete abstraction), or inset/multi‑panel layouts (spatial separation), the FGC lens delivers continuous magnification within a single map while preserving topology and bearings. This reduces cognitive load for readers who must relate local phenomena to their broader geography.
+
+**Limitations** The fisheye introduces non‑metric distortion in the focus and glue; therefore, use it for visual exploration and communication, not for metric analysis. Aggressive `zoom` or `squeeze` can impair legibility near the glue boundary; conservative defaults and `revolution = 0` are recommended for publication maps. Consistent parameter sets should be applied across layers to maintain alignment; when comparing multiple regions, prefer `normalized_center = TRUE` with fixed radii to ensure visual comparability. At present, exact matching of focus and glue radii across separately transformed layers may require a manual scaling step (as in the example’s `scale_radii` computed from the difference in `st_bbox` widths between the reference layer `vic` and the transformed `all_points`), followed by multiplying `r_in` and `r_out` by this factor; this workflow is correct but brittle and easy to misapply.
+
+**Future work** Planned extensions include anisotropic or elliptical profiles, multi‑focus blending, first‑class raster support via warped grids and resampling, and interactive focus selection for exploratory analysis. We also plan an API for shared normalisation and radius locking across layers (e.g., a `reference_bbox`/`match_to` argument or a parameter object returned by a `sf_fisheye_params()` helper) so that multiple layers can be warped with identical scale without computing ad‑hoc `scale_radii`. Performance improvements via vectorised geometry walkers or GPU acceleration would benefit dense polygonal datasets. Clear figure captions and scale disclaimers remain essential to communicate the presence and intent of distortion.
 
