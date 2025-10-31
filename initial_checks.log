@@ -1,0 +1,10 @@
+Initial check results: 
+
+SUCCESS: Submission has consistently named tex, bib, and R files
+ERROR: There are nested subdirectories. Please use at most two directory levels for the article.
+NOTE: Remove .log, .aux and .out files before submitting.
+SUCCESS: No problematic file found
+SUCCESS: Possible motivation letter found: motivation-letter, motivation-letter.pdf
+SUCCESS: Article title formatted in title case.
+ERROR: Section Background: Alternative Approaches to the Detail-Context Problem, Focus--Glue--Context Transformation is not in sentence case!
+SUCCESS: Abstract formatted in plain text.

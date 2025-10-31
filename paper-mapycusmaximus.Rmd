@@ -70,7 +70,7 @@ Parallel developments in statistical graphics tackled the "crowding problem"—h
 
 Within R's spatial ecosystem, sf [@RJ-2018-009] provides robust vector handling and CRS transformations, while ggplot2 [@wickham2016] offers declarative visualization grammar. Yet a gap remained: existing tools addressed *related* distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
 
-# Background: Alternative Approaches to the Detail-Context Problem
+# Alternative approaches to the detail-context problem
 
 Before examining the mechanics of fisheye transformations, it is important to review how R’s spatial ecosystem currently addresses the detail-versus-context tradeoff. This context clarifies why existing solutions, though valuable, do not fully address the need for continuous lens-based warping.
 
@@ -264,9 +264,9 @@ These are effective for static reports but require viewers to mentally integrate
 
 **Why FGC fisheye offers something distinct.** None of these approaches provide *continuous geometric magnification within a single, topology-preserving map*. Cartograms distort for data, not user-chosen focus. Tile maps abstract away geography. Multi-panel tools spatially separate context. The fisheye lens keeps everything in one frame—roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases like: examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
 
-With this landscape established, we now turn to the technical implementation: how does the Focus–Glue–Context transformation actually work, and how does this package make it accessible within R's spatial workflows?
+With this landscape established, we now turn to the technical implementation: how does the FGC transformation actually work, and how does this package make it accessible within R's spatial workflows?
 
-# Focus–Glue–Context Transformation
+# FGC Transformation
 
 ```{r preparing-data, include=FALSE}
 
@@ -847,7 +847,7 @@ In the France example, the gridded choropleth is transformed with the same fishe
 
 # Discussion
 
-**Contribution** mapycusmaximus provides an sf‑native implementation of the Focus–Glue–Context fisheye that is projection‑aware, parameterised in normalised units, and safe across points, lines, and polygons. The package separates radial mapping from geometry orchestration, exposes explicit controls over focus, glue, and context, and preserves attributes and CRS invariants for reproducible pipelines with ggplot2.
+**Contribution** mapycusmaximus provides an sf‑native implementation of the FGC fisheye that is projection‑aware, parameterised in normalised units, and safe across points, lines, and polygons. The package separates radial mapping from geometry orchestration, exposes explicit controls over focus, glue, and context, and preserves attributes and CRS invariants for reproducible pipelines with ggplot2.
 
 **Relation to alternatives**.** Unlike cartograms (thematic distortion), hex/regular tile maps (discrete abstraction), or inset/multi‑panel layouts (spatial separation), the FGC lens delivers continuous magnification within a single map while preserving topology and bearings. This reduces cognitive load for readers who must relate local phenomena to their broader geography.
 
