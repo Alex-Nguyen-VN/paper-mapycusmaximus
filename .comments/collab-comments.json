@@ -1,3 +1,441 @@
 {
-  "comments": []
+  "comments": [
+    {
+      "id": "1761994199049",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:49:59.049Z",
+      "text": "Is there a twist?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 4,
+          "character": 471
+        },
+        "end": {
+          "line": 4,
+          "character": 493
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994357546",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:52:37.546Z",
+      "text": "Is there a reference for this?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 60,
+          "character": 272
+        },
+        "end": {
+          "line": 60,
+          "character": 295
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994452476",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:54:12.476Z",
+      "text": "This isn't really 'in contrast to' - these packages do that also. Possibly can be dropped, or reworded into another sentence.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 62,
+          "character": 418
+        },
+        "end": {
+          "line": 62,
+          "character": 513
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994506361",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:55:06.361Z",
+      "text": "How was this done? What sort of method is it?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 64,
+          "character": 94
+        },
+        "end": {
+          "line": 64,
+          "character": 108
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994589347",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:56:29.347Z",
+      "text": "If you say this you need examples of it.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 66,
+          "character": 192
+        },
+        "end": {
+          "line": 66,
+          "character": 209
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994636019",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:57:16.019Z",
+      "text": "Is it crucial? This sounds very grand. Try another way to word this in my opinion.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 66,
+          "character": 353
+        },
+        "end": {
+          "line": 66,
+          "character": 360
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761994687272",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T10:58:07.272Z",
+      "text": "I think this can be deleted - it's pretty outside the field we are thinking about.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 68,
+          "character": 0
+        },
+        "end": {
+          "line": 68,
+          "character": 649
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995105714",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:05:05.714Z",
+      "text": "Does it? I don't remember seeing this in the package.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 414,
+          "character": 4
+        },
+        "end": {
+          "line": 414,
+          "character": 44
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995132798",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:05:32.798Z",
+      "text": "Consider removing this paragraph as I don't think it adds much to the story",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 419,
+          "character": 0
+        },
+        "end": {
+          "line": 423,
+          "character": 45
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995361848",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:09:21.848Z",
+      "text": "can be deleted",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 456,
+          "character": 0
+        },
+        "end": {
+          "line": 456,
+          "character": 247
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995460494",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:11:00.494Z",
+      "text": "Surely this is just taking the CRS from the SF object to start with? If so don't call it out explicitly, just say you take the default",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 433,
+          "character": 93
+        },
+        "end": {
+          "line": 433,
+          "character": 137
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995504336",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:11:44.336Z",
+      "text": "I've read this 5 or 6 times and I still don't understand what it means. Break it down way more slowly, and you may need a diagram to help.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 435,
+          "character": 0
+        },
+        "end": {
+          "line": 435,
+          "character": 37
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995594735",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:13:14.735Z",
+      "text": "This is a bit too high level - tell me how to access these. You can include code and it's output (and you should!) that highlight this.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 439,
+          "character": 369
+        },
+        "end": {
+          "line": 439,
+          "character": 514
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995621360",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:13:41.360Z",
+      "text": "How sure of this are you?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 441,
+          "character": 244
+        },
+        "end": {
+          "line": 441,
+          "character": 280
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995674133",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:14:34.133Z",
+      "text": "Orchestration definitely not the right word. This is the single-function solution right? So call it something like \"An all-in-one function, sf_fisheye(), is provided which performs...\"",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 445,
+          "character": 0
+        },
+        "end": {
+          "line": 445,
+          "character": 13
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995780641",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:16:20.641Z",
+      "text": "Need to use proper cross-referencing",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 458,
+          "character": 0
+        },
+        "end": {
+          "line": 458,
+          "character": 7
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995803226",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:16:43.226Z",
+      "text": "Should show an output of these sorts of things",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 484,
+          "character": 31
+        },
+        "end": {
+          "line": 484,
+          "character": 248
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995837610",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:17:17.610Z",
+      "text": "Don't think this is needed",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 486,
+          "character": 0
+        },
+        "end": {
+          "line": 486,
+          "character": 444
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995871181",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:17:51.181Z",
+      "text": "We actually have a known issue with this so just be careful. You should say something about needing care about bounding boxes etc",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 488,
+          "character": 147
+        },
+        "end": {
+          "line": 488,
+          "character": 242
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761995927419",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:18:47.419Z",
+      "text": "I don't agree. This is not a criticism but it just opens you up to someone saying \"sf is not a verb\". Just remove it. And stability is never guaranteed.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 490,
+          "character": 137
+        },
+        "end": {
+          "line": 490,
+          "character": 176
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761996011015",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:20:11.015Z",
+      "text": "Same comment as before",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 507,
+          "character": 17
+        },
+        "end": {
+          "line": 507,
+          "character": 87
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761996044084",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:20:44.084Z",
+      "text": "This is a brand new package so to be honest let's just delete the cx cy and not confuse people with 2 things",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 519,
+          "character": 13
+        },
+        "end": {
+          "line": 519,
+          "character": 58
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1761996158225",
+      "author": "Michael Lydeamore",
+      "timestamp": "2025-11-01T11:22:38.225Z",
+      "text": "Can probably go I think",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 558,
+          "character": 0
+        },
+        "end": {
+          "line": 568,
+          "character": 72
+        }
+      },
+      "replies": [],
+      "resolved": false
+    }
+  ]
 }
