@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  31 OCT 2025 12:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  31 OCT 2025 12:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -958,20 +958,20 @@ L3 programming layer <2024-09-10>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
-(rerunfilecheck)             Checksum: 53381FB8E9AB5C653411F63238215288;2264.
+(rerunfilecheck)             Checksum: 7E31B374662DF9659685DBD7A1A99F91;2183.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: FF97C8BDEFF10718057B2DD11BA80609;880.
  ) 
 Here is how much of TeX's memory you used:
- 27152 strings out of 475478
- 499890 string characters out of 5773761
- 894048 words of memory out of 5000000
+ 27149 strings out of 475478
+ 499840 string characters out of 5773761
+ 894031 words of memory out of 5000000
  48955 multiletter control sequences out of 15000+600000
- 602310 words of font info for 285 fonts, out of 8000000 for 9000
+ 602151 words of font info for 283 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
  117i,12n,131p,1194b,757s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (15 pages, 1144339 bytes).
+Output written on RJwrapper.pdf (15 pages, 1144232 bytes).
 PDF statistics:
  486 PDF objects out of 1000 (max. 8388607)
  428 compressed objects within 5 object streams
