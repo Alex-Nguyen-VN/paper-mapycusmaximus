@@ -166,7 +166,7 @@ If the layer is already in a projected CRS, that CRS is used. If it is geographi
 
 }
 
-\caption{Diagram of the normalization step}\label{fig:norm-diagram-pdf}
+\caption{Diagram of the normalization step}\label{fig:norm-diagram-gg}
 \end{figure}
 
 A bounding box defines the normalizing scale. With \texttt{preserve\_aspect\ =\ TRUE}, a uniform scale \(s = \max(s_x, s_y)\) is applied; otherwise axes scale independently. Center resolution happens before normalization: \texttt{sf}/\texttt{sfc} centres reduce to a centroid then transform to the working CRS; numeric pairs with \texttt{center\_crs} are transformed; numeric pairs without CRS are interpreted heuristically; with \texttt{normalized\_center\ =\ TRUE}, pairs live in \([-1, 1]\) relative to the bbox midpoint. If no center is given, the bbox midpoint is used.
@@ -297,13 +297,9 @@ that downstream computation operates on a strict \(n\times 2\) coordinate matrix
 \texttt{target\_crs} sets the working projected CRS; if provided, the input is transformed via
 \texttt{sf::st\_transform()} and the original CRS is restored on return. When \texttt{target\_crs\ =\ NULL}
 and the input is geographic (lon/lat), a projected working CRS is chosen deterministically from the
-layer's centroid: for Victoria, Australia, GDA2020 / MGA Zone 55 (EPSG:7855) is used; otherwise a
-UTM zone is inferred by longitude and hemisphere. This choice ensures the fisheye operates in metric
-units with bounded distortion across the extent of interest. The \texttt{preserve\_aspect} flag governs
-normalisation: with \texttt{TRUE} (default) a uniform scale \(s = \max(s_x, s_y)\) is applied, where
-\(s_x, s_y\) are bbox half-spans; with \texttt{FALSE}, independent scales are used per axis. Uniform
-scaling preserves circular symmetry of the focus and glue; per-axis scaling yields an elliptical
-interpretation that can be useful for long, narrow extents but should be used deliberately. Degenerate
+layer's centroid: the default value is GDA2020 /; otherwise a
+UTM zone is inferred by longitude and hemisphere. This choice ensures the fisheye operates in metric units with bounded distortion across the extent of interest. The \texttt{preserve\_aspect} flag governs normalisation: with \texttt{TRUE} (default) a uniform scale \(s = \max(s_x, s_y)\) is applied, where
+\(s_x, s_y\) are bbox half-spans; with \texttt{FALSE}, independent scales are used per axis. Uniform scaling preserves circular symmetry of the focus and glue; per-axis scaling yields an ellipticalinterpretation that can be useful for long, narrow extents but should be used deliberately. Degenerate
 cases (\(s_x = 0\) or \(s_y = 0\)) are handled by substituting a unit scale to avoid division by zero.
 
 \textbf{Centre selection.} The lens centre may be specified in several forms. The preferred interface
@@ -368,8 +364,12 @@ enabled, translate radii to semi-axes using the bbox half-spans.
 \textbf{Balanced metropolitan focus within a state.} A common narrative emphasises a city region while
 retaining a recognisable state outline. Choose \(r_{\text{in}}\) to enclose the urban footprint (often
 \(0.30\text{--}0.35\)) and \(r_{\text{out}}\) to provide a broad glue buffer
-(\(0.55\text{--}0.70\)). A \texttt{zoom\_factor} of \(1.5\text{--}2.0\) provides visible enlargement
-without overwhelming the transition. Pair this with \texttt{squeeze\_factor\ =\ 0.25\textbackslash{}text\{-\/-}0.40\}, which
+(\(0.55\text{--}0.70\)). A \texttt{zoom\_factor} of \(5\text{--}10\) provides visible enlargement
+without overwhelming the transition.
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf}}
+
+Pair this with A \texttt{squeeze\_factor} of \(0.3\text{--}0.5\), which
 gently compresses surroundings while maintaining smoothness. The \texttt{"expand"} method yields a
 balanced appearance in which the mid-glue region visibly bridges detail and context. If preserving the
 outer coastline or boundary is paramount (e.g., for policy maps where the edge must remain stable),
@@ -386,26 +386,33 @@ diagnostic from \texttt{fisheye\_fgc()} to confirm that the derivative remains n
 
 \textbf{Polygon-dominated maps and choropleths.} For administrative regions, land-use parcels, or other
 polygon-dense layers, slightly stronger compression in the glue is tolerable because viewers rely on
-silhouette and adjacency rather than precise edge angles. Settings such as \texttt{\{squeeze\_factor\ =\ 0.25\textbackslash{}text\{\ -\ \}0.40\}} with \texttt{zoom\_factor\ =\ 1.6\textbackslash{}text\{\ -\ \}2.2\}} and either \texttt{"expand"} or
-\texttt{"outward"} often work well. We recommend \texttt{revolution\ =\ 0} for publication unless the swirl
+silhouette and adjacency rather than precise edge angles. Settings such as \texttt{\{squeeze\_factor\ =\ 0.25\textbackslash{}text\{\ -\ \}0.40\}} with \texttt{zoom\_factor\ =\ 5\textbackslash{}text\{\ -\ \}20\}} and either \texttt{"expand"} or
+\texttt{"outward"} often work well.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf}}
+\caption{\label{fig:method-plot}Different method for glue compression}
+\end{figure}
+
+We recommend \texttt{revolution\ =\ 0} for publication unless the swirl
 is part of the intended rhetoric; twists, while visually engaging, can distract from choropleth
 encoding and complicate legend interpretation.
 
 \textbf{Small multiples and parameter sweeps.} Analysts frequently compare scenarios across maps (e.g.,
 different thresholds or temporal slices). Portability of parameters is maximised by using a
 normalised centre (\texttt{normalized\_center\ =\ TRUE}) with \texttt{preserve\_aspect\ =\ TRUE}. This yields
-consistent radii across datasets of different extent and makes small multiples directly comparable. A
-pattern that works well is to fix \(r_{\text{in}}, r_{\text{out}}\) and \texttt{squeeze\_factor}, and vary
+consistent radii across datasets of different extent and makes small multiples directly comparable.
+
+A pattern that works well is to fix \(r_{\text{in}}, r_{\text{out}}\) and \texttt{squeeze\_factor}, and vary
 \texttt{zoom\_factor} over a short range (e.g., \(1.3, 1.6, 2.0\)). Faceting these outputs produces a
 transparent narrative of how emphasis changes with magnification.
 
-\textbf{Choosing radii from map scale.} When stakeholders communicate distances in kilometres or miles,
-convert desired physical radii to unit radii using the bbox half-span. With \texttt{\{preserve\_aspect\ =\ TRUE\}}, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for
-metric projections) and \(s\) is the larger half-span of the bbox. This rule allows quick calibration:
-for a state with half-span 250 km, a desired 75 km focus corresponds to \(r_{\text{in}} \approx 0.30\).
-For per-axis scaling, choose semi-axes independently: \(r_{\text{in,x}} = d_x/s_x\),
-\(r_{\text{in,y}} = d_y/s_y\), noting that the current implementation interprets \(r_{\text{in}}\) as a
-single scalar and therefore realises an ellipse only through \texttt{preserve\_aspect\ =\ FALSE}.
+\textbf{Choosing radii from map scale.} When stakeholders communicate distances in kilometres or miles, convert desired physical radii to unit radii using the bbox half-span. With \texttt{\{preserve\_aspect\ =\ TRUE\}}, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for metric projections) and \(s\) is the larger half-span of the bbox.
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf}}
+
+This rule allows quick calibration: for a state with half-span 250 km, a desired 75 km focus corresponds to \(r_{\text{in}} \approx 0.30\). For per-axis scaling, choose semi-axes independently: \(r_{\text{in,x}} = d_x/s_x\), \(r_{\text{in,y}} = d_y/s_y\), noting that the current implementation interprets \(r_{\text{in}}\) as a single scalar and therefore realises an ellipse only through \texttt{preserve\_aspect\ =\ FALSE}.
 
 \textbf{Centres for reproducibility.} To avoid ambiguity in collaborative settings, prefer specifying
 \texttt{center} either as an \texttt{sf} geometry (whose CRS is explicit) or as a lon/lat pair with
@@ -419,11 +426,18 @@ government dashboards) should specify \texttt{target\_crs} to improve cross-repo
 switching working CRS between layers that will be overlaid; doing so changes the meaning of
 normalised radii and will misalign warps.
 
-\textbf{Publication vs.~exploration.} For exploratory notebooks and talks, small nonzero
-\texttt{revolution} values (\(\le 0.3\) radians) can help audiences perceive continuity across the glue.
-For manuscripts and dashboards, prefer \texttt{revolution\ =\ 0}. Similarly, start with \texttt{"expand"} and
-adopt \texttt{"outward"} only when outer stability is an explicit requirement. Always annotate or at
-least describe the distortion in figure captions so readers do not mistake warped areas for standard
+\textbf{Publication vs.~exploration.} For exploratory notebooks and talks, small nonzero \texttt{revolution} values (\(\le 0.3\) radians) can help audiences perceive continuity across the glue.
+
+\begin{figure}
+
+{\centering \includegraphics{paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1} 
+
+}
+
+\caption{Fisheye with different revolutions.}\label{fig:fisheye-revolution}
+\end{figure}
+
+For manuscripts and dashboards, prefer \texttt{revolution\ =\ 0}. Similarly, start with \texttt{"expand"} and adopt \texttt{"outward"} only when outer stability is an explicit requirement. Always annotate or at least describe the distortion in figure captions so readers do not mistake warped areas for standard
 projections.
 
 \section{Examples of use}\label{examples-of-use}

@@ -228,11 +228,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 765,
+          "line": 773,
           "character": 0
         },
         "end": {
-          "line": 765,
+          "line": 773,
           "character": 247
         }
       },
@@ -285,11 +285,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 655,
+          "line": 657,
           "character": 369
         },
         "end": {
-          "line": 655,
+          "line": 657,
           "character": 514
         }
       },
@@ -304,11 +304,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 670,
+          "line": 672,
           "character": 244
         },
         "end": {
-          "line": 670,
+          "line": 672,
           "character": 280
         }
       },
@@ -330,11 +330,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 755,
+          "line": 763,
           "character": 0
         },
         "end": {
-          "line": 755,
+          "line": 763,
           "character": 13
         }
       },
@@ -349,11 +349,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 766,
+          "line": 774,
           "character": 0
         },
         "end": {
-          "line": 766,
+          "line": 774,
           "character": 7
         }
       },
@@ -368,11 +368,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 792,
+          "line": 800,
           "character": 31
         },
         "end": {
-          "line": 792,
+          "line": 800,
           "character": 248
         }
       },
@@ -387,11 +387,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 793,
+          "line": 801,
           "character": 0
         },
         "end": {
-          "line": 793,
+          "line": 801,
           "character": 444
         }
       },
@@ -406,11 +406,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 794,
+          "line": 802,
           "character": 147
         },
         "end": {
-          "line": 794,
+          "line": 802,
           "character": 242
         }
       },
@@ -432,11 +432,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 819,
+          "line": 827,
           "character": 137
         },
         "end": {
-          "line": 819,
+          "line": 827,
           "character": 176
         }
       },
@@ -451,16 +451,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 836,
+          "line": 843,
           "character": 17
         },
         "end": {
-          "line": 836,
+          "line": 843,
           "character": 87
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761996044084",
@@ -470,11 +470,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 848,
+          "line": 852,
           "character": 13
         },
         "end": {
-          "line": 848,
+          "line": 852,
           "character": 58
         }
       },
@@ -489,11 +489,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 887,
+          "line": 891,
           "character": 0
         },
         "end": {
-          "line": 897,
+          "line": 901,
           "character": 72
         }
       },

@@ -511,6 +511,8 @@ diagram |>
   charToRaw() |>
   rsvg::rsvg_png("diagram.png")
 
+
+## ----norm-diagram-gg, fig.cap="Diagram of the normalization step", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"----
 knitr::include_graphics("diagram.png")
 
 
@@ -525,84 +527,90 @@ fisheye_org |> head()
 fisheye_org |> attributes() |> names()
 
 
-## ----bench-data-----------------------------------------------------------------
-library(microbenchmark)
-
-gen_xy <- function(n) matrix(runif(2L*n, -1, 1), ncol = 2)
-
-bench_core <- function(ns = c(1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5), times = 10L) {
-  r_in <- 0.34; r_out <- 0.55
-  res <- lapply(ns, function(n) {
-    xy <- gen_xy(n)
-    invisible(fisheye_fgc(xy, r_in = r_in, r_out = r_out, zoom_factor = 1.6, squeeze_factor = 0.35)) # warm-up
-    b <- microbenchmark(
-      fisheye_fgc(xy, r_in = r_in, r_out = r_out, zoom_factor = 1.6, squeeze_factor = 0.35),
-      times = times, unit = "ms"
-    )
-    data.frame(
-      n = n,
-      median_ms = median(b$time),
-      per_vertex_ns = 1e6 * median(b$time) / n
-    )
-  })
-  df <- bind_rows(res) |>
-    mutate(logn = log(n), logt = log(median_ms))
-  slope <- coef(lm(logt ~ logn, data = df))[2]
-  list(data = df, slope = slope)
-}
-
-core <- bench_core()
-
-# sf_fisheye end-to-end (vertex-count scaling)
-
-library(sf)
-
-nverts <- function(sfc_or_sf) nrow(sf::st_coordinates(sfc_or_sf))
-
-gen_points_sf <- function(n, crs = 3857) {
-  st_as_sf(data.frame(x = runif(n, -1, 1)*1e4, y = runif(n, -1, 1)*1e4),
-            coords = c("x", "y"), crs = crs)
-}
-
-bench_sf <- function(ns = c(5e3, 1e4, 2e4, 5e4), times = 5L) {
-  res <- lapply(ns, function(n) {
-    s <- gen_points_sf(n)
-    center <- st_centroid(st_union(s))
-    invisible(sf_fisheye(s, center = center, r_in = 0.35, r_out = 0.60, zoom = 1.8, squeeze = 0.35)) # warm-up
-    b <- microbenchmark(
-      sf_fisheye(s, center = center, r_in = 0.35, r_out = 0.60, zoom = 1.8, squeeze = 0.35),
-      times = times, unit = "ms"
-    )
-    data.frame(
-      vertices = nverts(s),
-      median_ms = median(b$time),
-      per_vertex_ns = 1e6 * median(b$time) / nverts(s)
-    )
-  })
-  df <- bind_rows(res) |>
-    mutate(logv = log(vertices), logt = log(median_ms))
-  slope <- coef(lm(logt ~ logv, data = df))[2]
-  list(data = df, slope = slope)
-}
-
-sfb <- bench_sf()
-sf_data <- sfb$data
-plot_1 <- ggplot(sf_data, aes(vertices, median_ms)) +
-  geom_point() + geom_line() +
-  scale_x_log10() + scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE) +
-  coord_fixed(ratio = 1)
-
-
-plot_2 <- ggplot(core$data, aes(n, median_ms)) +
-  geom_point() + geom_line() +
-  scale_x_log10() + scale_y_log10() +
-  geom_smooth(method = "lm", se = FALSE)+
-  coord_fixed(ratio = 1)
-
+## ----bench-data, eval=FALSE-----------------------------------------------------
+# library(microbenchmark)
+# 
+# gen_xy <- function(n) matrix(runif(2L*n, -1, 1), ncol = 2)
+# 
+# bench_core <- function(ns = c(1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5), times = 10L) {
+#   r_in <- 0.34; r_out <- 0.55
+#   res <- lapply(ns, function(n) {
+#     xy <- gen_xy(n)
+#     invisible(fisheye_fgc(xy, r_in = r_in, r_out = r_out, zoom_factor = 1.6, squeeze_factor = 0.35)) # warm-up
+#     b <- microbenchmark(
+#       fisheye_fgc(xy, r_in = r_in, r_out = r_out, zoom_factor = 1.6, squeeze_factor = 0.35),
+#       times = times, unit = "ms"
+#     )
+#     data.frame(
+#       n = n,
+#       median_ms = median(b$time),
+#       per_vertex_ns = 1e6 * median(b$time) / n
+#     )
+#   })
+#   df <- bind_rows(res) |>
+#     mutate(logn = log(n), logt = log(median_ms))
+#   slope <- coef(lm(logt ~ logn, data = df))[2]
+#   list(data = df, slope = slope)
+# }
+# 
+# core <- bench_core()
+# 
+# # sf_fisheye end-to-end (vertex-count scaling)
+# 
+# library(sf)
+# 
+# nverts <- function(sfc_or_sf) nrow(sf::st_coordinates(sfc_or_sf))
+# 
+# gen_points_sf <- function(n, crs = 3857) {
+#   st_as_sf(data.frame(x = runif(n, -1, 1)*1e4, y = runif(n, -1, 1)*1e4),
+#             coords = c("x", "y"), crs = crs)
+# }
+# 
+# bench_sf <- function(ns = c(5e3, 1e4, 2e4, 5e4), times = 5L) {
+#   res <- lapply(ns, function(n) {
+#     s <- gen_points_sf(n)
+#     center <- st_centroid(st_union(s))
+#     invisible(sf_fisheye(s, center = center, r_in = 0.35, r_out = 0.60, zoom = 1.8, squeeze = 0.35)) # warm-up
+#     b <- microbenchmark(
+#       sf_fisheye(s, center = center, r_in = 0.35, r_out = 0.60, zoom = 1.8, squeeze = 0.35),
+#       times = times, unit = "ms"
+#     )
+#     data.frame(
+#       vertices = nverts(s),
+#       median_ms = median(b$time),
+#       per_vertex_ns = 1e6 * median(b$time) / nverts(s)
+#     )
+#   })
+#   df <- bind_rows(res) |>
+#     mutate(logv = log(vertices), logt = log(median_ms))
+#   slope <- coef(lm(logt ~ logv, data = df))[2]
+#   list(data = df, slope = slope)
+# }
+# 
+# sfb <- bench_sf()
+# sf_data <- sfb$data
+# plot_1 <- ggplot(sf_data, aes(vertices, median_ms)) +
+#   geom_point() + geom_line() +
+#   scale_x_log10() + scale_y_log10() +
+#   geom_smooth(method = "lm", se = FALSE) +
+#   coord_fixed(ratio = 1)
+# 
+# 
+# plot_2 <- ggplot(core$data, aes(n, median_ms)) +
+#   geom_point() + geom_line() +
+#   scale_x_log10() + scale_y_log10() +
+#   geom_smooth(method = "lm", se = FALSE)+
+#   coord_fixed(ratio = 1)
+# 
+# plot_all <- plot_1 + plot_2
+# 
+# save(plot_all, file = "data/plot-all.rda")
+# 
 
 
 ## ----bench-plot, fig.cap="Benchmark performance of fisheye_fgc() and sf_fisheye()", echo=FALSE----
+load("data/plot-all.rda")
+
 plot_1 + plot_2
 
 
@@ -651,6 +659,112 @@ samples |>
 #   dplyr::select(-.layer)
 
 
+## -------------------------------------------------------------------------------
+vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 5)
+vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 20, squeeze_factor = 0.40)
+
+plot_3 <- ggplot() + 
+  geom_sf(data = vic_fish_1, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_1 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Victoria map with center Melbourne \n zoom factor: 5") +
+  theme(
+  plot.title = element_text(size = 8) 
+  ) +
+  theme_map()
+
+plot_4 <- ggplot() + 
+  geom_sf(data = vic_fish_2, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_2 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Victoria map with center Melbourne \n zoom factor: 20") +
+  geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
+  theme(
+  plot.title = element_text(size = 8) 
+  ) +
+  theme_map()
+
+plot_3 + plot_4
+
+
+## ----method-plot, echo=FALSE, fig.cap="Different method for glue compression"----
+vic_fish_3 <- sf_fisheye(vic, center = melbourne, r_in = 0.3, r_out = 0.4, zoom_factor = 15, squeeze_factor = 0.7, method = "outward")
+vic_fish_4 <- sf_fisheye(vic, center = melbourne, r_in = 0.3, r_out = 0.4, zoom_factor = 15, squeeze_factor = 0.7, method = "expand")
+
+plot_5 <- ggplot() + 
+  geom_sf(data = vic_fish_3, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_3 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Method: Outward") +
+  theme(
+  plot.title = element_text(size = 8) 
+  ) +
+  theme_map()
+
+plot_6 <- ggplot() + 
+  geom_sf(data = vic_fish_4, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_4 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Method: Expand") +
+  theme(
+  plot.title = element_text(size = 8) 
+  ) +
+  theme_map()
+
+plot_5 + plot_6
+
+
+
+## ----radii-prepare--------------------------------------------------------------
+vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.1, r_out = 0.2, zoom_factor = 5)
+vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.25, r_out = 0.3, zoom_factor = 5)
+vic_fish_3 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 5)
+vic_fish_4 <- sf_fisheye(vic, center = melbourne, r_in = 0.5, r_out = 0.70, zoom_factor = 5)
+
+
+plot_test_1 <- ggplot() +
+  geom_sf(data = vic_fish_1, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_1 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Radii: 0.1, 0.2") +
+  theme_map()
+
+plot_test_2 <- ggplot() +
+  geom_sf(data = vic_fish_2, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_2 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Radii: 0.25, 0.3") +
+  theme_map()
+
+plot_test_3 <- ggplot() +
+  geom_sf(data = vic_fish_3, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_3 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Radii: 0.35, 0.5") +
+  theme_map()
+
+plot_test_4 <- ggplot() +
+  geom_sf(data = vic_fish_4, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_4 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Radii: 0.5, 0.7") +
+  theme_map()
+
+plot_test_1 + plot_test_2 + plot_test_3 + plot_test_4
+
+
+## ----fisheye-revolution, echo=FALSE, fig.cap="Fisheye with different revolutions.", fig.align="center"----
+vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 20, revolution = 0)
+vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 20, revolution = pi/2)
+
+plot_test_1 <- ggplot() +
+  geom_sf(data = vic_fish_1, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_1 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Revolution: 0") +
+  theme_map()
+
+plot_test_2 <- ggplot() +
+  geom_sf(data = vic_fish_2, fill = "grey", linewidth = 0.5) +
+  geom_sf(data = vic_fish_2 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
+  labs(title = "Revolution: pi/2") +
+  theme_map()
+
+plot_test_1 + plot_test_2
+
+
+
 ## ----preparing-hosp-data--------------------------------------------------------
 hosp_point <- conn_fish |>
   st_drop_geometry() |>
@@ -674,7 +788,7 @@ plot_hosp <- ggplot(vic) +
   geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
   ggtitle("Standard: Melbourne hospitals") +
   theme(
-  plot.title = element_text(size = 10, face = "bold") # adjust here
+  plot.title = element_text(size = 8) # adjust here
   ) +
   theme_map() 
 plot_racf <- ggplot(vic) + 
@@ -682,7 +796,7 @@ plot_racf <- ggplot(vic) +
   geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
   ggtitle("Standard: Melbourne RACFs") +
   theme(
-  plot.title = element_text(size = 10, face = "bold") # adjust here
+  plot.title = element_text(size = 8) # adjust here
   ) +
   theme_map()
 
@@ -710,9 +824,9 @@ pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
 ## ----fisheye-plot, fig.cap="Fisheye applied with a common centre and parameters keeps overlays aligned while magnifying the Melbourne LGA."----
 ggplot() +
   geom_sf(data = vic_w, fill = "grey", linewidth = 0.5) +
-  geom_sf(data = pts_w, aes(color = type), size = 0.7, alpha = 0.5) +
+  geom_sf(data = vic_w |> filter(LGA_NAME == "MELBOURNE"), fill = "white", linewidth = 1) +
   geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
-  geom_sf(data = melbourne, fill = "white", linewidth = 1) +
+  geom_sf(data = pts_w, aes(color = type), size = 1, alpha = 0.7) +
   scale_color_manual(
   name = "Facility type",
   values = c("hospital" = "red", "racf" = "blue"),
