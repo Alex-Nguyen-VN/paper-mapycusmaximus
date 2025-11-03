@@ -614,7 +614,7 @@ load("data/plot-all.rda")
 plot_1 + plot_2
 
 
-## ----transformation-table, echo=FALSE, caption = "Coordinate transformation across fisheye zones for selected points on a regular grid"----
+## ----prepare-table, echo=FALSE-----------------------------------------
 # Table 1: Coordinate transformation across zones for selected points
 samples <- transform_df |>
   group_by(zone) |>
@@ -629,9 +629,12 @@ samples <- samples |>
   cbind(orig_samples) |>
   select(x, y, x_new, y_new, zone, r_orig, r_new)
 
+
+## ----transformation-table, echo=FALSE----------------------------------
 samples |>
   knitr::kable(
-    digits = 3
+  caption = "Coordinate transformation across zones for selected points",
+  digits = 3
   )
 
 
