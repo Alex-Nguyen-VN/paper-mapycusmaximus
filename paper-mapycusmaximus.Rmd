@@ -509,7 +509,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
     curvature = 0.2,
     arrow = arrow(type = "closed", length = unit(4, "pt"))
   ) +
-  annotate("label", x = r_in * 0.7, y = r_in * 0.5,
+  annotate("label", x = r_in, y = r_in * 0.5,
             label = "shifted radius (expansion) in focus \n then flattened at r_in",
             color = "steelblue", fill = "white") +
   # Visual cue for flattening at r_in (horizontal tangent/cap)
