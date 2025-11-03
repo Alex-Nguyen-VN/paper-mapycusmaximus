@@ -413,7 +413,6 @@ Let $(r, \theta)$ denote the polar form of point $P = (x, y)$ relative to center
    r_{\text{in}} + (r_{\text{out}} - r_{\text{in}}) \cdot h(u; s) & \text{if } r_{\text{in}} < r \le r_{\text{out}}, \\
    r & \text{if } r > r_{\text{out}},
  \end{cases}
-(\#eq:fgc_transform)
 \end{equation} 
 
 where \(z > 1\) is the zoom factor within the focus, \(s \in (0, 1]\) controls glue compression, and
@@ -427,7 +426,6 @@ first derivatives and the radii match at the boundaries. We adopt a symmetric po
    \tfrac{1}{2} \cdot u^{1/s} & \text{if } 0 \le u \le 0.5, \\
    1 - \tfrac{1}{2} \cdot (1 - u)^{1/s} & \text{if } 0.5 < u \le 1,
  \end{cases}
-(\#eq:fgc_transform_2)
 \end{equation} 
 
 which compresses radii near both boundaries and emphasises the mid-glue region. Analysts seeking
@@ -803,7 +801,7 @@ samples |>
 
 Utilities in `utils.R` provide `create_test_grid()` for diagnostics, `classify_zones()` for labeling, and `plot_fisheye_fgc()` for visualization. Dataset documentation in `data.R` accompanies example layers (vic, vic_fish, conn_fish) used in tests.
 
-For multi-layer maps, the normal process is combine all the layers into a single sf object and apply `sf_fisheye()`, then split the result later. One minialist example for this approach is show in the code block \@ref{sec:multi-layer-example}.
+For multi-layer maps, the normal process is combine all the layers into a single sf object and apply `sf_fisheye()`, then split the result later. One minialist example for this approach is show in the code block \ref{sec:multi-layer-example}.
 
 ```{r multi-layer-example, eval=FALSE, echo=TRUE, caption = "Handling of multi-layer maps in sf_fisheye()"}
 # Multi-layer example
@@ -1291,7 +1289,7 @@ In Figure \@ref(fig:france-comparison), the gridded choropleth is transformed wi
 
 **Relation to alternatives** Unlike cartograms (thematic distortion), hex/regular tile maps (discrete abstraction), or inset/multi‑panel layouts (spatial separation), the FGC lens delivers continuous magnification within a single map while preserving topology and bearings. This reduces cognitive load for readers who must relate local phenomena to their broader geography.
 
-**Limitations** The fisheye introduces non‑metric distortion in the focus and glue; therefore, use it for visual exploration and communication, not for metric analysis. Aggressive `zoom` or `squeeze` can impair legibility near the glue boundary; conservative defaults and `revolution = 0` are recommended for publication maps. When comparing multiple regions, prefer `normalized_center = TRUE` with fixed radii to ensure visual comparability. At present, exact matching of focus and glue radii across separately transformed layers may require a manual step (the user have to manually merge the two or more layers, perform the fisheye transformation, then seperated the transformed layers as in the Code chunk \@ref{sec:multi-layer-example}). 
+**Limitations** The fisheye introduces non‑metric distortion in the focus and glue; therefore, use it for visual exploration and communication, not for metric analysis. Aggressive `zoom` or `squeeze` can impair legibility near the glue boundary; conservative defaults and `revolution = 0` are recommended for publication maps. When comparing multiple regions, prefer `normalized_center = TRUE` with fixed radii to ensure visual comparability. At present, exact matching of focus and glue radii across separately transformed layers may require a manual step (the user have to manually merge the two or more layers, perform the fisheye transformation, then seperated the transformed layers as in the Code chunk \ref{sec:multi-layer-example}). 
 
 **Future work** Planned extensions include anisotropic or elliptical profiles, multi‑focus blending, first‑class raster support via warped grids and resampling, and interactive focus selection for exploratory analysis. We also plan an API for shared normalisation and radius locking across layers (e.g., a `combine_fisheye`) so that multiple layers can be warped with identical scale and then returned transformed. Performance improvements via vectorised geometry walkers or GPU acceleration would benefit dense polygonal datasets. Clear figure captions and scale disclaimers remain essential to communicate the presence and intent of distortion.
 
