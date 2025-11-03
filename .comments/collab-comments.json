@@ -16,8 +16,15 @@
           "character": 493
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994199049-reply-1762081653863",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:07:33.862Z",
+          "text": "Yes, there are arg to control the twist."
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761994357546",
@@ -27,16 +34,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 60,
+          "line": 64,
           "character": 272
         },
         "end": {
-          "line": 60,
+          "line": 64,
           "character": 295
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994357546-reply-1762081909059",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:11:49.059Z",
+          "text": "@cockburn2008: \r\nThis discontinuity can cause cognitive and mechanical burdens for users, who must mentally assimilate\r\nthe overall structure of the information space and their location within it, as well as\r\nmanipulate controls in order to navigate through it. For example, Grudin [2001] reports\r\nthat reducing the discontinuity between views “reduces the cognitive load by allowing\r\nrapid glances to check on information; for example between a bird’s-eye view of an\r\nentire graphical object and a close-up of a detail.”"
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761994452476",
@@ -46,16 +60,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 62,
+          "line": 66,
           "character": 418
         },
         "end": {
-          "line": 62,
+          "line": 66,
           "character": 513
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761994506361",
@@ -65,16 +79,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 64,
+          "line": 75,
           "character": 94
         },
         "end": {
-          "line": 64,
+          "line": 75,
           "character": 108
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994506361-reply-1762082332488",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:18:52.488Z",
+          "text": "DOI(x | y) = API(x) − D(x, y)\r\nx = a data element\r\ny = the current focus\r\nAPI(x) = a-priori interest (pre-assigned importance)\r\nD(x, y) = spatial or semantic distance between x and y\r\nItems whose DOI falls below a threshold are suppressed or shown with reduced detail. This allows the interface to maintain global context while emphasizing relevant regions, and was the conceptual basis for fisheye views."
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761994589347",
@@ -84,16 +105,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 66,
+          "line": 77,
           "character": 192
         },
         "end": {
-          "line": 66,
+          "line": 77,
           "character": 209
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994589347-reply-1762082484461",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:21:24.461Z",
+          "text": "Alright fix that part."
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761994636019",
@@ -103,16 +131,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 66,
+          "line": 77,
           "character": 353
         },
         "end": {
-          "line": 66,
+          "line": 77,
           "character": 360
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994636019-reply-1762082519308",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:21:59.308Z",
+          "text": "Fix wording"
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761994687272",
@@ -122,16 +157,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 68,
+          "line": 79,
           "character": 0
         },
         "end": {
-          "line": 68,
+          "line": 79,
           "character": 649
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761994687272-reply-1762082547663",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:22:27.663Z",
+          "text": "Alright"
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761995105714",
@@ -141,16 +183,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 414,
+          "line": 434,
           "character": 4
         },
         "end": {
-          "line": 414,
+          "line": 434,
           "character": 44
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761995105714-reply-1762082804653",
+          "author": "Alex",
+          "timestamp": "2025-11-02T11:26:44.653Z",
+          "text": "Yeah there is one hidden arg call rotation"
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761995132798",
@@ -160,16 +209,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 419,
+          "line": 438,
           "character": 0
         },
         "end": {
-          "line": 423,
+          "line": 442,
           "character": 45
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995361848",
@@ -179,16 +228,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 456,
+          "line": 766,
           "character": 0
         },
         "end": {
-          "line": 456,
+          "line": 766,
           "character": 247
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995460494",
@@ -198,16 +247,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 433,
+          "line": 531,
           "character": 93
         },
         "end": {
-          "line": 433,
+          "line": 531,
           "character": 137
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995504336",
@@ -217,16 +266,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 435,
+          "line": 535,
           "character": 0
         },
         "end": {
-          "line": 435,
+          "line": 535,
           "character": 37
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995594735",
@@ -236,11 +285,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 439,
+          "line": 655,
           "character": 369
         },
         "end": {
-          "line": 439,
+          "line": 655,
           "character": 514
         }
       },
@@ -255,16 +304,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 441,
+          "line": 670,
           "character": 244
         },
         "end": {
-          "line": 441,
+          "line": 670,
           "character": 280
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761995621360-reply-1762085875567",
+          "author": "Alex",
+          "timestamp": "2025-11-02T12:17:55.567Z",
+          "text": "I'm sure. The plot for time will be provided. "
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761995674133",
@@ -274,16 +330,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 445,
+          "line": 756,
           "character": 0
         },
         "end": {
-          "line": 445,
+          "line": 756,
           "character": 13
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995780641",
@@ -293,16 +349,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 458,
+          "line": 767,
           "character": 0
         },
         "end": {
-          "line": 458,
+          "line": 767,
           "character": 7
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995803226",
@@ -312,16 +368,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 484,
+          "line": 793,
           "character": 31
         },
         "end": {
-          "line": 484,
+          "line": 793,
           "character": 248
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995837610",
@@ -331,16 +387,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 486,
+          "line": 794,
           "character": 0
         },
         "end": {
-          "line": 486,
+          "line": 794,
           "character": 444
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761995871181",
@@ -350,16 +406,23 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 488,
+          "line": 795,
           "character": 147
         },
         "end": {
-          "line": 488,
+          "line": 795,
           "character": 242
         }
       },
-      "replies": [],
-      "resolved": false
+      "replies": [
+        {
+          "id": "1761995871181-reply-1762089835277",
+          "author": "Alex",
+          "timestamp": "2025-11-02T13:23:55.277Z",
+          "text": "Solve it with the new approach. Doesn't need to pay attention to the bounding box anyway.\r\n"
+        }
+      ],
+      "resolved": true
     },
     {
       "id": "1761995927419",
@@ -369,16 +432,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 490,
+          "line": 820,
           "character": 137
         },
         "end": {
-          "line": 490,
+          "line": 820,
           "character": 176
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761996011015",
@@ -388,11 +451,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 507,
+          "line": 837,
           "character": 17
         },
         "end": {
-          "line": 507,
+          "line": 837,
           "character": 87
         }
       },
@@ -407,16 +470,16 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 519,
+          "line": 849,
           "character": 13
         },
         "end": {
-          "line": 519,
+          "line": 849,
           "character": 58
         }
       },
       "replies": [],
-      "resolved": false
+      "resolved": true
     },
     {
       "id": "1761996158225",
@@ -426,11 +489,11 @@
       "filePath": "paper-mapycusmaximus.Rmd",
       "range": {
         "start": {
-          "line": 558,
+          "line": 888,
           "character": 0
         },
         "end": {
-          "line": 568,
+          "line": 898,
           "character": 72
         }
       },
