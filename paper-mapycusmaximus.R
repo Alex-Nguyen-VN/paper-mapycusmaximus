@@ -552,7 +552,6 @@ bench_core <- function(ns = c(1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5), times = 10L) {
 }
 
 core <- bench_core()
-core$data
 
 # sf_fisheye end-to-end (vertex-count scaling)
 
@@ -713,11 +712,12 @@ ggplot() +
   geom_sf(data = vic_w, fill = "grey", linewidth = 0.5) +
   geom_sf(data = pts_w, aes(color = type), size = 0.7, alpha = 0.5) +
   geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
+  geom_sf(data = melbourne, fill = "white", linewidth = 1) +
   scale_color_manual(
   name = "Facility type",
   values = c("hospital" = "red", "racf" = "blue"),
   labels = c("Hospital", "RACF")) +
-  ggtitle("Melbourne hospitals and RACFs connection") +
+  ggtitle("Melbourne hospitals and RACFs locations") +
   theme_map()
 
 
