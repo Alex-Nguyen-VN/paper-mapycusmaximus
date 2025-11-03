@@ -190,8 +190,8 @@ It attaches diagnostic attributes (zone labels, original and new radii) consumed
 \end{verbatim}
 
 \begin{verbatim}
-#> [1] "dim"             "dimnames"        "zones"           "original_radius"
-#> [5] "new_radius"
+#> [1] "dim"             "dimnames"        "zones"          
+#> [4] "original_radius" "new_radius"
 \end{verbatim}
 
 Numeric stability at zone boundaries is ensured by clamping expansions in the focus so radii do not exceed \(r_{in}\), and using smooth power curves in the glue so derivatives match across boundaries. The radial mapping is vectorized and runs in linear time in the number of vertices as seen in the benchmark \ref{fig:bench-plot}.
@@ -322,7 +322,7 @@ in unit space corresponds to a circle of radius \(r_{\text{in}}\,s\) in map unit
 scaling, the corresponding shape is an axis-aligned ellipse with semi-axes \(r_{\text{in}}s_x\) and
 \(r_{\text{in}}s_y\). Inside the focus, distances from the centre are multiplied by
 \texttt{zoom\_factor}; to prevent overshoot, the implementation clamps \(r'\) so that points do not cross
-the \(r_{\text{in}}\) boundary. Across the glue, \texttt{squeeze\_factor\ \textbackslash{}in\ (0,1{]}} controls how strongly
+the \(r_{\text{in}}\) boundary. Across the glue, \texttt{squeeze\_factor} in \((0,1]\) controls how strongly
 intermediate radii compress: smaller values create tighter compression near the boundaries and a
 more pronounced ``shoulder'' in the middle of the glue; larger values approach a linear transition. The
 \texttt{method} selects the family of curves used in the glue. The default \texttt{"expand"} applies a
@@ -367,7 +367,9 @@ retaining a recognisable state outline. Choose \(r_{\text{in}}\) to enclose the 
 (\(0.55\text{--}0.70\)). A \texttt{zoom\_factor} of \(5\text{--}10\) provides visible enlargement
 without overwhelming the transition.
 
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf}}
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/zoom-factor-1} \caption{Zoom factors for balanced metropolitan focus within a state.}\label{fig:zoom-factor}
+\end{figure}
 
 Pair this with A \texttt{squeeze\_factor} of \(0.3\text{--}0.5\), which
 gently compresses surroundings while maintaining smoothness. The \texttt{"expand"} method yields a
@@ -410,7 +412,11 @@ transparent narrative of how emphasis changes with magnification.
 
 \textbf{Choosing radii from map scale.} When stakeholders communicate distances in kilometres or miles, convert desired physical radii to unit radii using the bbox half-span. With \texttt{\{preserve\_aspect\ =\ TRUE\}}, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for metric projections) and \(s\) is the larger half-span of the bbox.
 
+\begin{figure}
+\centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf}}
+\caption{\label{fig:radii-prepare}Map scale for different radii}
+\end{figure}
 
 This rule allows quick calibration: for a state with half-span 250 km, a desired 75 km focus corresponds to \(r_{\text{in}} \approx 0.30\). For per-axis scaling, choose semi-axes independently: \(r_{\text{in,x}} = d_x/s_x\), \(r_{\text{in,y}} = d_y/s_y\), noting that the current implementation interprets \(r_{\text{in}}\) as a single scalar and therefore realises an ellipse only through \texttt{preserve\_aspect\ =\ FALSE}.
 

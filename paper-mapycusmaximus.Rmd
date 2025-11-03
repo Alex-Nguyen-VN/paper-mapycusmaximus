@@ -865,7 +865,7 @@ in unit space corresponds to a circle of radius \(r_{\text{in}}\,s\) in map unit
 scaling, the corresponding shape is an axis-aligned ellipse with semi-axes \(r_{\text{in}}s_x\) and
 \(r_{\text{in}}s_y\). Inside the focus, distances from the centre are multiplied by
 `zoom_factor`; to prevent overshoot, the implementation clamps \(r'\) so that points do not cross
-the \(r_{\text{in}}\) boundary. Across the glue, `squeeze_factor \in (0,1]` controls how strongly
+the \(r_{\text{in}}\) boundary. Across the glue, `squeeze_factor` in $(0,1]$ controls how strongly
 intermediate radii compress: smaller values create tighter compression near the boundaries and a
 more pronounced “shoulder” in the middle of the glue; larger values approach a linear transition. The
 `method` selects the family of curves used in the glue. The default `"expand"` applies a
@@ -910,26 +910,26 @@ retaining a recognisable state outline. Choose \(r_{\text{in}}\) to enclose the 
 (\(0.55\text{--}0.70\)). A `zoom_factor` of \(5\text{--}10\) provides visible enlargement
 without overwhelming the transition. 
 
-```{r}
+```{r zoom-factor, echo=FALSE, fig.cap="Zoom factors for balanced metropolitan focus within a state.", out.width="80%"}
 vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 5)
 vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 20, squeeze_factor = 0.40)
 
 plot_3 <- ggplot() + 
   geom_sf(data = vic_fish_1, fill = "grey", linewidth = 0.5) +
   geom_sf(data = vic_fish_1 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
-  labs(title = "Victoria map with center Melbourne \n zoom factor: 5") +
+  ggtitle("Victoria map with center Melbourne \n zoom factor: 5") +
   theme(
-  plot.title = element_text(size = 8) 
+  plot.title = element_text(size = 6) 
   ) +
   theme_map()
 
 plot_4 <- ggplot() + 
   geom_sf(data = vic_fish_2, fill = "grey", linewidth = 0.5) +
   geom_sf(data = vic_fish_2 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
-  labs(title = "Victoria map with center Melbourne \n zoom factor: 20") +
+  ggtitle("Victoria map with center Melbourne \n zoom factor: 20") +
   geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
   theme(
-  plot.title = element_text(size = 8) 
+  plot.title = element_text(size = 6) 
   ) +
   theme_map()
 
@@ -997,7 +997,7 @@ transparent narrative of how emphasis changes with magnification.
 
 **Choosing radii from map scale.** When stakeholders communicate distances in kilometres or miles, convert desired physical radii to unit radii using the bbox half-span. With `{preserve_aspect = TRUE}`, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for metric projections) and \(s\) is the larger half-span of the bbox.
 
-```{r radii-prepare}
+```{r radii-prepare, echo=FALSE, fig.cap="Map scale for different radii"}
 vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.1, r_out = 0.2, zoom_factor = 5)
 vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.25, r_out = 0.3, zoom_factor = 5)
 vic_fish_3 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 5)
