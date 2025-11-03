@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  3 NOV 2025 22:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  3 NOV 2025 22:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -815,82 +815,82 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 <paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf, id=170, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf  used on input line 146.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf  used on input line 148.
 (pdftex.def)             Requested size: 478.00507pt x 330.92589pt.
 
-Overfull \hbox (79.66649pt too wide) in paragraph at lines 146--146
+Overfull \hbox (79.66649pt too wide) in paragraph at lines 148--148
 [][] 
  []
 
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 146.
+            Default family used instead on input line 148.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (RS)
 )
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 146.
+            Default family used instead on input line 148.
 
 
 [5 <./paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 155.
+            Default family used instead on input line 157.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 155.
+            Default family used instead on input line 157.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 155.
+            Default family used instead on input line 157.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 155.
+            Default family used instead on input line 157.
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
-            Default family used instead on input line 155.
-<diagram.png, id=190, 654.445pt x 882.29625pt>
+            Default family used instead on input line 157.
+<diagram.png, id=192, 654.445pt x 882.29625pt>
 File: diagram.png Graphic file (type png)
 <use diagram.png>
-Package pdftex.def Info: diagram.png  used on input line 165.
+Package pdftex.def Info: diagram.png  used on input line 167.
 (pdftex.def)             Requested size: 318.67207pt x 429.62294pt.
 
 
 [6 <./paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf>]
 
 [7 <./diagram.png>]
-<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=214, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=216, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf  used on input line 178.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf  used on input line 180.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Overfull \hbox (15.00174pt too wide) in paragraph at lines 178--179
+Overfull \hbox (15.00174pt too wide) in paragraph at lines 180--181
 [][] 
  []
 
-<paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf, id=216, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf, id=218, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf  used on input line 201.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf  used on input line 203.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [8 <./paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf>]
-Underfull \hbox (badness 4024) in paragraph at lines 209--210
+Underfull \hbox (badness 4024) in paragraph at lines 211--212
 []\T1/ppl/m/n/10 (+20) The ge-om-e-try walker \T1/zi4/m/n/10 st_transform_custom() \T1/ppl/m/n/10 (+20) acts as a drop-in ana-logue to
  []
 
 
-Underfull \hbox (badness 1314) in paragraph at lines 209--210
+Underfull \hbox (badness 1314) in paragraph at lines 211--212
 \T1/ppl/m/n/10 (+20) it ex-tracts co-or-di-nates via \T1/zi4/m/n/10 sf::st_coordinates()\T1/ppl/m/n/10 (+20) , yield-ing a ma-trix with columns
  []
 
-LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 214.
+LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 216.
 (c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/psnfss/ts1ppl.fd
 File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 216--218
+Underfull \hbox (badness 10000) in paragraph at lines 218--220
 
  []
 
@@ -901,67 +901,67 @@ Underfull \hbox (badness 10000) in paragraph at lines 216--218
 [10]
 
 [11]
-<paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf, id=249, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf, id=250, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf  used on input line 371.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf  used on input line 368.
 (pdftex.def)             Requested size: 318.67207pt x 220.61726pt.
-<paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf, id=250, 469.755pt x 325.215pt>
-File: paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf Graphic file (type pdf)
-<use paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf  used on input line 396.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [12 <./paper-mapycusmaximus_files/figure-latex/zoom-factor-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf, id=262, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf, id=262, 469.755pt x 325.215pt>
+File: paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf Graphic file (type pdf)
+<use paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf>
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf  used on input line 393.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+<paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf, id=263, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf  used on input line 417.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf  used on input line 414.
 (pdftex.def)             Requested size: 398.33858pt x 275.77405pt.
-<paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf, id=263, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf, id=264, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf  used on input line 425.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf  used on input line 422.
 (pdftex.def)             Requested size: 398.33858pt x 275.77405pt.
-<paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf, id=264, 469.755pt x 325.215pt>
-File: paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf Graphic file (type pdf)
-<use paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf  used on input line 450.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-
-Overfull \hbox (71.41528pt too wide) in paragraph at lines 450--451
- [][] 
- []
-
 
 
 [13 <./paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf>]
 
 [14 <./paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf> <./paper-mapycusmaximus_files/figure-latex/radii-prepare-2.pdf>]
-<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=292, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf, id=292, 469.755pt x 325.215pt>
+File: paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf Graphic file (type pdf)
+<use paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf>
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf  used on input line 447.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+
+Overfull \hbox (71.41528pt too wide) in paragraph at lines 447--448
+ [][] 
+ []
+
+<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=293, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf  used on input line 468.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf  used on input line 465.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=294, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=295, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf  used on input line 476.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf  used on input line 473.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
 [15 <./paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1.pdf>]
 
 [16 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf> <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
-Underfull \hbox (badness 4595) in paragraph at lines 484--485
+Underfull \hbox (badness 4595) in paragraph at lines 481--482
 \T1/ppl/m/n/10 (+20) The France grid ex-am-ple uses \T1/zi4/m/n/10 france_sport.gpkg \T1/ppl/m/n/10 (+20) from B. Nowak's repos-i-tory
  []
 
-<paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf, id=326, 469.755pt x 325.215pt>
+<paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf, id=327, 469.755pt x 325.215pt>
 File: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf Graphic file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf  used on input line 488.
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf  used on input line 485.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
 
@@ -979,13 +979,13 @@ Underfull \hbox (badness 1490) in paragraph at lines 57--57
 )
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 530.
+(Font)              using `T1/zi4/m/n' instead on input line 527.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 530.
-)
+(Font)              scaled to size 10.20004pt on input line 527.
 
-[19]
+
+[19])
 
 [20] (./RJwrapper.aux)
  ***********
@@ -1001,18 +1001,18 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: D643528FEC4C8D3DC2F4D7DF0DA15BE5;752.
  ) 
 Here is how much of TeX's memory you used:
- 27246 strings out of 475478
- 504110 string characters out of 5773761
- 895790 words of memory out of 5000000
- 49041 multiletter control sequences out of 15000+600000
+ 27242 strings out of 475478
+ 504005 string characters out of 5773761
+ 895677 words of memory out of 5000000
+ 49036 multiletter control sequences out of 15000+600000
  602370 words of font info for 288 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 117i,11n,131p,1194b,819s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,12n,131p,1194b,813s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk> <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm0900.600pk><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (20 pages, 2204605 bytes).
+Output written on RJwrapper.pdf (20 pages, 2205001 bytes).
 PDF statistics:
- 452 PDF objects out of 1000 (max. 8388607)
- 373 compressed objects within 4 object streams
- 69 named destinations out of 1000 (max. 500000)
+ 453 PDF objects out of 1000 (max. 8388607)
+ 374 compressed objects within 4 object streams
+ 70 named destinations out of 1000 (max. 500000)
  57557 words of extra memory for PDF output out of 61914 (max. 10000000)
 

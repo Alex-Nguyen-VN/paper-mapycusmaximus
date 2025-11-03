@@ -614,7 +614,7 @@ load("data/plot-all.rda")
 plot_1 + plot_2
 
 
-## ----transformation-table, echo=FALSE----------------------------------
+## ----transformation-table, echo=FALSE, caption = "Coordinate transformation across fisheye zones for selected points on a regular grid"----
 # Table 1: Coordinate transformation across zones for selected points
 samples <- transform_df |>
   group_by(zone) |>
@@ -631,12 +631,11 @@ samples <- samples |>
 
 samples |>
   knitr::kable(
-    caption = "Coordinate transformation across fisheye zones for selected points on a regular grid",
     digits = 3
   )
 
 
-## ----multi-layer-example, eval=FALSE, echo=TRUE------------------------
+## ----multi-layer-example, eval=FALSE, echo=TRUE, caption = "Handling of multi-layer maps in sf_fisheye()"----
 # # Multi-layer example
 # bind <- dplyr::bind_rows(
 #   object_1 |> dplyr::mutate(.layer="object_1"),
