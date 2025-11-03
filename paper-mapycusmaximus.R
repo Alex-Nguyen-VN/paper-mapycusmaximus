@@ -589,14 +589,14 @@ fisheye_org |> attributes() |> names()
 # 
 # sfb <- bench_sf()
 # sf_data <- sfb$data
-# plot_1 <- ggplot(sf_data, aes(vertices, median_ms)) +
+# plot_2 <- ggplot(sf_data, aes(vertices, median_ms)) +
 #   geom_point() + geom_line() +
 #   scale_x_log10() + scale_y_log10() +
 #   geom_smooth(method = "lm", se = FALSE) +
 #   coord_fixed(ratio = 1)
 # 
 # 
-# plot_2 <- ggplot(core$data, aes(n, median_ms)) +
+# plot_1 <- ggplot(core$data, aes(n, median_ms)) +
 #   geom_point() + geom_line() +
 #   scale_x_log10() + scale_y_log10() +
 #   geom_smooth(method = "lm", se = FALSE)+
@@ -666,7 +666,7 @@ vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoo
 plot_3 <- ggplot() + 
   geom_sf(data = vic_fish_1, fill = "grey", linewidth = 0.5) +
   geom_sf(data = vic_fish_1 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
-  ggtitle("Victoria map with center Melbourne \n zoom factor: 5") +
+  ggtitle("Zoom factor: 5") +
   theme(
   plot.title = element_text(size = 6) 
   ) +
@@ -675,7 +675,7 @@ plot_3 <- ggplot() +
 plot_4 <- ggplot() + 
   geom_sf(data = vic_fish_2, fill = "grey", linewidth = 0.5) +
   geom_sf(data = vic_fish_2 |> filter(LGA_NAME == "MELBOURNE"), fill = "red", linewidth = 0.5, inherit.aes = FALSE) +
-  ggtitle("Victoria map with center Melbourne \n zoom factor: 20") +
+  ggtitle("Zoom factor: 20") +
   geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
   theme(
   plot.title = element_text(size = 6) 
@@ -711,11 +711,11 @@ plot_5 + plot_6
 
 
 
-## ----radii-prepare, echo=FALSE, fig.cap="Map scale for different radii"----
-vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.1, r_out = 0.2, zoom_factor = 5)
-vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.25, r_out = 0.3, zoom_factor = 5)
-vic_fish_3 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 5)
-vic_fish_4 <- sf_fisheye(vic, center = melbourne, r_in = 0.5, r_out = 0.70, zoom_factor = 5)
+## ----radii-prepare, echo=FALSE, fig.cap="Map scale for different radii", fig.align="center", out.width="100%"----
+vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.1, r_out = 0.2, zoom_factor = 10)
+vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.25, r_out = 0.3, zoom_factor = 10)
+vic_fish_3 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.5, zoom_factor = 10)
+vic_fish_4 <- sf_fisheye(vic, center = melbourne, r_in = 0.5, r_out = 0.70, zoom_factor = 10)
 
 
 plot_test_1 <- ggplot() +
@@ -742,7 +742,8 @@ plot_test_4 <- ggplot() +
   labs(title = "Radii: 0.5, 0.7") +
   theme_map()
 
-plot_test_1 + plot_test_2 + plot_test_3 + plot_test_4
+plot_test_1 + plot_test_2 
+plot_test_3 + plot_test_4
 
 
 ## ----fisheye-revolution, echo=FALSE, fig.cap="Fisheye with different revolutions.", fig.align="center"----
@@ -786,7 +787,7 @@ racf_point <- conn_fish |>
 plot_hosp <- ggplot(vic) + 
   geom_sf(fill = "grey90") +
   geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
-  ggtitle("Standard: Melbourne hospitals") +
+  ggtitle("Melbourne hospitals") +
   theme(
   plot.title = element_text(size = 8) # adjust here
   ) +
@@ -794,7 +795,7 @@ plot_hosp <- ggplot(vic) +
 plot_racf <- ggplot(vic) + 
   geom_sf(fill = "grey90") +
   geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
-  ggtitle("Standard: Melbourne RACFs") +
+  ggtitle("Melbourne RACFs") +
   theme(
   plot.title = element_text(size = 8) # adjust here
   ) +

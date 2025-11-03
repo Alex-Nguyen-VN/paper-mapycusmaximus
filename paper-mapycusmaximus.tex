@@ -413,9 +413,20 @@ transparent narrative of how emphasis changes with magnification.
 \textbf{Choosing radii from map scale.} When stakeholders communicate distances in kilometres or miles, convert desired physical radii to unit radii using the bbox half-span. With \texttt{\{preserve\_aspect\ =\ TRUE\}}, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for metric projections) and \(s\) is the larger half-span of the bbox.
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/radii-prepare-1.pdf}}
-\caption{\label{fig:radii-prepare}Map scale for different radii}
+
+{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/radii-prepare-1} 
+
+}
+
+\caption{Map scale for different radii}\label{fig:radii-prepare-1}
+\end{figure}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/radii-prepare-2} 
+
+}
+
+\caption{Map scale for different radii}\label{fig:radii-prepare-2}
 \end{figure}
 
 This rule allows quick calibration: for a state with half-span 250 km, a desired 75 km focus corresponds to \(r_{\text{in}} \approx 0.30\). For per-axis scaling, choose semi-axes independently: \(r_{\text{in,x}} = d_x/s_x\), \(r_{\text{in,y}} = d_y/s_y\), noting that the current implementation interprets \(r_{\text{in}}\) as a single scalar and therefore realises an ellipse only through \texttt{preserve\_aspect\ =\ FALSE}.
