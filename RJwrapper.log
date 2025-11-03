@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  3 NOV 2025 21:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  3 NOV 2025 22:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -895,6 +895,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 216--218
  []
 
 
+LaTeX Warning: Reference `tab:multi-layer-example' on page 9 undefined on input line 260.
+
+
 
 [9 <./paper-mapycusmaximus_files/figure-latex/bench-plot-1.pdf>]
 
@@ -964,6 +967,9 @@ File: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf Graphic fi
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf  used on input line 488.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
+LaTeX Warning: Reference `tab:multi-layer-example' on page 17 undefined on input line 500.
+
+
 
 [17 <./paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf>] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
@@ -995,21 +1001,24 @@ L3 programming layer <2024-09-10>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
 (rerunfilecheck)             Checksum: 2BFF334CE20548FBC9ACE27364B925A2;2452.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: D643528FEC4C8D3DC2F4D7DF0DA15BE5;752.
  ) 
 Here is how much of TeX's memory you used:
- 27246 strings out of 475478
- 504110 string characters out of 5773761
+ 27247 strings out of 475478
+ 504135 string characters out of 5773761
  895790 words of memory out of 5000000
- 49041 multiletter control sequences out of 15000+600000
+ 49042 multiletter control sequences out of 15000+600000
  602370 words of font info for 288 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 117i,11n,131p,1194b,819s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,11n,131p,1194b,820s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk> <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm0900.600pk><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (20 pages, 2204614 bytes).
+Output written on RJwrapper.pdf (20 pages, 2204168 bytes).
 PDF statistics:
  453 PDF objects out of 1000 (max. 8388607)
  374 compressed objects within 4 object streams

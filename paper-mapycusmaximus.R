@@ -636,7 +636,7 @@ samples |>
   )
 
 
-## ----multi-layer-example, eval=FALSE, echo=TRUE, fig.cap="Example of multi-layer fisheye transformation.", fig.align="center"----
+## ----multi-layer-example, eval=FALSE, echo=TRUE------------------------
 # # Multi-layer example
 # bind <- dplyr::bind_rows(
 #   object_1 |> dplyr::mutate(.layer="object_1"),
