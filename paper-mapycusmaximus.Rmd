@@ -79,7 +79,7 @@ In cartography, the need for nonlinear magnification emerged independently. @sny
 
 Within R's spatial ecosystem, sf [@RJ-2018-009] provides robust vector handling and CRS transformations, while ggplot2 [@wickham2016] offers declarative visualization grammar. Yet a gap remained: existing tools addressed *related* distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
 
-# Alternative approaches to the detail-context problem
+# Background
 
 Before examining the mechanics of fisheye transformations, it is important to review how R’s spatial ecosystem currently addresses the detail-versus-context tradeoff. This context clarifies why existing solutions, though valuable, do not fully address the need for continuous lens-based warping.
 
@@ -252,7 +252,17 @@ As seen in Figure \@ref(fig:geo-grid-plot), tile maps *abstract away* precise ge
 Tools like `cowplot::ggdraw()`[@cowplot] create side-by-side views: one panel shows overview, another shows zoomed detail (Figure \@ref(fig:cow-plot-plot)).
 
 ```{r data-cow-plot, include=FALSE}
-lga_inset <- vic[vic$LGA_NAME == "MELBOURNE", ]
+greater_melbourne <- c(
+  "BANYULE", "BAYSIDE", "BOROONDARA", "BRIMBANK", "CARDINIA", "CASEY",
+  "DAREBIN", "FRANKSTON", "GLEN EIRA", "GREATER DANDENONG",
+  "HOBSONS BAY", "HUME", "KINGSTON", "KNOX", "MARIBYRNONG",
+  "MANNINGHAM", "MAROONDAH", "MELBOURNE", "MELTON", "MERRI-BEK",
+  "MONASH", "MOONEE VALLEY", "MORNINGTON PENINSULA",
+  "NILLUMBIK", "PORT PHILLIP", "STONNINGTON", "WHITEHORSE",
+  "WHITTLESEA", "WYNDHAM", "YARRA", "YARRA RANGES"
+)
+
+lga_inset <- vic[vic$LGA_NAME %in% greater_melbourne, ]
 main_map <- ggplot() +
  geom_sf(data = vic, fill = "lightgray", color = "white") +
  geom_sf(data = lga_inset, fill = "red", color = "red") + # Highlight the inset area
@@ -261,7 +271,7 @@ main_map <- ggplot() +
 inset_map <- ggplot() +
  geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue") +
  theme_void() +
- labs(title = "Melbourne LGA")
+ labs(title = "Greater Melbourne")
 ```
 
 ```{r cow-plot-plot, echo=FALSE, fig.cap="Overview with inset: separates focus from context into distinct panels."}
@@ -280,7 +290,7 @@ None of these approaches provide *continuous geometric magnification within a si
 
 With this landscape established, we now turn to the technical implementation: how does the FGC transformation actually work, and how does this package make it accessible within R's spatial workflows?
 
-# Methods
+# Implementation
 
 ```{r preparing-data, include=FALSE}
 
@@ -733,27 +743,27 @@ bench_sf <- function(ns = c(5e3, 1e4, 2e4, 5e4), times = 5L) {
 
 sfb <- bench_sf()
 sf_data <- sfb$data
+save(sf_data, file = "data/sf_data.rda")
+save(core, file = "data/core.rda")
+```
+
+```{r bench-plot-data}
+load("data/sf_data.rda")
+load("data/core.rda")
 plot_2 <- ggplot(sf_data, aes(vertices, median_ms)) +
   geom_point() + geom_line() +
   scale_x_log10() + scale_y_log10() +
   geom_smooth(method = "lm", se = FALSE) +
   coord_fixed(ratio = 1)
 
-
 plot_1 <- ggplot(core$data, aes(n, median_ms)) +
   geom_point() + geom_line() +
   scale_x_log10() + scale_y_log10() +
   geom_smooth(method = "lm", se = FALSE)+
   coord_fixed(ratio = 1)
-
-plot_all <- plot_1 + plot_2
-
-save(plot_all, file = "data/plot-all.rda")
-
 ```
 
 ```{r bench-plot, fig.cap="Benchmark performance of fisheye_fgc() and sf_fisheye()", echo=FALSE}
-load("data/plot-all.rda")
 
 plot_1 + plot_2
 ```
@@ -912,6 +922,9 @@ retaining a recognisable state outline. Choose \(r_{\text{in}}\) to enclose the 
 without overwhelming the transition. 
 
 ```{r zoom-factor, echo=FALSE, fig.cap="Zoom factors for balanced metropolitan focus within a state.", out.width="80%"}
+
+melbourne <- vic_fish |> filter(LGA_NAME == "MELBOURNE")
+
 vic_fish_1 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 5)
 vic_fish_2 <- sf_fisheye(vic, center = melbourne, r_in = 0.35, r_out = 0.70, zoom_factor = 20, squeeze_factor = 0.40)
 
@@ -935,6 +948,10 @@ plot_4 <- ggplot() +
   theme_map()
 
 plot_3 + plot_4
+```
+
+```{r}
+test_grid
 ```
 
 Pair this with  A `squeeze_factor` of \(0.3\text{--}0.5\), which
@@ -1074,9 +1091,7 @@ projections.
 
 # Examples of use
 
-We present two applied scenarios to illustrate how the FGC fisheye clarifies local structure while retaining geographic context. The first uses Victorian hospital-RACF to demonstrate overplotting relief and alignment across multiple layers. The second reproduces a gridded choropleth over France to show how the transform improves legibility around dense urban cores while preserving national context.
-
-## Hospital locations within state context
+We present the applied scenario to illustrate how the FGC fisheye clarifies local structure while retaining geographic context. We will uses Victorian hospital-RACF to demonstrate overplotting relief and alignment across multiple layers.
 
 ```{r preparing-hosp-data}
 hosp_point <- conn_fish |>
@@ -1119,7 +1134,6 @@ plot_hosp + plot_racf
 As shown in Figure \@ref(fig:hospitals-basic-plot), standard maps of hospital and RACF locations quickly become cluttered in metropolitan Melbourne. Points occlude one another, and the relationship between facilities is difficult to assess. The simple pair of small-scale views indicates relative counts (many RACFs, fewer hospitals) but masks local proximity patterns and neighbourhood coverage.
 
 ```{r fisheye-preparation}
-melbourne <- vic_fish |> filter(LGA_NAME == "MELBOURNE")
 hosp_point2 <- hosp_point |>
   mutate(type = "hospital") |>
   rename(id = destination)
@@ -1139,149 +1153,17 @@ pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
 ```{r fisheye-plot, fig.cap="Fisheye applied with a common centre and parameters keeps overlays aligned while magnifying the Melbourne LGA."}
 ggplot() +
   geom_sf(data = vic_w, fill = "grey", linewidth = 0.5) +
-  geom_sf(data = vic_w |> filter(LGA_NAME == "MELBOURNE"), fill = "white", linewidth = 1) +
-  geom_sf_label(data = melbourne, aes(label = "Mel CBD"), size = 3) +
+  geom_sf(data = vic_w |> filter(LGA_NAME == "MELBOURNE"), fill = "white", linewidth = 1, color ="red") +
+  geom_sf_label(data = melbourne, aes(label = "Melbourne CBD"), size = 3) +
   geom_sf(data = pts_w, aes(color = type), size = 1, alpha = 0.5) +
   scale_color_manual(
   name = "Facility type",
   values = c("hospital" = "red", "racf" = "blue"),
   labels = c("Hospital", "RACF")) +
-  ggtitle("Melbourne hospitals and RACFs locations") +
-  theme_map()
+  ggtitle("Melbourne hospitals and RACFs locations")
 ```
 
 Applying the fisheye to both features (points) and boundaries with a common centre (the MELBOURNE polygon) and shared parameters (`zoom = 20`, `squeeze = 0.3`, method = "expand") yields a single, continuous map in which the Melbourne LGA is magnified while the rest of Victoria remains readable. Because all layers undergo the same warp, overlays remain aligned. The result improves visual separation of facilities and reveals local hub structures without resorting to insets. All computations on attributes remain valid—the geometry is warped for display, but feature identity, CRS metadata, and table structure are preserved. As with any lens, distances and areas inside the focus and glue are not metric and should not be used for quantitative spatial inference.
-
-## France example
-
-The France grid example uses `france_sport.gpkg` from B. Nowak’s repository (github.com/BjnNowak/lego_map), where `value` denotes the percentage of population who are members of a sport association. We classify `value` into six bins for a gridded choropleth and overlay centroids for reference.
-
-```{r france-preparation}
-map<-sf::read_sf('https://github.com/BjnNowak/lego_map/raw/main/data/france_sport.gpkg')
-
-# Create classes
-clean <- map |>
-  mutate(clss=case_when(
-    value<18~"1",
-    value<20~"2",
-    value<22~"3",
-    value<24~"4",
-    value<26~"5",
-    TRUE~"6"
-  ))
-
-# Set color palette
-pal <- c("#bb3e03","#ee9b00","#e9d8a6","#94d2bd","#0a9396","#005f73")
-# Set color background
-bck <- "#001219"
-
-# Set theme 
-theme_custom <- theme_void()+
-  theme(
-    plot.title = element_text(size = 14, face = "bold", hjust = 0.5, color = "#ffffffff"),
-    plot.margin = margin(1,1,10,1,"pt"),
-    plot.background = element_rect(fill=bck,color=NA),
-    legend.position = "bottom",
-    legend.title = element_text(hjust=0.5,color="white",face="bold"),
-    legend.text = element_text(color="white")
-  )
-
-# Make grid
-grd <- st_make_grid(
-    clean, # map name 
-    n = c(60,60) # number of cells per longitude/latitude
-  )|>
-  # convert back to sf object
-  st_sf()|>
-  # add a unique id to each cell 
-  # (will be useful later to get back centroids data)
-  mutate(id=row_number())
-  
-# Extract centroids
-cent<-grd|>
-  st_centroid()
-
-# Intersect centroids with basemap
-cent_clean<-cent|>
-  st_intersection(clean)
-
-# Make a centroid without geom
-# (convert from sf object to tibble)
-cent_no_geom <- cent_clean|>
-  st_drop_geometry()
-
-# Join with grid thanks to id column
-grd_clean<-grd|>
-  #filter(id%in%sel)|>
-  left_join(cent_no_geom)
-
-grd_clean <- grd_clean |> rename("geometry" = "st_make_grid.clean..n...c.60..60..")
-cent_clean <- cent_clean |> rename("geometry" = "st_make_grid.clean..n...c.60..60..")
-
-grd_clean_fish <- sf_fisheye(grd_clean)
-cent_clean_fish <- sf_fisheye(cent_clean)
-
-```
-
-```{r france-plots}
-plot_frc_1 <- ggplot() +
-  geom_sf(
-    grd_clean |> drop_na(),
-    mapping = aes(geometry = geometry, fill = clss)
-  ) +
-  geom_sf(
-    cent_clean,
-    mapping = aes(geometry = geometry),
-    fill = NA, pch = 21, size = 0.5
-  ) +
-  labs(title = "Before fisheye",
-    fill="Percentage of population \nis a member of a sport association") +
-  scale_fill_manual(
-    values = pal,
-    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
-  ) +
-  guides(
-    fill = guide_legend(
-      nrow = 1,
-      title.position = "top",
-      label.position = "bottom"
-    )
-  ) +
-  theme_custom
-
-
-plot_frc_2 <- ggplot() +
-  geom_sf(
-    grd_clean_fish |> drop_na(),
-    mapping = aes(geometry = geometry, fill = clss)
-  ) +
-  geom_sf(
-    cent_clean_fish,
-    mapping = aes(geometry = geometry),
-    fill = NA, pch = 21, size = 0.5
-  ) +
-  guides(
-    fill = guide_legend(
-      nrow = 1,
-      title.position = "top",
-      label.position = "bottom"
-    )
-  ) +
-  labs(title = "After fisheye",
-    fill="Percentage of population \nis a member of a sport association") +
-
-  scale_fill_manual(
-    values = pal,
-    label = c("< 18 %","< 20 %","< 22 %","< 24 %","< 26 %", "≥ 26 %")
-  ) +
-  theme_custom
-```
-
-```{r france-comparison, fig.cap="France choropleth before (left) and after (right) fisheye: the lens improves legibility around the selected metropolitan area while preserving national context."}
-plot_frc_1 + plot_frc_2
-```
-
-In Figure \@ref(fig:france-comparison), the gridded choropleth is transformed with the same fisheye, yielding enhanced detail in the selected metropolitan region while preserving national context and class boundaries. Classification and legend semantics are unchanged because attributes are not altered; only the geometry is warped. The paired before/after view illustrates how the lens aids interpretation near dense urban centres without fragmenting the map or sacrificing continuity.
 
 # Discussion
 
