@@ -292,7 +292,7 @@ With this landscape established, we now turn to the technical implementation: ho
 
 # Implementation
 
-```{r preparing-data, include=FALSE}
+```{r preparing-data, inMMOlude=FALSE}
 
 plot_fisheye_fgc <- function(original_coords, transformed_coords, 
   cx = 0, cy = 0, r_in = 0.34, r_out = 0.5) {
@@ -951,7 +951,59 @@ plot_3 + plot_4
 ```
 
 ```{r}
-test_grid
+test_grid <- create_test_grid()
+transform_grid_1 <- fisheye_fgc(test_grid, zoom_factor = 1.2)
+transform_grid_2 <- fisheye_fgc(test_grid, zoom_factor = 1.7, revolution = pi/2)
+zones_1 <- attr(transform_grid_1,"zones")
+zones_2 <- attr(transform_grid_2,"zones")
+transform_grid_1 <- as_tibble(transform_grid_1)
+transform_grid_2 <- as_tibble(transform_grid_2)
+transform_grid_1$zones <- zones_1
+transform_grid_2$zones <- zones_2
+plot_1 <- ggplot() +
+  geom_point(data = transform_grid_1, aes(x = x_new, y = y_new, color = zones)) +
+  geom_path(data = transform_grid_1, aes(x = x_new, y = y_new, color = zones)
+  )+ scale_color_discrete() + 
+  coord_fixed(ratio = 1)
+plot_2 <- ggplot() +
+  geom_point(data = transform_grid_2, aes(x = x_new, y = y_new, color = zones)) +
+  scale_color_discrete() + 
+  coord_fixed(ratio = 1)
+
+plot_1 + plot_2
+```
+
+```{r}
+transform_grid_1 <- transform_grid_1 %>%
+  mutate(seg = ceiling(row_number() / 21))
+transform_grid_2 <- transform_grid_2 %>%
+  mutate(seg = ceiling(row_number() / 21))
+
+plot_3 <- ggplot(transform_grid_1, aes(x_new, y_new)) +
+  geom_path(aes(group = seg, colour = zones), size = 1) +
+  coord_equal() +
+  theme_minimal()
+
+plot_4 <- ggplot(transform_grid_2, aes(x_new, y_new)) +
+  geom_path(aes(group = seg, colour = zones), size = 1) +
+  coord_equal() +
+  theme_minimal()
+
+plot_3 + plot_4
+
+```
+```{r}
+library(geozoo)
+d <- cube.line(p = 2, n = 8)
+d_seg <- tibble(
+  x = d$points[d$edges[,1],1],
+  xend = d$points[d$edges[,2],1], 
+  y = d$points[d$edges[,1],2],
+  yend = d$points[d$edges[,2],2])
+
+ggplot(d) +
+  geom_segment()
+
 ```
 
 Pair this with  A `squeeze_factor` of \(0.3\text{--}0.5\), which
