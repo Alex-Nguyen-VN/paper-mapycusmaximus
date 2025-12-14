@@ -276,7 +276,7 @@ ui <- fluidPage(
     });
 
     gUI.innerHTML = '';
-    const ringIn = document.createElementNS(svgNS, 'circle');
+    const ringIn = document.createElementNS(svgNS, 'path');
     ringIn.setAttribute('class', 'ring-in');
     ringIn.setAttribute('fill', 'none');
     ringIn.setAttribute('stroke', '#111');
@@ -284,7 +284,7 @@ ui <- fluidPage(
     ringIn.setAttribute('stroke-width', '1.2');
     gUI.appendChild(ringIn);
 
-    const ringOut = document.createElementNS(svgNS, 'circle');
+    const ringOut = document.createElementNS(svgNS, 'path');
     ringOut.setAttribute('class', 'ring-out');
     ringOut.setAttribute('fill', 'none');
     ringOut.setAttribute('stroke', '#111');
@@ -342,16 +342,28 @@ ui <- fluidPage(
     const cx = P.xScale(lens.x);
     const cy = P.yScale(lens.y);
 
-    const ringIn  = gUI.querySelector('circle.ring-in');
-    const ringOut = gUI.querySelector('circle.ring-out');
+    const ringIn  = gUI.querySelector('path.ring-in');
+    const ringOut = gUI.querySelector('path.ring-out');
 
-    ringIn.setAttribute('cx', cx);
-    ringIn.setAttribute('cy', cy);
-    ringIn.setAttribute('r', rInData * P.k);
+    function ringPath(rNorm) {
+      const n = 240;
+      const pts = [];
+      const s = sFromBBox();
+      const rData = rNorm * s;
+      for (let i = 0; i <= n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const x0 = lens.x + rData * Math.cos(a);
+        const y0 = lens.y + rData * Math.sin(a);
+        const w = warpPoint(x0, y0); // should be identity on boundary, but keeps us honest
+        pts.push([P.xScale(w[0]), P.yScale(w[1])]);
+      }
+      let d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+      for (let i = 1; i < pts.length; i++) d += ' L ' + pts[i][0] + ' ' + pts[i][1];
+      return d + ' Z';
+    }
 
-    ringOut.setAttribute('cx', cx);
-    ringOut.setAttribute('cy', cy);
-    ringOut.setAttribute('r', rOutData * P.k);
+    ringIn.setAttribute('d', ringPath(params.r_in));
+    ringOut.setAttribute('d', ringPath(params.r_out));
   }
 
   function scheduleUpdate() {
@@ -416,6 +428,9 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
+  # shared bbox so static plot matches JS framing
+  bbox_val <- reactiveVal(NULL)
+
   # store sampled network (changes only when resample / n_fac changes)
   sampled_layers <- reactiveVal(prepare_network(n_hosp = 10, n_racf = 10))
 
@@ -454,6 +469,8 @@ server <- function(input, output, session) {
 
     bb <- sf::st_bbox(bind0)
 
+    bbox_val(bb)
+
     payload <- list(
       bbox = as.list(bb),
       centre = centre_point(),
@@ -479,13 +496,22 @@ server <- function(input, output, session) {
 
   output$original_plot <- renderPlot({
     layers <- sampled_layers()
+    bb <- bbox_val()
+    req(bb)
+
     ggplot() +
       geom_sf(data = vic, fill = "grey95", color = "grey70", linewidth = 0.2) +
       { if (isTRUE(input$show_lines)) geom_sf(data = layers$transfers, aes(linewidth = transfer_n), color = "grey50", alpha = 0.45) } +
       geom_sf(data = layers$racfs, color = "#2c7fb8", size = 1, alpha = 0.9) +
       geom_sf(data = layers$hospitals, color = "#d7191c", size = 1.2, alpha = 0.9) +
       scale_linewidth(range = c(0.2, 1.2), guide = "none") +
-      ggtitle("Original Victoria") +
+      coord_sf(
+        crs = st_crs(vic),
+        xlim = c(as.numeric(bb["xmin"]), as.numeric(bb["xmax"])),
+        ylim = c(as.numeric(bb["ymin"]), as.numeric(bb["ymax"])),
+        expand = FALSE
+      ) +
+      ggtitle("Original Victoria (matched framing)") +
       theme_map() +
       theme(panel.background = element_rect(fill = "grey98", color = NA))
   }, res = 110)
