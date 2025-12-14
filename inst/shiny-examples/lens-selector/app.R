@@ -90,16 +90,53 @@ server <- function(input, output, session) {
     )
   })
 
-  transformed <- reactive({
-    layers <- sampled_layers()
-    args <- lens_args()
-    list(
-      vic = do.call(sf_fisheye, c(list(vic), args)),
-      hospitals = do.call(sf_fisheye, c(list(layers$hospitals), args)),
-      racfs = do.call(sf_fisheye, c(list(layers$racfs), args)),
-      transfers = do.call(sf_fisheye, c(list(layers$transfers), args))
-    )
-  })
+transformed <- reactive({
+  layers <- sampled_layers()
+  args   <- lens_args()
+
+  # 1) Make points with consistent schema (type + id)
+  hosp_point2 <- layers$hospitals |>
+    mutate(type = "hospital") |>
+    rename(id = destination)
+
+  racf_point2 <- layers$racfs |>
+    mutate(type = "racf") |>
+    rename(id = source)
+
+  all_points <- bind_rows(hosp_point2, racf_point2)
+
+  # 2) Bind all layers into ONE sf so they share bbox + normalization
+  bind <- dplyr::bind_rows(
+    vic       |> dplyr::mutate(.layer = "vic"),
+    all_points|> dplyr::mutate(.layer = "pts"),
+    layers$transfers |> dplyr::mutate(.layer = "transfers")
+  )
+
+  # 3) Apply ONE fisheye transform to the bound object
+  bind_w <- do.call(sf_fisheye, c(list(bind), args))
+
+  # 4) Split back out
+  vic_w <- bind_w |>
+    dplyr::filter(.layer == "vic") |>
+    dplyr::select(-.layer)
+
+  pts_w <- bind_w |>
+    dplyr::filter(.layer == "pts") |>
+    dplyr::select(-.layer)
+
+  transfers_w <- bind_w |>
+    dplyr::filter(.layer == "transfers") |>
+    dplyr::select(-.layer)
+
+  list(
+    vic = vic_w,
+    hospitals = pts_w |> filter(type == "hospital"),
+    racfs     = pts_w |> filter(type == "racf"),
+    transfers = transfers_w
+  )
+}) |>
+  bindCache(input$centre, input$r_in, input$r_out, input$zoom, input$squeeze, input$n_fac, input$show_lines)
+
 
   fisheye_gg <- reactive({
     layers <- transformed()
