@@ -22,7 +22,7 @@ In cartography, the need for nonlinear magnification emerged independently. \cit
 
 Within R's spatial ecosystem, sf \citep{RJ-2018-009} provides robust vector handling and CRS transformations, while ggplot2 \citep{wickham2016} offers declarative visualization grammar. Yet a gap remained: existing tools addressed \emph{related} distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
 
-\section{Alternative approaches to the detail-context problem}\label{alternative-approaches-to-the-detail-context-problem}
+\section{Background}\label{background}
 
 Before examining the mechanics of fisheye transformations, it is important to review how R's spatial ecosystem currently addresses the detail-versus-context tradeoff. This context clarifies why existing solutions, though valuable, do not fully address the need for continuous lens-based warping.
 
@@ -36,19 +36,19 @@ The cartogram family \citep{gastner2004} intentionally distorts geographic areas
 \caption{\label{fig:plot-cart}Cartogram example: thematic distortion changes shapes and sizes to encode population.}
 \end{figure}
 
-This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. For example, a population cartogram enlarges Melbourne while shrinking Mornington, prioritizing thematic insight over geographic fidelity. In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
+This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. For example, a population cartogram enlarges Monash while shrinking La Trobe, prioritizing thematic insight over geographic fidelity. The reader can still somehow find the shape of Victoria familiars, as the cartogram preserves relative positions and topology, however, it shape and size are distorted. In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
 
 \subsubsection{Hexagon tile maps: Discrete abstraction}\label{hexagon-tile-maps-discrete-abstraction}
 
-Packages like \texttt{geogrid} and visualizations using \texttt{sf::st\_make\_grid()} replace irregular polygons with regular hexagonal or square tiles, each representing an administrative unit.
+Packages like \texttt{sugarbag} replace irregular polygons with regular hexagonal or square tiles, each representing an administrative unit.
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/geo-grid-plot-1.pdf}}
-\caption{\label{fig:geo-grid-plot}Victoria LGA grid assignment: tile maps abstract away precise geometry in favour of adjacency.}
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/sugarbag-plot-1.pdf}}
+\caption{\label{fig:sugarbag-plot}Sugarbag example: thematic distortion changes shapes and sizes to encode population.}
 \end{figure}
 
-As seen in Figure \ref{fig:geo-grid-plot}, tile maps \emph{abstract away} precise geography entirely, treating space as a topology-preserving tessellation where ``neighbors touch'' matters more than accurate boundaries. Tile maps excel at avoiding size bias (Mildura gets equal visual weight to Yarra) and creating aesthetic, clutter-free layouts. However, they abandon continuous spatial relationships: you cannot identify precise locations, measure distances, or overlay point data meaningfully. Hexbin aggregation for point data (via \texttt{ggplot2::geom\_hex()}) serves a different purpose---density estimation---rather than focus+context navigation.
+As seen in Figure \ref{fig:sugarbag-plot}, tile maps \emph{abstract away} precise geography entirely, treating space as a topology-preserving tessellation where ``neighbors touch'' matters more than accurate boundaries. Tile maps excel at avoiding size bias (Mildura gets equal visual weight to Yarra) and creating aesthetic, clutter-free layouts. However, they abandon continuous spatial relationships: you cannot identify precise locations, measure distances, or overlay point data meaningfully. In the example above, the sugarbag approach was overlay on top of the orignal geography. Hexbin aggregation for point data (via \texttt{ggplot2::geom\_hex()}) serves a different purpose---density estimation---rather than focus+context navigation.
 
 \subsubsection{Multi-panel approaches: Spatial separation}\label{multi-panel-approaches-spatial-separation}
 
@@ -68,7 +68,7 @@ None of these approaches provide \emph{continuous geometric magnification within
 
 With this landscape established, we now turn to the technical implementation: how does the FGC transformation actually work, and how does this package make it accessible within R's spatial workflows?
 
-\section{Methods}\label{methods}
+\section{Implementation}\label{implementation}
 
 \begin{figure}
 \centering
@@ -361,135 +361,74 @@ reliable starting points. We describe these regimes and articulate the trade-off
 choice. The recommendations assume the default \texttt{preserve\_aspect\ =\ TRUE}; when per-axis scaling is
 enabled, translate radii to semi-axes using the bbox half-spans.
 
-\textbf{Balanced metropolitan focus within a state.} A common narrative emphasises a city region while
-retaining a recognisable state outline. Choose \(r_{\text{in}}\) to enclose the urban footprint (often
-\(0.30\text{--}0.35\)) and \(r_{\text{out}}\) to provide a broad glue buffer
-(\(0.55\text{--}0.70\)). A \texttt{zoom\_factor} of \(5\text{--}10\) provides visible enlargement
-without overwhelming the transition.
+\textbf{Quick start (synthetic grid).} Set \(r_{\text{in}}\) to 0.30--0.35 and \(r_{\text{out}}\) to
+0.55--0.70. Pair this with \texttt{zoom\_factor} between 5 and 10 and \texttt{squeeze\_factor} near 0.35 for a
+balanced focus that still shows context. Stick with \texttt{method\ =\ "expand"} and \texttt{revolution\ =\ 0} unless
+you explicitly need outer rigidity or a twist.
+
+In this simple example, we demo the effect of zoom factor 1.5 and 2 on a synthetic grid to demonstrate how the point movement was effected by the zoom factor.
 
 \begin{figure}
-\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/zoom-factor-1} \caption{Zoom factors for balanced metropolitan focus within a state.}\label{fig:zoom-factor}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1} \caption{Zoom factors for balanced metropolitan focus within a state.}\label{fig:zoom-factor-plot}
 \end{figure}
 
-Pair this with A \texttt{squeeze\_factor} of \(0.3\text{--}0.5\), which
-gently compresses surroundings while maintaining smoothness. The \texttt{"expand"} method yields a
-balanced appearance in which the mid-glue region visibly bridges detail and context. If preserving the
-outer coastline or boundary is paramount (e.g., for policy maps where the edge must remain stable),
-\texttt{"outward"} can be substituted to reduce outer drift at the cost of slightly stronger inner
-squeeze.
-
-\textbf{Dense line networks and flows.} When the layer of interest is line-heavy (transport corridors,
-flows, hydrology), kink introduction and overplotting are the primary risks. Reduce glue compression
-and avoid large twists: \texttt{squeeze\_factor\ \textbackslash{}ge\ 0.35} (ideally \(0.40\text{--}0.60\)) coupled with
-\texttt{revolution\ \textbackslash{}le\ 0.2} radians keeps linework legible while still communicating focus. The
-\texttt{"expand"} method is generally preferable because its symmetric treatment of the glue reduces
-inflections near \(r_{\text{in}}\) and \(r_{\text{out}}\). When in doubt, plot a radius-vs-radius
-diagnostic from \texttt{fisheye\_fgc()} to confirm that the derivative remains near one at boundaries.
-
-\textbf{Polygon-dominated maps and choropleths.} For administrative regions, land-use parcels, or other
-polygon-dense layers, slightly stronger compression in the glue is tolerable because viewers rely on
-silhouette and adjacency rather than precise edge angles. Settings such as \texttt{\{squeeze\_factor\ =\ 0.25\textbackslash{}text\{\ -\ \}0.40\}} with \texttt{zoom\_factor\ =\ 5\textbackslash{}text\{\ -\ \}20\}} and either \texttt{"expand"} or
-\texttt{"outward"} often work well.
+However, as demonstrated below, the revolution effect might make the distortion of the linestring object more obvious, comparing to just only the zoom factor effect.
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/method-plot-1.pdf}}
-\caption{\label{fig:method-plot}Different method for glue compression}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1} \caption{Revolution effect}\label{fig:unnamed-chunk-1}
 \end{figure}
 
-We recommend \texttt{revolution\ =\ 0} for publication unless the swirl
-is part of the intended rhetoric; twists, while visually engaging, can distract from choropleth
-encoding and complicate legend interpretation.
-
-\textbf{Small multiples and parameter sweeps.} Analysts frequently compare scenarios across maps (e.g.,
-different thresholds or temporal slices). Portability of parameters is maximised by using a
-normalised centre (\texttt{normalized\_center\ =\ TRUE}) with \texttt{preserve\_aspect\ =\ TRUE}. This yields
-consistent radii across datasets of different extent and makes small multiples directly comparable.
-
-A pattern that works well is to fix \(r_{\text{in}}, r_{\text{out}}\) and \texttt{squeeze\_factor}, and vary
-\texttt{zoom\_factor} over a short range (e.g., \(1.3, 1.6, 2.0\)). Faceting these outputs produces a
-transparent narrative of how emphasis changes with magnification.
-
-\textbf{Choosing radii from map scale.} When stakeholders communicate distances in kilometres or miles, convert desired physical radii to unit radii using the bbox half-span. With \texttt{\{preserve\_aspect\ =\ TRUE\}}, \(r_{\text{in}} = d/s\) where \(d\) is the intended focus radius in map units (metres for metric projections) and \(s\) is the larger half-span of the bbox.
+For polygon object, we can see the same distortion effect as the linestring.
 
 \begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/radii-prepare-1} 
-
-}
-
-\caption{Map scale for different radii}\label{fig:radii-prepare-1}
-\end{figure}
-\begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/radii-prepare-2} 
-
-}
-
-\caption{Map scale for different radii}\label{fig:radii-prepare-2}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/poly-plot-1} \caption{Revolution effect with polygon}\label{fig:poly-plot}
 \end{figure}
 
-This rule allows quick calibration: for a state with half-span 250 km, a desired 75 km focus corresponds to \(r_{\text{in}} \approx 0.30\). For per-axis scaling, choose semi-axes independently: \(r_{\text{in,x}} = d_x/s_x\), \(r_{\text{in,y}} = d_y/s_y\), noting that the current implementation interprets \(r_{\text{in}}\) as a single scalar and therefore realises an ellipse only through \texttt{preserve\_aspect\ =\ FALSE}.
+As we can see, the revolution effect create a vortex or zoom wheel effect into the focus zone, which may be useful in some cases. For manuscripts and dashboards, prefer \texttt{revolution\ =\ 0}.
 
-\textbf{Centres for reproducibility.} To avoid ambiguity in collaborative settings, prefer specifying
-\texttt{center} either as an \texttt{sf} geometry (whose CRS is explicit) or as a lon/lat pair with
-\texttt{center\_crs\ =\ "EPSG:4326"}. Numeric pairs without CRS are accepted but rely on heuristics. When
-the focal area is itself a polygon or multi-polygon, passing that object as \texttt{center} ensures the
-centroid is derived from the same dataset used for the map, improving reproducibility and intent.
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-2-1.pdf}}
 
-\textbf{CRS considerations.} Leaving \texttt{target\_crs\ =\ NULL} suffices for most lon/lat inputs because
-the working CRS is chosen deterministically. Projects that maintain a standard grid (e.g., local
-government dashboards) should specify \texttt{target\_crs} to improve cross-report comparability. Avoid
-switching working CRS between layers that will be overlaid; doing so changes the meaning of
-normalised radii and will misalign warps.
+Similarly, start with \texttt{"expand"} and adopt \texttt{"outward"} only when outer stability is an explicit requirement. Always annotate or at least describe the distortion in figure captions so readers do not mistake warped areas for standard projections.
 
-\textbf{Publication vs.~exploration.} For exploratory notebooks and talks, small nonzero \texttt{revolution} values (\(\le 0.3\) radians) can help audiences perceive continuity across the glue.
-
-\begin{figure}
-
-{\centering \includegraphics{paper-mapycusmaximus_files/figure-latex/fisheye-revolution-1} 
-
-}
-
-\caption{Fisheye with different revolutions.}\label{fig:fisheye-revolution}
-\end{figure}
-
-For manuscripts and dashboards, prefer \texttt{revolution\ =\ 0}. Similarly, start with \texttt{"expand"} and adopt \texttt{"outward"} only when outer stability is an explicit requirement. Always annotate or at least describe the distortion in figure captions so readers do not mistake warped areas for standard
-projections.
+\textbf{Simple tweaks.} If linework kinks, raise \texttt{squeeze\_factor} slightly (e.g., 0.45). If the focus
+feels too tight, lower \texttt{zoom\_factor} toward 4--6. For reproducible comparisons, keep
+\texttt{normalized\_center\ =\ TRUE} and reuse the same radii across runs.
 
 \section{Examples of use}\label{examples-of-use}
 
-We present two applied scenarios to illustrate how the FGC fisheye clarifies local structure while retaining geographic context. The first uses Victorian hospital-RACF to demonstrate overplotting relief and alignment across multiple layers. The second reproduces a gridded choropleth over France to show how the transform improves legibility around dense urban cores while preserving national context.
+We focus on one application: Victorian hospitals and residential aged care facilities (RACFs). Transfer counts are simulated; coordinates come from \texttt{conn\_fish}. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens.
 
-\subsection{Hospital locations within state context}\label{hospital-locations-within-state-context}
+First, we can plot seperately the sampled hospitals and the age care facilities to see where they actually are.
+
+\begin{figure}
+\centering
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf}}
+\caption{\label{fig:hospitals-point-plot}Standard maps: hospital (red) and RACF (blue) points plotted over Victoria without fisheye.}
+\end{figure}
+
+Afterward, we can plot the connection between the hospital and the age care facilities to see the movement of the patient between the two as shown in the Figure \ref{fig:hospitals-basic-plot}.
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf}}
-\caption{\label{fig:hospitals-basic-plot}Standard maps: hospital (red) and RACF (blue) points plotted over Victoria without fisheye.}
+\caption{\label{fig:hospitals-basic-plot}Standard Victorian map with sampled hospitals (red), RACFs (blue), and simulated transfer lines on a grey background.}
 \end{figure}
 
-As shown in Figure \ref{fig:hospitals-basic-plot}, standard maps of hospital and RACF locations quickly become cluttered in metropolitan Melbourne. Points occlude one another, and the relationship between facilities is difficult to assess. The simple pair of small-scale views indicates relative counts (many RACFs, fewer hospitals) but masks local proximity patterns and neighbourhood coverage.
+As we can see, comparing to the scale of Victoria, with the default scale method, the network mostly invisible. To magnify the network, we can apply a fisheye lens.
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf}}
-\caption{\label{fig:fisheye-plot}Fisheye applied with a common centre and parameters keeps overlays aligned while magnifying the Melbourne LGA.}
+\caption{\label{fig:fisheye-plot}Fisheye view magnifies greater Melbourne while keeping statewide context; lines, points, and polygons stay aligned.}
 \end{figure}
 
-Applying the fisheye to both features (points) and boundaries with a common centre (the MELBOURNE polygon) and shared parameters (\texttt{zoom\ =\ 20}, \texttt{squeeze\ =\ 0.3}, method = ``expand'') yields a single, continuous map in which the Melbourne LGA is magnified while the rest of Victoria remains readable. Because all layers undergo the same warp, overlays remain aligned. The result improves visual separation of facilities and reveals local hub structures without resorting to insets. All computations on attributes remain valid---the geometry is warped for display, but feature identity, CRS metadata, and table structure are preserved. As with any lens, distances and areas inside the focus and glue are not metric and should not be used for quantitative spatial inference.
+We could also include an interactive version of the plot above, thanks to the natively support and intergration of \texttt{ggplotly} with sf object.
 
-\subsection{France example}\label{france-example}
+The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same centre and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. To inspect a different hub (e.g., Geelong), change \texttt{center} to that polygon; multiple centres can be explored by re-running \texttt{sf\_fisheye()} with alternative centres and comparing panels side by side.
 
-The France grid example uses \texttt{france\_sport.gpkg} from B. Nowak's repository (github.com/BjnNowak/lego\_map), where \texttt{value} denotes the percentage of population who are members of a sport association. We classify \texttt{value} into six bins for a gridded choropleth and overlay centroids for reference.
+For polygons beyond metro Melbourne, the same lens settings apply; polygon edges bend smoothly but retain adjacency. Because transfer counts are simulated, readers should treat magnitude as illustrative only; spatial relationships (what becomes readable after zoom vs.~what remains hidden) follow from the geometry.
 
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/france-comparison-1.pdf}}
-\caption{\label{fig:france-comparison}France choropleth before (left) and after (right) fisheye: the lens improves legibility around the selected metropolitan area while preserving national context.}
-\end{figure}
-
-In Figure \ref{fig:france-comparison}, the gridded choropleth is transformed with the same fisheye, yielding enhanced detail in the selected metropolitan region while preserving national context and class boundaries. Classification and legend semantics are unchanged because attributes are not altered; only the geometry is warped. The paired before/after view illustrates how the lens aids interpretation near dense urban centres without fragmenting the map or sacrificing continuity.
+In this case, we can see that some point and connection was squished together since they were in the glue zone. We can change that by introducing a new center, and shrink the original focus zone. However, the mechanic of handling overlapping zone between multiple center is not implemented in this version yet.
 
 \section{Discussion}\label{discussion}
 
