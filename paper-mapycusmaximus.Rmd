@@ -1259,10 +1259,8 @@ We used AI tools to assist with code refactoring and drafting portions of the te
 
 # Resources
 
-The github link for this paper is [here](https://github.com/Alex-Nguyen-VN/paper-mapycusmaximus).
+The github repo for this paper is [https://github.com/Alex-Nguyen-VN/paper-mapycusmaximus](https://github.com/Alex-Nguyen-VN/paper-mapycusmaximus).
 
-The mapycusmaximus package is available on [GitHub](https://github.com/Alex-Nguyen-VN/mapycusmaximus).
-
-The slideshow for this package can be found [here](https://github.com/Alex-Nguyen-VN/Talk/tree/main/mapycus-slide).
+The mapycusmaximus package is available at [https://github.com/Alex-Nguyen-VN/mapycusmaximus](https://github.com/Alex-Nguyen-VN/mapycusmaximus).
 
 
