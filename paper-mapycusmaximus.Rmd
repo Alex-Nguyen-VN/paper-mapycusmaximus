@@ -58,6 +58,7 @@ library(DiagrammeRsvg)
 library(stringr)
 library(janitor)
 library(plotly)
+library(lwgeom)
 ```
 
 # Introduction
