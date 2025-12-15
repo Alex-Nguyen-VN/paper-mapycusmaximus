@@ -201,7 +201,7 @@ ggplot(mapping = aes(fill = LGA_NAME)) +
     group = interaction(LGA_NAME))) +
   scale_fill_viridis_d() +
   theme_map() +
-  theme(legend.position = "none", aspect.ratio = 1)
+  theme(legend.position = "none")
 ```
 
 
