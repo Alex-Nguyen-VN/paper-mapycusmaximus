@@ -85,7 +85,7 @@ Within R's spatial ecosystem, sf [@RJ-2018-009] provides robust vector handling 
 Before examining the mechanics of fisheye transformations, it is important to review how R’s spatial ecosystem currently addresses the detail-versus-context tradeoff. This context clarifies why existing solutions, though valuable, do not fully address the need for continuous lens-based warping.
 
 ### Cartograms: Thematic distortion
-The cartogram family [@gastner2004] intentionally distorts geographic areas to encode variables—population density reshapes regions so area becomes proportional to demographic weight (see Figure \@ref(fig:plot-cart)). 
+The cartogram family intentionally distorts geographic areas to encode variables—population density reshapes regions so area becomes proportional to demographic weight. (See the diffusion cartograms in @gastner2004, for example.) Figure \@ref(fig:plot-cart)) shows a cartogram for Victorian local government areas (LGAs) where colour indicates population, and polygons are distorted proportionally to population. 
 
 ```{r data-cart, include=FALSE}
 # Library
@@ -137,7 +137,7 @@ cartogram <- cartogram_cont(my_sf_merc_2024, "erp_n")
 cartogram <- st_transform(cartogram, st_crs(my_sf))
 ```
 
-```{r plot-cart, echo=FALSE, fig.cap="Cartogram example: thematic distortion changes shapes and sizes to encode population."}
+```{r plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded."}
 ggplot(cartogram) +
   geom_sf(aes(fill = erp_n), linewidth = 0.05, alpha = 0.9, color = "black") +
   scale_fill_gradientn(
