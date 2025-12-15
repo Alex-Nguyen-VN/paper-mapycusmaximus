@@ -2,7 +2,7 @@
 title: "Focus-Glue-Context Fisheye Transformations for Spatial Visualization"
 date: "2025-10-30"
 abstract: >
-  Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus–Glue–Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus (r_in), a smooth transitional glue zone (r_out), and a fixed exterior. Distances expand or compress via a zoom factor and a power-law squeeze, with an optional angular twist that enhances continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (e.g., GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st_transform_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
+  Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus–Glue–Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus, a smooth transitional glue zone, and a fixed exterior. Distances expand or compress via a zoom factor and a power-law squeeze, with an optional angular twist that enhances continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (e.g., GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st_transform_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
 draft: true
 author:  
   - name: Thanh Cuong Nguyen
@@ -33,9 +33,7 @@ author:
     orcid: 0000-0002-3813-7155
 type: package
 output: 
-  rjtools::rjournal_pdf_article:
-    toc: no
-  rjtools::rjournal_web_article:
+  rjtools::rjournal_article:
     self_contained: yes
     toc: no
 bibliography: paper-mapycusmaximus.bib
@@ -59,6 +57,7 @@ library(rsvg)
 library(DiagrammeRsvg)
 library(stringr)
 library(janitor)
+library(plotly)
 ```
 
 # Introduction
@@ -1086,8 +1085,13 @@ Similarly, start with `"expand"` and adopt `"outward"` only when outer stability
 feels too tight, lower `zoom_factor` toward 4–6. For reproducible comparisons, keep
 `normalized_center = TRUE` and reuse the same radii across runs.
 
+# Exploring the implementation using Shiny
 
-# Examples of use
+Explain the shiny app structure, and how it can be used interactively to explore a spatial data set.
+
+Screenshot
+
+# Application to Victorian ambulance transfer records
 
 We focus on one application: Victorian hospitals and residential aged care facilities (RACFs). Transfer counts are simulated; coordinates come from `conn_fish`. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens.
 
@@ -1193,7 +1197,7 @@ pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
 transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
 ```
 
-```{r fisheye-plot, fig.cap="Fisheye view magnifies greater Melbourne while keeping statewide context; lines, points, and polygons stay aligned.", fig.asp=1}
+```{r fisheye-plot, fig.cap="Fisheye view magnifies greater Melbourne while keeping statewide context; lines, points, and polygons stay aligned.", eval=knitr::is_latex_output()}
 focus <- ggplot() +
   geom_sf(data = vic_w, fill = "grey92", color = "grey65") +
   geom_sf(data = transfers_w, aes(alpha = transfer_n), color = "grey40") +
@@ -1218,16 +1222,16 @@ cowplot::ggdraw(focus) +
 
 We could also include an interactive version of the plot above, thanks to the natively support and intergration of `ggplotly` with sf object. 
 
-```{r fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive fisheye plot into Greater Melbourne region, with points, lines, and polygons aligned.", include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
+```{r fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive fisheye plot into Greater Melbourne region, with points, lines, and polygons aligned.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
 focus2 <- ggplot() +
   geom_sf(data = vic_w, fill = "grey92", color = "grey65") +
   geom_sf(data = transfers_w, aes(linewidth = transfer_n), color = "grey40", alpha = 0.6) +
   scale_linewidth(range = c(0.1, 1.2), guide = "none") +
   geom_sf(data = pts_w, aes(color = type), size = 1) +
-  theme_map()
+  ggtitle("Fisheye on Greater Melbourne") +
+  theme_map() 
 
-library(plotly)
-ggplotly(focus2 + ggtitle("Fisheye on Greater Melbourne")) |>
+ggplotly(focus2) |>
   layout(hovermode = "closest")
 ```
 
