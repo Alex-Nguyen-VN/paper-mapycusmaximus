@@ -402,13 +402,105 @@ feels too tight, lower \texttt{zoom\_factor} toward 4-6. For reproducible compar
 
 \section{Exploring the implementation using Shiny}\label{exploring-the-implementation-using-shiny}
 
-Explain the shiny app structure, and how it can be used interactively to explore a spatial data set.
+To support interactive exploration of Focus--Glue--Context (FGC) parameters, the package includes a Shiny-based \emph{lens explorer}. The app allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
 
-Screenshot
+\subsection{App structure}\label{app-structure}
+
+\begin{figure}
+\includegraphics[width=0.8\linewidth]{figures/screenshot} \caption{Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.}\label{fig:shiny-screenshot}
+\end{figure}
+
+The interface is divided into two coordinated panels:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Fisheye (drag lens)}: an SVG-based view rendered in the browser. The fisheye center can be repositioned by dragging directly on the map, triggering real-time geometric warping without re-running server-side plotting code.
+\item
+  \textbf{Original (static)}: a conventional \texttt{ggplot2}/\texttt{sf} map rendered with the \emph{same bounding box and aspect ratio} as the fisheye view, enabling fair visual comparison between warped and unwarped representations.
+\end{itemize}
+
+Spatial data (LGAs, points, and transfer lines) are converted once into plain coordinate lists and sent to the browser. Subsequent interactions update only lens parameters, ensuring smooth response even during continuous dragging.
+
+\subsection{Interactive workflow}\label{interactive-workflow}
+
+\subsubsection{Selecting the lens center}\label{selecting-the-lens-center}
+
+Users begin by choosing an \textbf{Initial lens center (LGA)} from the sidebar. Internally, the selected LGA polygon is reduced to a representative point (\texttt{st\_point\_on\_surface()}), which becomes the fisheye center. This mirrors the common scripted workflow of passing a polygon or centroid as the \texttt{center} argument to \texttt{sf\_fisheye()}.
+
+Once initialized, the center can be moved freely by dragging within the fisheye panel, allowing rapid scanning of different regions without changing parameters.
+
+\subsubsection{Adjusting focus and glue radii}\label{adjusting-focus-and-glue-radii}
+
+Two sliders control the spatial extent of distortion:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Inner radius (focus)} -\textgreater{} \texttt{r\_in} Sets the size of the magnified region. Smaller values create a tight focal bubble; larger values expand the magnified area.
+\item
+  \textbf{Outer radius (glue)} -\textgreater{} \texttt{r\_out} Sets the extent of the transition zone where compression occurs before geometry becomes fixed.
+\end{itemize}
+
+Together, these define the Focus--Glue--Context structure used by both \texttt{fisheye\_fgc()} and \texttt{sf\_fisheye()}. Increasing \texttt{r\_out} spreads distortion more gradually; decreasing it concentrates deformation closer to the focus.
+
+\subsubsection{Controlling magnification and compression}\label{controlling-magnification-and-compression}
+
+Two further sliders adjust distortion strength:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Zoom factor} -\textgreater{} \texttt{zoom\_factor} / \texttt{zoom} Controls radial expansion inside the focus. Higher values increase separation of dense features but amplify distortion near the focus boundary.
+\item
+  \textbf{Squeeze} -\textgreater{} \texttt{squeeze\_factor} / \texttt{squeeze} Controls how sharply distances compress within the glue region. Smaller values produce a pronounced ``shoulder'' near boundaries; larger values yield a smoother transition.
+\end{itemize}
+
+Users are encouraged to increase zoom until local structure becomes readable, then adjust squeeze to reduce crowding or sharp curvature near the glue boundary.
+
+\subsubsection{Sampling and layer visibility}\label{sampling-and-layer-visibility}
+
+The network is intentionally subsampled to maintain interpretability:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sample size per layer} (\texttt{n\_fac}) controls how many hospitals and RACFs are included.
+\item
+  \textbf{Resample facilities} draws a new random subset to test robustness of visual conclusions.
+\item
+  \textbf{Show transfer lines} toggles line geometry on and off, allowing users to tune parameters using points alone before validating connectivity.
+\end{itemize}
+
+All layers (polygons, points, and lines) are warped together using identical parameters, ensuring alignment is preserved under distortion.
+
+\subsection{What to look for}\label{what-to-look-for}
+
+When using the app, readers should pay attention to:
+
+\begin{itemize}
+\tightlist
+\item
+  Whether dense metropolitan features separate cleanly in the focus.
+\item
+  Whether transfer lines remain connected to their endpoints under distortion.
+\item
+  How stable the surrounding context remains as the lens moves or parameters change.
+\end{itemize}
+
+These observations help users choose sensible parameter ranges before producing static figures or scripted analyses.
+
+\subsection{Design rationale}\label{design-rationale}
+
+The app deliberately separates \emph{parameter exploration} from \emph{final figure generation}. Interactive dragging and sliders provide immediate visual feedback, while the parameter values correspond directly to arguments in \texttt{sf\_fisheye()}. Once suitable settings are identified, the same values can be reused verbatim in reproducible code pipelines.
+
+\subsection{Future work}\label{future-work}
+
+For the current approach, the shiny app only use the default dataset included in the \texttt{mapycusmaximus} package, which are the 2016 Victorian Local Government Areas (LGA) and their boundaries, accompany with the synthetic transfer network between hospital and RACF. In the future stable, we will open up the app for users to upload their own spatial data or piping it directly to the Shiny app from R.
 
 \section{Application to Victorian ambulance transfer records}\label{application-to-victorian-ambulance-transfer-records}
 
-We focus on one application: Victorian hospitals and residential aged care facilities (RACFs). Transfer counts are simulated; coordinates come from \texttt{conn\_fish}. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens.
+We focus on one application: Victorian hospitals, residential aged care facilities (RACFs) and ambulance transfer act as connection between these two during COVID-19 period. All of the data was synthetic, except for the location of the hospitals and RACF, which is publicly available. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens.
 
 First, we can plot seperately the sampled hospitals and the age care facilities to see where they actually are.
 

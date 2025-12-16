@@ -881,6 +881,11 @@ plot_3 + plot_4 +
   theme(legend.position = "right")
 
 
+## ----shiny-screenshot, fig.cap= "Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.", out.width="80%"----
+
+knitr::include_graphics("figures/screenshot.jpeg")
+
+
 ## ----preparing-hosp-data------------------------------------------------------
 
 metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
@@ -1008,5 +1013,7 @@ cowplot::ggdraw(focus) +
 
 ## ----fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."----
 # ggplotly(focus) |>
-#   layout(hovermode = "closest")
+#   layout(hovermode = "closest",
+#   xaxis = list(autorange = TRUE),
+#   yaxis = list(autorange = TRUE))
 
