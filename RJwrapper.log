@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  17 DEC 2025 10:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.14)  17 DEC 2025 10:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -958,15 +958,15 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: 89486F21071CA5F7E34B0ABCE0592AB5;752.
  ) 
 Here is how much of TeX's memory you used:
- 27243 strings out of 475478
- 502829 string characters out of 5773761
+ 27240 strings out of 475478
+ 502802 string characters out of 5773761
  898900 words of memory out of 5000000
  48971 multiletter control sequences out of 15000+600000
- 604117 words of font info for 329 fonts, out of 8000000 for 9000
+ 604032 words of font info for 327 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 117i,12n,131p,1852b,841s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,12n,131p,1854b,841s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/thanh/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (21 pages, 1672234 bytes).
+Output written on RJwrapper.pdf (21 pages, 1672267 bytes).
 PDF statistics:
  456 PDF objects out of 1000 (max. 8388607)
  381 compressed objects within 4 object streams
