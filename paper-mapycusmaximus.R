@@ -19,6 +19,8 @@ library(rsvg)
 library(DiagrammeRsvg)
 library(stringr)
 library(janitor)
+library(plotly)
+library(sugarbag)
 
 
 ## ----intro-snippet, eval=FALSE------------------------------------------------
@@ -28,7 +30,7 @@ library(janitor)
 #                        zoom = 1.8, squeeze = 0.35)
 
 
-## ----data-cart, include=FALSE-------------------------------------------------
+## ----data-preparation-pop-----------------------------------------------------
 # Library
 # Load the population per states (source: https://www.abs.gov.au/methodologies/data-region-methodology/2011-25#data-downloads)
 pop <- readxl::read_xlsx("data/14100DO0001_2011-25.xlsx",sheet = 3, skip = 6)
@@ -66,78 +68,21 @@ vic2 <- vic |>
 
 my_sf <- left_join(vic2, pop2, by = "lga_key")
 
+
 # Compute the cartogram, using this population information
 # First we need to change the projection, we use Mercator (AKA Google Maps, EPSG 3857)
 my_sf_merc <- st_transform(my_sf, 3857)
 my_sf_merc <- my_sf_merc |>
   mutate(erp_n = erp_n / 100000)
 my_sf_merc_2024 <- my_sf_merc |> filter(year == 2024)
-cartogram <- cartogram_cont(my_sf_merc_2024, "erp_n")
+my_sf_merc_2024 <- my_sf_merc_2024 |>
+  mutate(erp_round = factor(round(erp_n)))
+my_sf <- my_sf_merc_2024 |>
+  select(LGA_NAME, erp_n, erp_round, geometry) |>
+  st_make_valid() |>
+  st_transform(7844)
 
-# Back to original projection
-cartogram <- st_transform(cartogram, st_crs(my_sf))
-
-
-## ----plot-cart, echo=FALSE, fig.cap="Cartogram example: thematic distortion changes shapes and sizes to encode population."----
-ggplot(cartogram) +
-  geom_sf(aes(fill = erp_n), linewidth = 0.05, alpha = 0.9, color = "black") +
-  scale_fill_gradientn(
-    colours = brewer.pal(7, "BuPu"), name = "population (in 100,000)",
-    labels = scales::label_comma(),
-    guide = guide_legend(
-      keyheight = unit(3, units = "mm"),
-      keywidth = unit(12, units = "mm"),
-      title.position = "top",
-      label.position = "bottom"
-    )
-  ) +
-  geom_sf_text(aes(label = LGA_NAME), color = "white", size = 2, alpha = 0.8) +
-  theme_void() +
-  ggtitle("Another look on the Victoria population") +
-  theme(
-    legend.position = c(0.5, 0.9),
-    legend.direction = "horizontal",
-    text = element_text(color = "#22211d"),
-    plot.background = element_rect(fill = "#f5f5f9", color = NA),
-    panel.background = element_rect(fill = "#f5f5f9", color = NA),
-    legend.background = element_rect(fill = "#f5f5f9", color = NA),
-    plot.title = element_text(size = 22, hjust = 0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
-  )
-
-
-## ----sugarbag-prepare, include=FALSE------------------------------------------
-library(sugarbag)
-
-centroids <- create_centroids(vic, "LGA_NAME")
-grid <- create_grid(centroids = centroids, hex_size = 0.2, buffer_dist = 1.2)
-hex_allocated <- allocate(
-  centroids = centroids,
-  hex_grid = grid,
-  hex_size = 0.2, # same size used in create_grid
-  hex_filter = 3,
-  focal_points = capital_cities,
-  width = 30, 
-  verbose = TRUE
-)
-
-
-## ----sugarbag-plot, echo=FALSE, fig.cap="Sugarbag example: thematic distortion changes shapes and sizes to encode population."----
-hexagons <- fortify_hexagon(data = hex_allocated, sf_id = "LGA_NAME", hex_size = 0.2)
-
-polygons <- fortify_sfc(vic) %>% 
-  mutate(poly_type = "geo")
-
-ggplot(mapping = aes(fill = LGA_NAME)) +
-  geom_polygon(data = polygons, 
-               aes(x=long, lat, 
-    group = interaction(LGA_NAME, polygon)), 
-               alpha = 0.4) +
-  geom_polygon(data = hexagons, 
-               aes(x=long, lat, 
-    group = interaction(LGA_NAME))) +
-  scale_fill_viridis_d() +
-  theme_map() +
-  theme(legend.position = "none", aspect.ratio = 1)
+pal <- brewer.pal(nlevels(my_sf$erp_round), "BuPu")
 
 
 ## ----data-cow-plot, include=FALSE---------------------------------------------
@@ -151,19 +96,35 @@ greater_melbourne <- c(
   "WHITTLESEA", "WYNDHAM", "YARRA", "YARRA RANGES"
 )
 
-lga_inset <- vic[vic$LGA_NAME %in% greater_melbourne, ]
+lga_inset <- my_sf[my_sf$LGA_NAME %in% greater_melbourne, ]
 main_map <- ggplot() +
- geom_sf(data = vic, fill = "lightgray", color = "white") +
- geom_sf(data = lga_inset, fill = "red", color = "red") + # Highlight the inset area
- theme_void() +
- labs(title = "Victoria")
+ geom_sf(data = my_sf, aes(fill = erp_round)) +
+ geom_sf(data = lga_inset, color = "red") + # Highlight the inset area
+  scale_fill_manual(
+    values = pal,
+    name   = "population (in 100,000)",
+    drop   = TRUE,              # don't show unused levels
+    na.translate = FALSE,       # don't show NA in legend
+    guide  = guide_legend(
+      title.position = "top",
+      label.position = "bottom",
+      keyheight = unit(3, "mm"),
+      keywidth  = unit(12, "mm")
+    )
+  ) +
+  ggtitle("Another look on the Victoria population with inset map") +
+  theme_map() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal"
+  )
 inset_map <- ggplot() +
  geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue") +
- theme_void() +
- labs(title = "Greater Melbourne")
+ labs(title = "Greater Melbourne") + 
+ theme_map()
 
 
-## ----cow-plot-plot, echo=FALSE, fig.cap="Overview with inset: separates focus from context into distinct panels."----
+## ----cow-plot-plot, echo=FALSE, fig.cap="Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels."----
 final_map <- ggdraw() +
  draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
  draw_plot(inset_map, x = 0.7, y = 0.7, width = 0.25, height = 0.25) # Inset map position and size
@@ -171,7 +132,174 @@ final_map <- ggdraw() +
 print(final_map)
 
 
-## ----preparing-data, inMMOlude=FALSE------------------------------------------
+## ----sugarbag-prepare, include=FALSE------------------------------------------
+centroids <- create_centroids(vic, "LGA_NAME")
+grid <- create_grid(centroids = centroids, hex_size = 0.2, buffer_dist = 1.2)
+hex_allocated <- allocate(
+  centroids = centroids,
+  hex_grid = grid,
+  hex_size = 0.2, # same size used in create_grid
+  hex_filter = 3,
+  focal_points = capital_cities,
+  width = 30, 
+  verbose = TRUE
+)
+
+
+
+## ----sugarbag-plot, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location."----
+hexagons <- fortify_hexagon(
+  data    = hex_allocated,
+  sf_id   = "LGA_NAME",
+  hex_size = 0.2
+) %>%
+  left_join(
+    my_sf %>%
+      st_drop_geometry() %>%
+      select(LGA_NAME, erp_round, erp_n),
+    by = "LGA_NAME", 
+    relationship = "many-to-many"
+  ) %>%
+  mutate(
+    erp_round = factor(
+      erp_round,
+      levels = sort(unique(erp_round))
+    )
+  ) |>
+  filter(!is.na(erp_round))
+
+polygons <- fortify_sfc(vic) %>% 
+  mutate(poly_type = "geo") |> 
+  mutate(layer = "base")
+
+
+plot_2 <- ggplot() +
+  geom_polygon(
+    data = polygons,
+    aes(x = long, y = lat, group = interaction(LGA_NAME, polygon)),
+    fill = "grey85", colour = "grey70", linewidth = 0.2
+  ) +
+  geom_polygon(
+    data = hexagons,
+    aes(x = long, y = lat, group = interaction(LGA_NAME), fill = erp_round,
+        text = paste0(
+          "<b>", LGA_NAME, "</b><br>",
+          "Population: ", scales::comma(erp_n * 1e5)
+        )),
+    colour = "grey20", linewidth = 0.3
+  ) +
+  scale_fill_manual(
+    values = pal,
+    name   = "population (in 100,000)",
+    drop   = TRUE,              # don't show unused levels
+    na.translate = FALSE,       # don't show NA in legend
+    guide  = guide_legend(
+      title.position = "top",
+      label.position = "bottom",
+      keyheight = unit(3, "mm"),
+      keywidth  = unit(12, "mm")
+    )
+  ) +
+  ggtitle("Another look on the Victoria population with sugarbag") +
+  coord_equal(expand = FALSE) +
+  theme_map() +
+  theme(
+    legend.position = "top",
+    legend.direction = "horizontal"
+  )
+
+ggplotly(plot_2, tooltip = "text") |> layout(
+  title = list(text = "Another look on the Victoria population", x = 0.5),
+  legend = list(
+    orientation = "h",
+    x = 0.5, xanchor = "center",
+    y = 1.07, yanchor = "top"  # inside the plot area
+  ),
+  margin = list(t = 60)
+)
+
+
+## ----data-cart, include=FALSE-------------------------------------------------
+cartogram <- cartogram_cont(my_sf_merc_2024, "erp_n")
+# Back to original projection
+cartogram <- st_transform(cartogram, st_crs(my_sf))
+
+
+## ----plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"----
+ggplot(cartogram) +
+  geom_sf(aes(fill = erp_n), linewidth = 0.05, alpha = 0.9, color = "black") +
+  scale_fill_gradientn(
+    colours = brewer.pal(7, "BuPu"), name = "population (in 100,000)",
+    labels = scales::label_comma(),
+    guide = guide_legend(
+      keyheight = unit(3, units = "mm"),
+      keywidth = unit(12, units = "mm"),
+      title.position = "top",
+      label.position = "bottom"
+    )
+  ) +
+  theme_void() +
+  ggtitle("Another look on the Victoria population") +
+  theme(
+    legend.position = c(0.5, 0.9),
+    legend.direction = "horizontal",
+    text = element_text(color = "#22211d"),
+    plot.background = element_rect(fill = "#f5f5f9", color = NA),
+    panel.background = element_rect(fill = "#f5f5f9", color = NA),
+    legend.background = element_rect(fill = "#f5f5f9", color = NA),
+    plot.title = element_text(size = 20, hjust = 0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+  )
+
+
+## ----plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", out.width="80%"----
+# 
+# cartogram2 <- cartogram |>
+#   st_make_valid() |>
+#   st_collection_extract("POLYGON") |>
+#   st_cast("MULTIPOLYGON")
+# 
+# plot_1 <- ggplot(cartogram2) +
+#   geom_sf(
+#     aes(
+#       fill = erp_round,
+#       text = paste0(
+#         "<b>", LGA_NAME, "</b><br>",
+#         "Population: ", scales::comma(erp_n * 1e5)
+#       )
+#     ),
+#     linewidth = 0.05, alpha = 0.9, color = "black"
+#   ) +
+#   scale_fill_manual(
+#     values = brewer.pal(nlevels(cartogram2$erp_round), "BuPu"),
+#     name   = "population (in 100,000)",
+#     guide  = guide_legend(
+#       title.position = "top",
+#       label.position = "bottom",
+#       keyheight = unit(3, "mm"),
+#       keywidth  = unit(12, "mm")
+#     )
+#   ) +
+#   theme_void() +
+#   theme(
+#     legend.position = c(0.5, 0.9),
+#     legend.direction = "horizontal"
+#   ) +
+#   coord_sf(expand = FALSE)
+# 
+# p <- ggplotly(plot_1, tooltip = "text")
+# 
+# p |> layout(
+#   title = list(text = "Another look on the Victoria population", x = 0.5),
+#   legend = list(
+#     orientation = "h",
+#     x = 0.5, xanchor = "center",
+#     y = 1.07, yanchor = "top"  # inside the plot area
+#   ),
+#   margin = list(t = 60)
+# )
+
+
+## ----preparing-data, include=FALSE--------------------------------------------
 
 plot_fisheye_fgc <- function(original_coords, transformed_coords, 
   cx = 0, cy = 0, r_in = 0.34, r_out = 0.5) {
@@ -232,7 +360,7 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 }
 
 
-## ----fgc-zones, echo=FALSE, fig.cap="The three zones of an FGC transformation. Points inside the focus (red) expand radially; points in the glue (blue) compress toward the focus boundary; context points (gold) remain fixed."----
+## ----fgc-zones, echo=FALSE, fig.cap="Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, coloured by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context."----
 
 grid <- create_test_grid()
 grid_df <- as_tibble(grid)
@@ -286,7 +414,7 @@ head(transform_df[, c("x_new", "y_new", "zone", "r_orig", "r_new")])
 table(transform_df$zone)
 
 
-## ----radial-curve, fig.cap="Radial mapping r→r' across focus, glue, and context.", out.width="120%"----
+## ----radial-curve, fig.cap="Radial mapping function of the FGC fisheye. The plot shows original radius r against warped radius r', with shaded focus, glue, and context regions and a reference identity line. The curve demonstrates expansion in the focus, smooth compression in the glue, and identity mapping outside.", out.width="120%"----
 r_in  <- 0.34
 r_out <- 0.55
 
@@ -369,7 +497,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
   theme_minimal(base_size = 10)
 
 
-## ----norm-diagram, fig.cap="Diagram of the normalization step", eval=knitr::is_html_output(), fig.align="center", out.width="100%"----
+## ----norm-diagram, fig.cap="Workflow diagram of the normalization and CRS handling pipeline. The flowchart depicts CRS selection, normalization, center resolution, fisheye application, and CRS restoration. This highlights the staged design ensuring projection awareness and parameter stability.", eval=knitr::is_html_output(), fig.align="center", out.width="100%"----
 # grViz("
 # digraph fgc {
 #   rankdir=TB; nodesep=0.25; ranksep=0.4;
@@ -386,10 +514,10 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
 #   H [label='Use s=max(sx,sy)'];
 #   I [label='Use sx,sy independently'];
 #   J [shape=diamond, label='Resolve center', fillcolor='#eef3ff'];
-#   K [label='sf/sfc → centroid'];
-#   L [label='numeric + CRS → transform'];
-#   M [label='numeric only → lon/lat heuristic'];
-#   N [label='normalized_center → (mx,my)+center*scale'];
+#   K [label='sf/sfc -> centroid'];
+#   L [label='numeric + CRS -> transform'];
+#   M [label='numeric only -> lon/lat heuristic'];
+#   N [label='normalized_center -> (mx,my)+center*scale'];
 #   O [label='Normalize to unit space'];
 #   P [label='Apply fisheye'];
 #   Q [label='Denormalize'];
@@ -421,7 +549,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
 # ")
 
 
-## ----norm-diagram-pdf, fig.cap="Diagram of the normalization step", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"----
+## ----norm-diagram-pdf, eval=knitr::is_latex_output()--------------------------
 
 # Static version for PDF using DiagrammeR's export
 
@@ -441,10 +569,10 @@ digraph fgc {
   H [label='Use s=max(sx,sy)'];
   I [label='Use sx,sy independently'];
   J [shape=diamond, label='Resolve center', fillcolor='#eef3ff'];
-  K [label='sf/sfc → centroid'];
-  L [label='numeric + CRS → transform'];
-  M [label='numeric only → lon/lat heuristic'];
-  N [label='normalized_center → (mx,my)+center*scale'];
+  K [label='sf/sfc -> centroid'];
+  L [label='numeric + CRS -> transform'];
+  M [label='numeric only -> lon/lat heuristic'];
+  N [label='normalized_center -> (mx,my)+center*scale'];
   O [label='Normalize to unit space'];
   P [label='Apply fisheye'];
   Q [label='Denormalize'];
@@ -481,11 +609,11 @@ diagram |>
   rsvg::rsvg_png("diagram.png")
 
 
-## ----norm-diagram-gg, fig.cap="Diagram of the normalization step", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"----
+## ----norm-diagram-gg, fig.cap="Workflow diagram of the normalization and CRS handling pipeline. The flowchart depicts CRS selection, normalization, center resolution, fisheye application, and CRS restoration. This highlights the staged design ensuring projection awareness and parameter stability.", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"----
 knitr::include_graphics("diagram.png")
 
 
-## ----basic-example------------------------------------------------------------
+## ----basic-example, fig.cap="Basic numeric example of an FGC fisheye transformation. A synthetic grid is shown before and after warping. The example isolates the core radial mapping independent of spatial geometry reconstruction.", fig.align="center", out.width="80%"----
 original <- create_test_grid()
 fisheye_org <- fisheye_fgc(original, r_in = 0.34, r_out = 0.55)
 plot_fisheye_fgc(original, fisheye_org)
@@ -578,7 +706,7 @@ plot_1 <- ggplot(core$data, aes(n, median_ms)) +
   coord_fixed(ratio = 1)
 
 
-## ----bench-plot, fig.cap="Benchmark performance of fisheye_fgc() and sf_fisheye()", echo=FALSE----
+## ----bench-plot, fig.cap="Benchmark performance of fisheye transformations. Log-log plots show runtime scaling for fisheye_fgc() (numeric coordinates) and sf_fisheye() (sf geometries) against input size. Both exhibit near-linear scaling, indicating efficient per-vertex computation.", echo=FALSE----
 
 plot_1 + plot_2
 
@@ -644,7 +772,7 @@ grid_zoom_1 <- as_tibble(grid_zoom_1) |> mutate(zones = zones_1)
 grid_zoom_2 <- as_tibble(grid_zoom_2) |> mutate(zones = zones_2)
 
 
-## ----zoom-factor-plot, echo=FALSE, fig.cap="Zoom factors for balanced metropolitan focus within a state.", out.width="80%"----
+## ----zoom-factor-plot, echo=FALSE, fig.cap="ZEffect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points coloured by zone. Higher zoom increases magnification in the focus while preserving context stability.", out.width="80%"----
 zone_scale <- scale_color_discrete(name = "Zone")
 
 plot_3 <- ggplot(grid_zoom_1) +
@@ -685,7 +813,7 @@ transform_grid_2 <- transform_grid_2 %>%
   mutate(seg = ceiling(row_number() / 21))
 
 
-## ----echo=FALSE, fig.cap="Revolution effect", out.width="80%"-----------------
+## ----echo=FALSE, fig.cap="Effect of angular revolution on line geometries. Line paths are shown with revolution set to 0 and pi/8, coloured by zone. Introducing revolution produces a visible rotational flow in the glue region without affecting the focus or context radii.", out.width="80%"----
 zone_scale <- scale_color_discrete(name = "Zone")
 
 plot_3 <- ggplot(transform_grid_1, aes(x_new, y_new)) +
@@ -693,86 +821,21 @@ plot_3 <- ggplot(transform_grid_1, aes(x_new, y_new)) +
   coord_equal() +
   zone_scale +
   labs(title = "Revolution: 0") +
-  theme_minimal()
+  theme_void()
 
 plot_4 <- ggplot(transform_grid_2, aes(x_new, y_new)) +
   geom_path(aes(group = seg, colour = zones), size = 1) +
   labs(title = "Revolution: pi/8") +
   coord_equal() +
   zone_scale +
-  theme_minimal()
+  theme_void()
 
 plot_3 + plot_4 +
   plot_layout(guides = "collect", axes = "collect") &
   theme(legend.position = "right")
 
 
-## ----prepare-poly-data, echo=FALSE--------------------------------------------
-library(dplyr)
-
-add_blocks <- function(df, ncol_grid = 21, cell_size = 2) {
-  df %>%
-    mutate(
-      idx = row_number(),
-      row = (idx - 1) %/% ncol_grid + 1,
-      col = (idx - 1) %%  ncol_grid + 1,
-      brow = (row - 1) %/% cell_size,
-      bcol = (col - 1) %/% cell_size,
-      block = brow * ceiling(ncol_grid / cell_size) + bcol + 1,
-      # position inside the 2x2 cell:
-      r_in = (row - 1) %% cell_size,
-      c_in = (col - 1) %% cell_size,
-      # order corners: TL -> TR -> BR -> BL -> TL
-      corner = case_when(
-        r_in == 0 & c_in == 0 ~ 1L,  # top-left
-        r_in == 0 & c_in == 1 ~ 2L,  # top-right
-        r_in == 1 & c_in == 1 ~ 3L,  # bottom-right
-        r_in == 1 & c_in == 0 ~ 4L   # bottom-left
-      )
-    )
-}
-
-transform_grid_1b <- add_blocks(transform_grid_1, 21, 2)
-transform_grid_2b <- add_blocks(transform_grid_2, 21, 2)
-
-grid1_poly <- transform_grid_1b %>%
-  arrange(block, corner)
-
-grid2_poly <- transform_grid_2b %>%
-  arrange(block, corner)
-
-
-## ----poly-plot, echo=FALSE, fig.cap="Revolution effect with polygon", out.width="80%"----
-zone_scale <- scale_color_discrete(name = "Zone")
-
-plot_3 <- ggplot(grid1_poly, aes(x_new, y_new)) +
-  geom_polygon(
-    aes(group = block, colour = zones),
-    fill = NA,        # outline only
-    linewidth = 0.6
-  ) +
-  coord_equal() +
-  zone_scale +
-  labs(title = "Revolution: 0") +
-  theme_minimal()
-
-plot_4 <- ggplot(grid2_poly, aes(x_new, y_new)) +
-  geom_polygon(
-    aes(group = block, colour = zones),
-    fill = NA,
-    linewidth = 0.6
-  ) +
-  coord_equal() +
-  zone_scale +
-  labs(title = "Revolution: pi/8") +
-  theme_minimal()
-
-plot_3 + plot_4 +
-  plot_layout(guides = "collect", axes = "collect") &
-  theme(legend.position = "right")
-
-
-## -----------------------------------------------------------------------------
+## ----glue-method, fig.cap="Comparison of glue compression methods. Polygon grids are shown under expand and outward glue modes. The outward method concentrates distortion closer to the focus, while expand distributes compression symmetrically across the glue.", out.width="80%"----
 transform_grid_1 <- fisheye_fgc(test_grid, zoom_factor = 1.7, method = "expand")
 transform_grid_2 <- fisheye_fgc(test_grid, zoom_factor = 1.7, method = "outward")
 zones_1 <- attr(transform_grid_1,"zones")
@@ -782,40 +845,22 @@ transform_grid_2 <- as_tibble(transform_grid_2)
 transform_grid_1$zones <- zones_1
 transform_grid_2$zones <- zones_2
 
-transform_grid_1 <- transform_grid_1 %>%
-  mutate(seg = ceiling(row_number() / 21))
-transform_grid_2 <- transform_grid_2 %>%
-  mutate(seg = ceiling(row_number() / 21))
+zone_scale <- scale_color_discrete(name = "zones")
 
-grid1_poly <- add_blocks(transform_grid_1, 21, 2) %>%
-  arrange(block, corner)
-grid2_poly <- add_blocks(transform_grid_2, 21, 2) %>%
-  arrange(block, corner)
-
-zone_scale <- scale_color_discrete(name = "Zone")
-
-plot_3 <- ggplot(grid1_poly, aes(x_new, y_new)) +
-  geom_polygon(
-    aes(group = block, colour = zones),
-    fill = NA,        # outline only
-    linewidth = 0.6
-  ) +
+plot_3 <- ggplot(transform_grid_1, aes(x_new, y_new, color = zones)) +
+  geom_point() +
   coord_equal() +
   zone_scale +
   labs(title = "Method: expand") +
-  theme_minimal(
-)
+  theme_void()
 
-plot_4 <- ggplot(grid2_poly, aes(x_new, y_new)) +
-  geom_polygon(
-    aes(group = block, colour = zones),
-    fill = NA,
-    linewidth = 0.6
-  ) +
+plot_4 <- ggplot(transform_grid_2, aes(x_new, y_new, color = zones)) +
+  geom_point() +
   coord_equal() +
   zone_scale +
   labs(title = "Method: outward") +
-  theme_minimal()
+  theme_void()
+
 
 plot_3 + plot_4 +
   plot_layout(guides = "collect", axes = "collect") &
@@ -823,33 +868,50 @@ plot_3 + plot_4 +
 
 
 ## ----preparing-hosp-data------------------------------------------------------
+
+metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
+
+metro_center <- st_union(vic[vic$LGA_NAME %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))
+vic <- vic |> st_transform(st_crs(4326))
+vic <- vic |> mutate(distance = as.numeric(st_distance(metro_center, vic)))
+
+conn_fish <- st_transform(conn_fish, 4326)
+metro_poly <- vic %>%
+  arrange(distance) %>% head(10) %>%
+  st_union()
+
+outer_poly <- vic %>%
+  arrange(desc(distance)) %>% head(50) %>%
+  st_union()
+
+conn_pts <- conn_fish |> st_drop_geometry() |>
+  select(long_racf, lat_racf, long_hosp, lat_hosp) 
+
+hosp_pts <- st_as_sf(conn_pts, coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+racf_pts <- st_as_sf(conn_pts, coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
+
+in_metro_h <- st_within(hosp_pts, metro_poly, sparse = FALSE)[,1]
+in_metro_r <- st_within(racf_pts, metro_poly, sparse = FALSE)[,1]
+
+in_outer_h <- st_within(hosp_pts, outer_poly, sparse = FALSE)[,1]
+in_outer_r <- st_within(racf_pts, outer_poly, sparse = FALSE)[,1]
+
+conn_metro <- conn_fish %>% filter(in_metro_h & in_metro_r)
+conn_outer <- conn_fish %>% filter(in_outer_h & in_outer_r)
+
 set.seed(1092)
-conn_sample <- conn_fish |>
-  st_drop_geometry() |>
-  select(source, destination, long_racf, lat_racf, long_hosp, lat_hosp) |>
-  distinct() |>
-  slice_sample(n = 10)
+conn_metro_10 <- conn_metro %>% slice_sample(n = 5)
+conn_outer_10 <- conn_outer %>% slice_sample(n = 5)
 
-hosp_point <- conn_sample |>
-  st_drop_geometry() |>
-  select(destination, long_hosp, lat_hosp) |>
-  distinct() |>
-  st_as_sf(coords = c("long_hosp", "lat_hosp"), crs = 4326) |>
-  st_transform(crs = st_crs(vic))
-
-racf_point <- conn_sample |>
-  st_drop_geometry() |>
-  select(source, long_racf, lat_racf) |>
-  distinct() |>
-  st_as_sf(coords = c("long_racf", "lat_racf"), crs = 4326) |>
-  st_transform(crs = st_crs(vic))
+hosp_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+racf_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 
 
-## ----hospitals-point-plot, fig.cap="Standard maps: hospital (red) and RACF (blue) points plotted over Victoria without fisheye."----
+## ----hospitals-point-plot, fig.cap="Standard maps of hospitals and RACFs in Victoria. Hospitals (red) and residential aged care facilities (blue) are plotted separately over a grey basemap. The figure shows their true spatial distribution prior to any fisheye distortion."----
 # Standard plot
 plot_hosp <- ggplot(vic) + 
   geom_sf(fill = "grey90") +
-  geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
+  geom_sf(data = hosp_pts, color = "red", size = 0.3, alpha = 1) +
   ggtitle("Melbourne hospitals") +
   theme(
   plot.title = element_text(size = 8) # adjust here
@@ -857,7 +919,7 @@ plot_hosp <- ggplot(vic) +
   theme_map() 
 plot_racf <- ggplot(vic) + 
   geom_sf(fill = "grey90") +
-  geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
+  geom_sf(data = racf_pts, color = "blue", size = 0.3, alpha = 1) +
   ggtitle("Melbourne RACFs") +
   theme(
   plot.title = element_text(size = 8) # adjust here
@@ -867,89 +929,70 @@ plot_racf <- ggplot(vic) +
 plot_hosp + plot_racf
 
 
-## ----preparing-hosp-data-2----------------------------------------------------
-metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
-
-center_metro <- vic |> filter(LGA_NAME %in% metro_names) |>
-  st_union() |>
-  st_centroid()
-
-transfers <- conn_sample |>
-  mutate(
-    geometry = pmap(
-      list(long_racf, long_hosp, lat_racf, lat_hosp),
-      ~ st_linestring(matrix(c(..1, ..2, ..3, ..4), ncol = 2, byrow = FALSE))
-    ),
-    transfer_n = sample(20:80, n(), replace = TRUE)
-  ) |>
-  st_as_sf(crs = 4326) |>
-  st_transform(st_crs(vic))
-
-
-## ----hospitals-basic-plot, fig.cap="Standard Victorian map with sampled hospitals (red), RACFs (blue), and simulated transfer lines on a grey background."----
+## ----hospitals-basic-plot, fig.cap="Standard Victorian map of a sampled hospital-RACF network. Points represent hospitals and RACFs, and lines indicate simulated transfer counts. At state scale, metropolitan structure is visually compressed and difficult to discern."----
 ggplot() +
-  geom_sf(data = vic, fill = "grey95", color = "grey70", linewidth = 0.2) +
-  geom_sf(data = transfers, aes(size = transfer_n), color = "grey50", alpha = 0.45, linewidth = 0.3) +
+  geom_sf(data = vic, fill = "grey65", color = "white", linewidth = 0.5) +
+  geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
+  geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
   scale_size(range = c(0.2, 1.2), guide = "none") +
-  geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
-  geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
+  geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
+  geom_sf(data = racf_pts, color = "blue", size = 0.5) +
   coord_sf() +
-  ggtitle("Victorian hospital–RACF network (sampled)") +
+  ggtitle("Victorian hospital-RACF network (sampled)") +
   theme_map() +
-  theme(panel.background = element_rect(fill = "grey98", color = NA))
+  theme(panel.background = element_rect(fill = "white", color = NA))
 
 
 ## ----fisheye-preparation, echo = FALSE----------------------------------------
-hosp_point2 <- hosp_point |>
+hosp_point2 <- hosp_pts |>
   mutate(type = "hospital") |>
   rename(id = destination)
 
-racf_point2 <- racf_point |>
+racf_point2 <- racf_pts |>
   mutate(type = "racf") |>
   rename(id = source)
 
-metro_plain <- vic |> filter(LGA_NAME %in% metro_names)
-
+total_trans <- bind_rows(conn_metro_10, conn_outer_10) |> st_transform(st_crs(vic))
+hosp_point2 <- hosp_point2 |> st_transform(st_crs(vic))
+racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
 all_points <- bind_rows(hosp_point2, racf_point2)
-bind <- dplyr::bind_rows(vic |> dplyr::mutate(.layer="vic"), all_points |> dplyr::mutate(.layer="pts"), transfers |> dplyr::mutate(.layer="transfers"))
-bind_w <- sf_fisheye(bind, center = center_metro, r_in = 0.5, r_out = 0.8, zoom = 4, squeeze = 0.35)
+bind <- dplyr::bind_rows(
+  vic |> dplyr::mutate(.layer="vic"),
+  all_points |> dplyr::mutate(.layer="pts"),
+  total_trans |> dplyr::mutate(.layer="transfers"))
+bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
 vic_w   <- bind_w |> dplyr::filter(.layer == "vic") |> dplyr::select(-.layer)
 pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
 transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
 
 
-## ----fisheye-plot, fig.cap="Fisheye view magnifies greater Melbourne while keeping statewide context; lines, points, and polygons stay aligned.", fig.asp=1----
+## ----fisheye-plot-prepare-----------------------------------------------------
 focus <- ggplot() +
-  geom_sf(data = vic_w, fill = "grey92", color = "grey65") +
-  geom_sf(data = transfers_w, aes(alpha = transfer_n), color = "grey40") +
+  geom_sf(data = vic_w, fill = "grey65", color = "white") +
+  geom_sf(data = transfers_w, color = "black", size = 0.3) +
   geom_sf(data = pts_w, aes(color = type), size = 1) +
-  scale_size(range = c(0.2, 1.4), guide = "none") +
+  scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
   ggtitle("Fisheye on greater Melbourne") +
   theme_map() +
   theme(panel.background = element_rect(fill = "grey98", color = NA))
 
 overview <- ggplot() +
-  geom_sf(data = vic, fill = NA, color = "grey40", linewidth = 0.2) +
-  geom_sf(data = transfers, aes(size = transfer_n), color = "grey50", alpha = 0.45, linewidth = 0.3) +
+  geom_sf(data = vic, fill = NA, color = "grey", linewidth = 0.5) +
+  geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
+  geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
   scale_size(range = c(0.2, 1.2), guide = "none") +
-  geom_sf(data = hosp_point, color = "red", size = 0.3, alpha = 1) +
-  geom_sf(data = racf_point, color = "blue", size = 0.3, alpha = 1) +
+  geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
+  geom_sf(data = racf_pts, color = "blue", size = 0.5) +
+  coord_sf() +
   theme_void() +
   ggtitle("Original size")
 
+## ----fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_latex_output()----
 cowplot::ggdraw(focus) +
   cowplot::draw_plot(overview, x = 0.62, y = 0.62, width = 0.33, height = 0.33, scale = 1)
 
 
-## ----fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="A basic interactive fisheye plot into Greater Melbourne region, with points, lines, and polygons aligned.", include=knitr::is_html_output(), eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."----
-# focus2 <- ggplot() +
-#   geom_sf(data = vic_w, fill = "grey92", color = "grey65") +
-#   geom_sf(data = transfers_w, aes(linewidth = transfer_n), color = "grey40", alpha = 0.6) +
-#   scale_linewidth(range = c(0.1, 1.2), guide = "none") +
-#   geom_sf(data = pts_w, aes(color = type), size = 1) +
-#   theme_map()
-# 
-# library(plotly)
-# ggplotly(focus2 + ggtitle("Fisheye on Greater Melbourne")) |>
+## ----fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."----
+# ggplotly(focus) |>
 #   layout(hovermode = "closest")
 
