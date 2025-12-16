@@ -2,7 +2,7 @@
 title: "Focus-Glue-Context Fisheye Transformations for Spatial Visualization"
 date: "2025-10-30"
 abstract: >
-  Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus-Glue-Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus, a smooth transitional glue zone, and a fixed exterior. Distances expand or compress via a zoom factor and a power-law squeeze, with an optional angular twist that enhances continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (e.g., GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st_transform_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
+  Fisheye views magnify local detail while preserving context, yet projection-aware, scriptable tools for R spatial analysis remain limited. mapycusmaximus introduces a Focus-Glue-Context (FGC) fisheye transform for numeric coordinates and sf geometries. Acting radially around a chosen center, the transform defines a magnified focus, a smooth transitional glue zone, and a fixed exterior. Distances expand or compress via a zoom factor and a power-law squeeze, with an optional angular twist that enhances continuity. The method is projection-conscious: lon/lat inputs are reprojected to suitable CRSs (for example: GDA2020/MGA55), normalized for stable parameter control, and restored afterward. A geometry-safe engine (st_transform_custom) supports all feature types, maintaining ring closure and metadata. The high-level sf_fisheye() integrates with tidyverse, ggplot2, and Shiny, with built-in datasets and tests ensuring reproducibility. By coupling coherent radial warps with tidy, CRS-aware workflows, mapycusmaximus enables spatial exploration that emphasizes local structure without losing global context.
 draft: true
 author:  
   - name: Thanh Cuong Nguyen
@@ -65,7 +65,7 @@ library(sugarbag)
 
 Maps that reveal fine local structure without losing broader context face a persistent challenge: zooming in hides regional patterns, while small-scale views suppress local detail. Traditional solutions-insets, multi-panel displays, aggressive generalization-break spatial continuity and increase cognitive load [@cockburn2008]. What if we could smoothly magnify a metropolitan core *while keeping it embedded* in its state-level context?
 
-This package implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports reproducible, pipeline‑oriented cartography within the R sf and ggplot2 ecosystem. An optional glue‑zone twist (the `revolution` parameter) can gently rotate features to aid continuity; in this paper's figures we set `revolution = 0`.
+This package implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports reproducible, pipeline-oriented cartography within the R sf and ggplot2 ecosystem. An optional glue-zone twist (the `revolution` parameter) can gently rotate features to aid continuity; in this paper's figures we set `revolution = 0`.
 
 ```{r intro-snippet, eval=FALSE}
 # Minimal usage: warp an sf layer around a focal polygon
@@ -508,7 +508,7 @@ head(transform_df[, c("x_new", "y_new", "zone", "r_orig", "r_new")])
 table(transform_df$zone)
 ```
 
-Consider a point (P = (x, y)) in a projected coordinate system. The analyst chooses a center (C = (c_x, c_y)) and two radii: (r\_{\text{in}}) delineating the focus region and (r\_{\text{out}}) marking the glue boundary. Points inside the focus magnify, points between the radii focus on the center and then compress according to a smooth curve, and points outside remain unchanged. This radial scheme keeps angular coordinates intact, thereby preserving bearings and relative direction.
+Consider a point $P = (x, y)$ in a projected coordinate system. The analyst chooses a center $C = (c_x, c_y)$ and two radii: $r_{\text{in}}$ delineating the focus region and $r_{\text{out}}$ marking the glue boundary. Points inside the focus magnify, points between the radii focus on the center and then compress according to a smooth curve, and points outside remain unchanged. This radial scheme keeps angular coordinates intact, thereby preserving bearings and relative direction.
 
 ## Algorithm
 
@@ -523,7 +523,7 @@ Let $(r, \theta)$ denote the polar form of point $P = (x, y)$ relative to center
  \end{cases}
 \end{equation}
 
-where (z \> 1) is the zoom factor within the focus, (s \in (0, 1\]) controls glue compression, and (u = { (r - r\_{\text{in}}) }/{ (r\_{\text{out}} - r\_{\text{in}}) }) normalizes the glue radius to (\[0,1\]). The function (h(u; s)) is chosen so that (h(0; s) = 0), (h(1; s) = 1), and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve:
+where $z \> 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue compression, and $u = { (r - r_{\text{in}}) }/{ (r_{\text{out}} - r_{\text{in}}) }$ normalizes the glue radius to $[0,1]$. The function $h(u; s)$ is chosen so that $h(0; s) = 0$, $h(1; s) = 1$, and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve:
 
 \begin{equation} 
  h(u; s) = 
@@ -533,7 +533,7 @@ where (z \> 1) is the zoom factor within the focus, (s \in (0, 1\]) controls glu
  \end{cases}
 \end{equation}
 
-which compresses radii near both boundaries and emphasizes the mid-glue region. Analysts seeking outward compression can choose alternative methods (e.g., the `"outward"` mode) that bias the curve towards (r\_{\text{out}}). The demonstration on how original and transformed radius can be seen at the Figure \@ref(fig:radial-curve). The transform optionally introduces rotation within the glue zone to accentuate the flow from detail to context. Let (\phi(u)) denote the angular adjustment. We employ a bell-shaped profile: (\phi(u) = \rho \cdot 4u(1-u)), where (\rho) is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries, ensuring continuity.
+which compresses radii near both boundaries and emphasizes the mid-glue region. Analysts seeking outward compression can choose alternative methods (for example: the `"outward"` mode) that bias the curve towards $r_{\text{out}}$. The demonstration on how original and transformed radius can be seen at the Figure \@ref(fig:radial-curve). The transform optionally introduces rotation within the glue zone to accentuate the flow from detail to context. Let $\phi(u)$ denote the angular adjustment. We employ a bell-shaped profile: $\phi(u) = \rho \cdot 4u(1-u)$, where $\rho$ is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries, ensuring continuity.
 
 ```{r radial-curve, fig.cap="Radial mapping function of the FGC fisheye. The plot shows original radius r against warped radius r', with shaded focus, glue, and context regions and a reference identity line. The curve demonstrates expansion in the focus, smooth compression in the glue, and identity mapping outside.", out.width="120%"}
 r_in  <- 0.34
@@ -628,7 +628,7 @@ The pipeline proceeds: **sanitize input** -\> **select working CRS** -\> **norma
 
 #### CRS selection
 
-If the layer is already in a projected CRS, that CRS is used. If it is geographic (lon/lat), the data are transformed to a sensible local projected CRS (e.g., UTM inferred from the centroid; for Victoria, GDA2020/MGA55 is typical). Distances are then in metres and parameters behave consistently. The original CRS is restored on return.
+If the layer is already in a projected CRS, that CRS is used. If it is geographic (lon/lat), the data are transformed to a sensible local projected CRS (for example: UTM inferred from the centroid; for Victoria, GDA2020/MGA55 is typical). Distances are then in metres and parameters behave consistently. The original CRS is restored on return.
 
 #### Normalization
 
@@ -897,7 +897,7 @@ samples |>
 
 ### Design and extensibility
 
-Utilities in `utils.R` provide `create_test_grid()` for diagnostics, `classify_zones()` for labeling, and `plot_fisheye_fgc()` for visualization. Dataset documentation in `data.R` accompanies example layers (vic, vic_fish, conn_fish) used in tests.
+Utilities in `utils.R` provide `create_test_grid()` for diagnostics, `classify_zones()` for labeling, and `plot_fisheye_fgc()` for visualization. Dataset documentation in `data.R` accompanies example layers (`vic`, `vic_fish`, `conn_fish`) used in tests.
 
 For multi-layer maps, the normal process is combine all the layers into a single sf object and apply `sf_fisheye()`, then split the result later. One minimalist example for this approach is show in the code block below.
 
@@ -924,19 +924,19 @@ object_2_transformed   <- bind_w |>
   dplyr::select(-.layer)
 ```
 
-The test suite mirrors the modular structure, covering boundary behavior, zone labeling, CRS round‑trips, ring closure, and performance. Functions follow tidyverse‑oriented conventions (snake_case parameters, small exported surface). Behaviour is validated by tests; we aim for stability across versions but do not promise guarantees.
+The test suite mirrors the modular structure, covering boundary behavior, zone labeling, CRS round-trips, ring closure, and performance. Functions follow tidyverse-oriented conventions (snake case parameters, small exported surface). Behaviour is validated by tests; we aim for stability across versions but do not promise guarantees.
 
 ## Parameters
 
 The principal user interface is `sf_fisheye()`, which accepts an `sf` or `sfc` object and returns an object of the same top-level class whose geometry has been warped in a projection- aware manner. For clarity, we group arguments into data/CRS handling, center selection, and radial warping, and we make explicit the invariant enforced by the implementation.
 
-**Data and CRS.** The argument `sf_obj` supplies the features to be transformed. Before any calculation, empty geometries are removed and Z/M dimensions are dropped using `sf::st_zm()`, so that downstream computation operates on a strict (n\times 2) coordinate matrix. The optional `target_crs` sets the working projected CRS; if provided, the input is transformed via `sf::st_transform()` and the original CRS is restored on return. When `target_crs = NULL` and the input is geographic (lon/lat), a projected working CRS is chosen deterministically from the layer's centroid: the default value is GDA2020 /; otherwise a UTM zone is inferred by longitude and hemisphere. This choice ensures the fisheye operates in metric units with bounded distortion across the extent of interest. The `preserve_aspect` flag governs normalization: with `TRUE` (default) a uniform scale (s = \max(s_x, s_y)) is applied, where (s_x, s_y) are bbox half-spans; with `FALSE`, independent scales are used per axis. Uniform scaling preserves circular symmetry of the focus and glue; per-axis scaling yields an elliptical interpretation that can be useful common for long, narrow extents but should be used deliberately. Degenerate cases ((s_x = 0) or (s_y = 0)) are handled by substituting a unit scale to avoid division by zero.
+**Data and CRS.** The argument `sf_obj` supplies the features to be transformed. Before any calculation, empty geometries are removed and Z/M dimensions are dropped using `sf::st_zm()`, so that downstream computation operates on a strict $n\times 2$ coordinate matrix. The optional `target_crs` sets the working projected CRS; if provided, the input is transformed via `sf::st_transform()` and the original CRS is restored on return. When `target_crs = NULL` and the input is geographic (lon/lat), a projected working CRS is chosen deterministically from the layer's centroid: the default value is GDA2020, otherwise a UTM zone is inferred by longitude and hemisphere. This choice ensures the fisheye operates in metric units with bounded distortion across the extent of interest. The `preserve_aspect` flag governs normalization: with `TRUE` (default) a uniform scale $s = \max(s_x, s_y)$ is applied, where $s_x, s_y$ are bbox half-spans; with `FALSE`, independent scales are used per axis. Uniform scaling preserves circular symmetry of the focus and glue; per-axis scaling yields an elliptical interpretation that can be useful common for long, narrow extents but should be used deliberately. Degenerate cases $(s_x = 0) or (s_y = 0)$ are handled by substituting a unit scale to avoid division by zero.
 
-**center selection.** The lens center may be specified in several forms. The preferred interface is `center`, which takes precedence over legacy `cx`, `cy`. If `center` is a numeric pair and `center_crs` is provided (e.g., `"EPSG:4326"`), the point is transformed into the working CRS. If `center_crs` is omitted, a heuristic interprets pairs that lie within (\|\text{lon}\|\le 180), (\|\text{lat}\|\le 90) as WGS84 and transforms them accordingly; otherwise the values are assumed to be already in working-CRS map units. Any `sf`/`sfc` geometry may be used as `center`; non-point centers are combined and reduced to a centroid and then transformed to the working CRS, which is often convenient when the focal area is a polygon (e.g., a CBD boundary) or a set of points (e.g., incident locations). Finally, when the argument `{normalized_center = TRUE}`, `center` is interpreted as a pair in (\[-1,1\]) relative to the bbox midpoint and the chosen normalization (uniform or per-axis). Normalised centers make parameter sets portable across datasets of different extents and are a natural fit for parameter sweeps in reproducible pipelines. If no center is supplied, the bbox midpoint is used; this default is stable under reprojection.
+**Center selection.** The lens center may be specified in several forms. The preferred interface is `center`, which takes precedence over legacy `cx`, `cy`. If `center` is a numeric pair and `center_crs` is provided (for example: `"EPSG:4326"`), the point is transformed into the working CRS. If `center_crs` is omitted, a heuristic interprets pairs that lie within $\|\text{lon}\|\le 180$, $\|\text{lat}\|\le 90$ as WGS84 and transforms them accordingly; otherwise the values are assumed to be already in working-CRS map units. Any `sf`/`sfc` geometry may be used as `center`; non-point centers are combined and reduced to a centroid and then transformed to the working CRS, which is often convenient when the focal area is a polygon (for example: a CBD boundary) or a set of points (for example: incident locations). Finally, when the argument `{normalized_center = TRUE}`, `center` is interpreted as a pair in $[-1,1]$ relative to the bbox midpoint and the chosen normalization (uniform or per-axis). Normalised centers make parameter sets portable across datasets of different extents and are a natural fit for parameter sweeps in reproducible pipelines. If no center is supplied, the bbox midpoint is used; this default is stable under reprojection.
 
-**Radial warping.** The radii `r_in` and `r_out` define the focus and glue boundaries in the normalized coordinate space and must satisfy `r_out > r_in`. The interpretation of these radii depends on `preserve_aspect`. With uniform scaling, a circle of radius (r\_{\text{in}}) in unit space corresponds to a circle of radius (r\_{\text{in}},s) in map units; with per-axis scaling, the corresponding shape is an axis-aligned ellipse with semi-axes (r\_{\text{in}}s_x) and (r\_{\text{in}}s_y). Inside the focus, distances from the center are multiplied by `zoom_factor`; to prevent overshoot, the implementation clamps (r') so that points do not cross the (r\_{\text{in}}) boundary. Across the glue, `squeeze_factor` in $(0,1]$ controls how strongly intermediate radii compress: smaller values create tighter compression near the boundaries and a more pronounced "shoulder" in the middle of the glue; larger values approach a linear transition. The `method` selects the family of curves used in the glue. The default `"expand"` applies a symmetrical power law that expands inward and outward halves of the glue to maintain visual balance around the midpoint; `"outward"` biases the map towards (r\_{\text{out}}), keeping the outer boundary steadier and pushing more deformation into the inner portion of the glue. The optional `revolution` parameter adds a bell-shaped angular twist inside the glue of magnitude (\rho,4u(1-u)), where (u) is the normalized glue radius. This rotation vanishes at both glue boundaries and peaks at the midpoint, preserving continuity. Positive values rotate counter-clockwise, negative values clockwise; values are specified in radians.
+**Radial warping.** The radii `r_in` and `r_out` define the focus and glue boundaries in the normalized coordinate space and must satisfy `r_out > r_in`. The interpretation of these radii depends on `preserve_aspect`. With uniform scaling, a circle of radius $r_{\text{in}}$ in unit space corresponds to a circle of radius $r_{\text{in}},s$ in map units; with per-axis scaling, the corresponding shape is an axis-aligned ellipse with semi-axes $r_{\text{in}},s_x$ and $r_{\text{in}},s_y$. Inside the focus, distances from the center are multiplied by `zoom_factor`; to prevent overshoot, the implementation clamps (r') so that points do not cross the $r_{\text{in}}$ boundary. Across the glue, `squeeze_factor` in $(0,1]$ controls how strongly intermediate radii compress: smaller values create tighter compression near the boundaries and a more pronounced "shoulder" in the middle of the glue; larger values approach a linear transition. The `method` selects the family of curves used in the glue. The default `"expand"` applies a symmetrical power law that expands inward and outward halves of the glue to maintain visual balance around the midpoint; `"outward"` biases the map towards $r_{\text{out}}$, keeping the outer boundary steadier and pushing more deformation into the inner portion of the glue. The optional `revolution` parameter adds a bell-shaped angular twist inside the glue of magnitude $\rho,4u(1-u)$, where $u$ is the normalized glue radius. This rotation vanishes at both glue boundaries and peaks at the midpoint, preserving continuity. Positive values rotate counter-clockwise, negative values clockwise; values are specified in radians.
 
-**Inter-parameter interactions and invariant.** The following constraints and behaviors are enforced: (r\_{\text{out}} \> r\_{\text{in}} \> 0); `zoom_factor` (\ge 1) (values close to one yield gentle focus); `squeeze_factor` in ((0,1\]) ((=1) approaches linear); and monotonicity of the radial map so that ordering by distance from the center is preserved. The choice of `preserve_aspect` affects the physical size of radii and thereby the impact of a given parameter set on different datasets; using uniform scaling with a normalized center yields the most portable configurations. Twisting via `revolution` is confined to the glue; it does not change radii and therefore does not affect the classification of points into zones. Because angles are modified only in the glue, bearings inside the focus and in the context are preserved.
+**Inter-parameter interactions and invariant.** The following constraints and behaviors are enforced: $r_{\text{out}} > r_{\text{in}} > 0$; `zoom_factor` $\ge 1$ (values close to one yield gentle focus); `squeeze_factor` in $(0,1]$ ($=1$ approaches linear); and monotonicity of the radial map so that ordering by distance from the center is preserved. The choice of `preserve_aspect` affects the physical size of radii and thereby the impact of a given parameter set on different datasets; using uniform scaling with a normalized center yields the most portable configurations. Twisting via `revolution` is confined to the glue; it does not change radii and therefore does not affect the classification of points into zones. Because angles are modified only in the glue, bearings inside the focus and in the context are preserved.
 
 **Return value and side effects.** The function returns an object of the same top-level class as its input (`sf` or `sfc`). For `sf` inputs, non-geometry columns are preserved verbatim; only the geometry column is replaced. The original CRS is restored before return so that downstream plotting and analysis code does not need to change. On malformed geometries, the implementation emits a warning and returns an empty geometry of the appropriate family to preserve row count and indices. For exploratory diagnostics, the low-level `fisheye_fgc()` returns a coordinate matrix with attributes `"zones"`, `"original_radius"`, and `"new_radius"`; these can be used to plot scale curves and verify parameter effects prior to applying the transform to complex geometries.
 
@@ -944,7 +944,7 @@ The principal user interface is `sf_fisheye()`, which accepts an `sf` or `sfc` o
 
 Although the parameter space is continuous, certain regimes recur in practice and can serve as reliable starting points. We describe these regimes and articulate the trade-offs that motivate each choice. The recommendations assume the default `preserve_aspect = TRUE`; when per-axis scaling is enabled, translate radii to semi-axes using the bbox half-spans.
 
-**Quick start (synthetic grid).** Set (r\_{\text{in}}) to 0.30-0.35 and (r\_{\text{out}}) to 0.55-0.70. Pair this with `zoom_factor` between 5 and 10 and `squeeze_factor` near 0.35 for a balanced focus that still shows context. Stick with `method = "expand"` and `revolution = 0` unless you explicitly need outer rigidity or a twist.
+**Quick start (synthetic grid).** Set $r_{\text{in}}$ to 0.30-0.35 and $r_{\text{out}}$ to 0.55-0.70. Pair this with `zoom_factor` between 5 and 10 and `squeeze_factor` near 0.35 for a balanced focus that still shows context. Stick with `method = "expand"` and `revolution = 0` unless you explicitly need outer rigidity or a twist.
 
 In this simple example, we demo the effect of zoom factor 1.5 and 2 on a synthetic grid to demonstrate how the point movement was effected by the zoom factor.
 
@@ -962,7 +962,7 @@ grid_zoom_1 <- as_tibble(grid_zoom_1) |> mutate(zones = zones_1)
 grid_zoom_2 <- as_tibble(grid_zoom_2) |> mutate(zones = zones_2)
 ```
 
-```{r zoom-factor-plot, echo=FALSE, fig.cap="ZEffect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points coloured by zone. Higher zoom increases magnification in the focus while preserving context stability.", out.width="80%"}
+```{r zoom-factor-plot, echo=FALSE, fig.cap="Effect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points coloured by zone. Higher zoom increases magnification in the focus while preserving context stability.", out.width="80%"}
 zone_scale <- scale_color_discrete(name = "Zone")
 
 plot_3 <- ggplot(grid_zoom_1) +
@@ -1063,11 +1063,11 @@ plot_3 + plot_4 +
 
 Similarly, start with `"expand"` and adopt `"outward"` only when outer stability is an explicit requirement. Always annotate or at least describe the distortion in figure captions so readers do not mistake warped areas for standard projections.
 
-**Simple tweaks.** If linework kinks, raise `squeeze_factor` slightly (e.g., 0.45). If the focus feels too tight, lower `zoom_factor` toward 4-6. For reproducible comparisons, keep `normalized_center = TRUE` and reuse the same radii across runs.
+**Simple tweaks.** If linework kinks, raise `squeeze_factor` slightly (for example: 0.45). If the focus feels too tight, lower `zoom_factor` toward 4-6. For reproducible comparisons, keep `normalized_center = TRUE` and reuse the same radii across runs.
 
 # Exploring the implementation using Shiny
 
-To support interactive exploration of Focus–Glue–Context (FGC) parameters, the package includes a Shiny-based *lens explorer*. The app allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
+To support interactive exploration of Focus-Glue-Context (FGC) parameters, the package includes a Shiny-based *lens explorer*. The app allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
 
 ## App structure
 
@@ -1079,7 +1079,7 @@ knitr::include_graphics("figures/screenshot.jpeg")
 The interface is divided into two coordinated panels:
 
 -   **Fisheye (drag lens)**: an SVG-based view rendered in the browser. The fisheye center can be repositioned by dragging directly on the map, triggering real-time geometric warping without re-running server-side plotting code.
--   **Original (static)**: a conventional `ggplot2`/`sf` map rendered with the *same bounding box and aspect ratio* as the fisheye view, enabling fair visual comparison between warped and unwarped representations.
+-   **Original (static)**: a conventional `ggplot2` and `sf` map rendered with the *same bounding box and aspect ratio* as the fisheye view, enabling fair visual comparison between warped and unwarped representations.
 
 Spatial data (LGAs, points, and transfer lines) are converted once into plain coordinate lists and sent to the browser. Subsequent interactions update only lens parameters, ensuring smooth response even during continuous dragging.
 
@@ -1098,14 +1098,14 @@ Two sliders control the spatial extent of distortion:
 -   **Inner radius (focus)** -\> `r_in` Sets the size of the magnified region. Smaller values create a tight focal bubble; larger values expand the magnified area.
 -   **Outer radius (glue)** -\> `r_out` Sets the extent of the transition zone where compression occurs before geometry becomes fixed.
 
-Together, these define the Focus–Glue–Context structure used by both `fisheye_fgc()` and `sf_fisheye()`. Increasing `r_out` spreads distortion more gradually; decreasing it concentrates deformation closer to the focus.
+Together, these define the Focus-Glue-Context structure used by both `fisheye_fgc()` and `sf_fisheye()`. Increasing `r_out` spreads distortion more gradually; decreasing it concentrates deformation closer to the focus.
 
 ### Controlling magnification and compression
 
 Two further sliders adjust distortion strength:
 
--   **Zoom factor** -\> `zoom_factor` / `zoom` Controls radial expansion inside the focus. Higher values increase separation of dense features but amplify distortion near the focus boundary.
--   **Squeeze** -\> `squeeze_factor` / `squeeze` Controls how sharply distances compress within the glue region. Smaller values produce a pronounced “shoulder” near boundaries; larger values yield a smoother transition.
+-   **Zoom factor** -\> `zoom_factor` or `zoom` Controls radial expansion inside the focus. Higher values increase separation of dense features but amplify distortion near the focus boundary.
+-   **Squeeze** -\> `squeeze_factor` or `squeeze` Controls how sharply distances compress within the glue region. Smaller values produce a pronounced 'shoulder' near boundaries; larger values yield a smoother transition.
 
 Users are encouraged to increase zoom until local structure becomes readable, then adjust squeeze to reduce crowding or sharp curvature near the glue boundary.
 
@@ -1282,7 +1282,7 @@ ggplotly(focus) |>
   yaxis = list(autorange = TRUE))
 ```
 
-The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same center and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. To inspect a different hub (e.g., Geelong), change `center` to that polygon; multiple center can be explored by re-running `sf_fisheye()` with alternative center and comparing panels side by side.
+The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same center and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. To inspect a different hub (for example: Geelong), change `center` to that polygon; multiple center can be explored by re-running `sf_fisheye()` with alternative center and comparing panels side by side.
 
 For polygons beyond metro Melbourne, the same lens settings apply; polygon edges bend smoothly but retain adjacency. Because transfer counts are simulated, readers should treat magnitude as illustrative only; spatial relationships (what becomes readable after zoom vs. what remains hidden) follow from the geometry.
 
@@ -1290,17 +1290,17 @@ In this case, we can see that some point and connection that was inside the cont
 
 # Discussion
 
-The mapycusmaximus package provides an sf‑native implementation of the FGC fisheye that is projection‑aware, parameterized in normalized units, and safe across points, lines, and polygons. The package separates radial mapping from geometry orchestration, exposes explicit controls over focus, glue, and context, and preserves attributes and CRS invariant for reproducible pipelines with ggplot2.
+The mapycusmaximus package provides an sf-native implementation of the FGC fisheye that is projection-aware, parameterized in normalized units, and safe across points, lines, and polygons. The package separates radial mapping from geometry orchestration, exposes explicit controls over focus, glue, and context, and preserves attributes and CRS invariant for reproducible pipelines with ggplot2.
 
-Unlike cartograms (thematic distortion), hex/regular tile maps (discrete abstraction), or inset/multi‑panel layouts (spatial separation), the FGC lens delivers continuous magnification within a single map while preserving topology and bearings. This reduces cognitive load for readers who must relate local phenomena to their broader geography.
+Unlike cartograms (thematic distortion), hex/regular tile maps (discrete abstraction), or inset/multi-panel layouts (spatial separation), the FGC lens delivers continuous magnification within a single map while preserving topology and bearings. This reduces cognitive load for readers who must relate local phenomena to their broader geography.
 
-The fisheye introduces non‑metric distortion in the focus and glue; therefore, use it for visual exploration and communication, not for metric analysis. Aggressive `zoom` or `squeeze` can impair legibility near the glue boundary; conservative defaults and `revolution = 0` are recommended for publication maps. When comparing multiple regions, prefer `normalized_center = TRUE` with fixed radii to ensure visual comparability. At present, exact matching of focus and glue radii across separately transformed layers may require a manual step (the user have to manually merge the two or more layers, perform the fisheye transformation, then separated the transformed layers).
+The fisheye introduces non-metric distortion in the focus and glue; therefore, use it for visual exploration and communication, not for metric analysis. Aggressive `zoom` or `squeeze` can impair legibility near the glue boundary; conservative defaults and `revolution = 0` are recommended for publication maps. When comparing multiple regions, prefer `normalized_center = TRUE` with fixed radii to ensure visual comparability. At present, exact matching of focus and glue radii across separately transformed layers may require a manual step (the user have to manually merge the two or more layers, perform the fisheye transformation, then separated the transformed layers).
 
-Planned extensions include anisotropic or elliptical profiles, multi‑focus blending, first‑class raster support via warped grids and resampling, and interactive focus selection for exploratory analysis. We also plan an API for shared normalization and radius locking across layers (e.g., a `combine_fisheye`) so that multiple layers can be warped with identical scale and then returned transformed. Performance improvements via vectorised geometry walkers or GPU acceleration would benefit dense polygonal datasets. Clear figure captions and scale disclaimers remain essential to communicate the presence and intent of distortion.
+Planned extensions include anisotropic or elliptical profiles, multi-focus blending, first-class raster support via warped grids and resampling, and interactive focus selection for exploratory analysis. We also plan an API for shared normalization and radius locking across layers (for example: a `combine_fisheye`) so that multiple layers can be warped with identical scale and then returned transformed. Performance improvements via vectorised geometry walkers or GPU acceleration would benefit dense polygonal datasets. Clear figure captions and scale disclaimers remain essential to communicate the presence and intent of distortion.
 
 # Conclusion
 
-FGC fisheye transformations offer a concise, CRS‑aware way to emphasize local structure without losing geographic context. By starting from a point‑wise radial map and integrating carefully with sf for geometry reconstruction, the approach keeps figures continuous and overlays aligned. The examples demonstrate clearer narratives for metropolitan focus while maintaining state‑ or nation‑level context.
+FGC fisheye transformations offer a concise, CRS-aware way to emphasize local structure without losing geographic context. By starting from a point-wise radial map and integrating carefully with sf for geometry reconstruction, the approach keeps figures continuous and overlays aligned. The examples demonstrate clearer narratives for metropolitan focus while maintaining state or nation-level context.
 
 # AI Use Declaration
 
