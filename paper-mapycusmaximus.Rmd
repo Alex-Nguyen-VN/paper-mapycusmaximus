@@ -157,8 +157,8 @@ greater_melbourne <- c(
 
 lga_inset <- my_sf[my_sf$LGA_NAME %in% greater_melbourne, ]
 main_map <- ggplot() +
- geom_sf(data = my_sf, aes(fill = erp_round)) +
- geom_sf(data = lga_inset, color = "red") + # Highlight the inset area
+ geom_sf(data = my_sf, aes(fill = erp_round), color = "grey65") +
+ geom_sf(data = lga_inset, aes(fill = erp_round), color = "black") + # Highlight the inset area
   scale_fill_manual(
     values = pal,
     name   = "population (in 100,000)",
@@ -175,12 +175,18 @@ main_map <- ggplot() +
   theme_map() +
   theme(
     legend.position = "top",
-    legend.direction = "horizontal"
+    legend.direction = "horizontal",
+    plot.title = element_text(size = 12, face = "bold"),
+    legend.title = element_text(size = 9),
+    legend.text  = element_text(size = 8)
   )
 inset_map <- ggplot() +
- geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue") +
- labs(title = "Greater Melbourne") + 
- theme_map()
+  geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue", linewidth = 0.2) +
+  labs(title = "Greater Melbourne") +
+  theme_map() +
+  theme(
+    plot.title = element_text(size = 9, face = "bold", hjust = 0.5)
+  )
 ```
 
 ```{r cow-plot-plot, echo=FALSE, fig.cap="Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels."}
@@ -321,7 +327,7 @@ ggplot(cartogram) +
   )
 ```
 
-```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", out.width="80%"}
+```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", out.width="100%"}
 
 cartogram2 <- cartogram |>
   st_make_valid() |>
@@ -358,15 +364,23 @@ plot_1 <- ggplot(cartogram2) +
 
 p <- ggplotly(plot_1, tooltip = "text")
 
-p |> layout(
-  title = list(text = "Another look on the Victoria population", x = 0.5),
-  legend = list(
+p <- p |>
+  layout(
+    title = list(text = "Another look on the Victoria population", x = 0.5, font = list(size = 14)),
+     legend = list(
     orientation = "h",
     x = 0.5, xanchor = "center",
-    y = 1.07, yanchor = "top"  # inside the plot area
-  ),
-  margin = list(t = 60)
-)
+    y = 1.10, yanchor = "top",
+    title = list(font = list(size = 12)),
+    font  = list(size = 9)
+  ), 
+    margin = list(l = 0, r = 0, b = 0, t = 90, pad = 0),
+    xaxis = list(autorange = TRUE), 
+    yaxis = list(autorange = TRUE)
+    ) |>
+  config(responsive = TRUE)
+
+p
 ```
 
 
