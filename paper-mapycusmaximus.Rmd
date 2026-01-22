@@ -63,9 +63,9 @@ library(sugarbag)
 
 # Introduction
 
-Maps that reveal fine local structure without losing broader context face a persistent challenge: zooming in hides regional patterns, while small-scale views suppress local detail. Traditional solutions-insets, multi-panel displays, aggressive generalization-break spatial continuity and increase cognitive load [@cockburn2008]. What if we could smoothly magnify a metropolitan core *while keeping it embedded* in its state-level context?
+Maps that reveal fine local structure without losing broader context face a persistent challenge: zooming in hides regional patterns, while small-scale views suppress local detail. Traditional solutions such as insets and multi-panel displays break spatial continuity and increase cognitive load [@cockburn2008].
 
-This package implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports reproducible, pipeline-oriented cartography within the R sf and ggplot2 ecosystem. An optional glue-zone twist (the `revolution` parameter) can gently rotate features to aid continuity; in this paper's figures we set `revolution = 0`.
+We introduce `mapycusmaximus`, an R package which implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports a reproducible, pipeline-oriented cartography within the R `sf` and `ggplot2` ecosystem. An optional glue-zone twist (the `revolution` parameter) can gently rotate features to aid continuity.
 
 ```{r intro-snippet, eval=FALSE}
 # Minimal usage: warp an sf layer around a focal polygon
@@ -74,15 +74,15 @@ vic_fish <- sf_fisheye(vic, center = melb, r_in = 0.33, r_out = 0.60,
                        zoom = 1.8, squeeze = 0.35)
 ```
 
-The intellectual lineage of focus+context visualization traces back to @furnas1986's *degree-of-interest* function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. @sarkar1992 and @sarkar1994 extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Subsequent innovations explored diverse lenses: hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. By 2008, @cockburn2008's comprehensive review synthesized two decades of research across overview+detail, zooming, and focus+context paradigms.
+The development of focus+context visualization traces back to @furnas1986's *degree-of-interest* (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. @sarkar1992 [@sarkar1994] extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. A 2008 review from @cockburn2008's covers two decades of research across overview+detail, zooming, and focus+context paradigms.
 
-In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales-mathematical foundations. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. An influential contribution came from @yamamoto2009 and @yamamoto2012: their **Focus+Glue+Context model** introduced an intermediate "glue" region that absorbs distortion, preventing the excessively warped roads and boundaries that plagued earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
+In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. An influential contribution came from @yamamoto2009 [@yamamoto2012], who introduced the **Focus+Glue+Context model**, in which the intermediate "glue" region absorbs distortion, preventing the excessively warped roads and boundaries that were seen in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
 
-Within R's spatial ecosystem, sf [@RJ-2018-009] provides robust vector handling and CRS transformations, while ggplot2 [@wickham2016] offers declarative visualization grammar. Yet a gap remained: existing tools addressed *related* distortion needs but not continuous geometric fisheye lenses. This package fills that niche by formalizing an sf-native FGC radial model with controllable zone parameters, optional angular effects, automatic normalization, and safe geometry handling across points, lines, and polygons.
+Despite the Focus+Glue+Context model being introduced more than a decade ago, there is currently no native R solution for implementing these models. The package `mapycusmaximus` fills this niche by providing a general function to perform these transformations, as well as integrations to work natively within the R spatial ecosystem with `sf` [@RJ-2018-009].
 
 # Background
 
-Before examining the mechanics of fisheye transformations, it is important to review how R's spatial ecosystem currently addresses the detail-versus-context tradeoff. This context clarifies why existing solutions, though valuable, do not fully address the need for continuous lens-based warping.
+First, we briefly review the current R-based solutions to the detail-versus-context tradeoff. Ths includes multi-panel approaches, hexagon tile maps and cartograms.
 
 ```{r data-preparation-pop}
 # Library
@@ -139,9 +139,7 @@ my_sf <- my_sf_merc_2024 |>
 pal <- brewer.pal(nlevels(my_sf$erp_round), "BuPu")
 ```
 
-### Multi-panel approaches: Spatial separation
-
-Tools like `cowplot::ggdraw()`[@cowplot] create side-by-side views: one panel shows overview, another shows zoomed detail (Figure \@ref(fig:cow-plot-plot)).
+Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \@ref(fig:cow-plot-plot)).
 
 ```{r data-cow-plot, include=FALSE}
 greater_melbourne <- c(
@@ -180,7 +178,7 @@ main_map <- ggplot() +
     legend.text  = element_text(size = 8)
   )
 inset_map <- ggplot() +
-  geom_sf(data = lga_inset, fill = "lightblue", color = "darkblue", linewidth = 0.2) +
+  geom_sf(data = lga_inset, aes(fill = erp_round), color = "grey65", linewidth = 0.2) +
   labs(title = "Greater Melbourne") +
   theme_map() +
   theme(
@@ -196,11 +194,9 @@ final_map <- ggdraw() +
 print(final_map)
 ```
 
-These are effective for static reports but require viewers to mentally integrate separate views, and they don't preserve the *embedded* relationship between focus and context within a single continuous geography. Furthermore, if you introduce one or more elements into the plot like filling value equal to a variable, the audience will have a hard time identify the zoomed detail.
+These are potentially the most practical approach to the detail-versus-context tradeoff, and may effective for static reports, but require viewers to mentally integrate separate views, and don't preserve the *embedded* relationship between focus and context within a single continuous geography. The lack of continuous geography also presents challenges if additional elements such as fill colour are introduced to the plot.
 
-### Hexagon tile maps: Discrete abstraction
-
-Packages like `sugarbag` replace irregular polygons with regular hexagonal or square tiles, each representing an administrative unit.
+A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the `sugarbag` package [REF]. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
 
 ```{r sugarbag-prepare, include=FALSE}
 centroids <- create_centroids(vic, "LGA_NAME")
@@ -289,11 +285,9 @@ ggplotly(plot_2, tooltip = "text") |> layout(
 )
 ```
 
-As seen in Figure \@ref(fig:sugarbag-plot), tile maps *abstract away* precise geography entirely, treating space as a topology-preserving tessellation where "neighbors touch" matters more than accurate boundaries. Tile maps excel at avoiding size bias (Mildura gets equal visual weight to Yarra) and creating aesthetic, clutter-free layouts. However, they abandon continuous spatial relationships: you cannot identify precise locations, measure distances, or overlay point data meaningfully. In the example above, the sugarbag approach was overlay on top of the original geography. Hexbin aggregation for point data (via `ggplot2::geom_hex()`) serves a different purpose-density estimation-rather than focus+context navigation.
+The challenge with tile maps is that they abstract away precise geography entirely, treating space as a topology-preserving tessellation where "neighbors touch" matters more than accurate boundaries. Tile maps excel at avoiding size bias. However, they abandon continuous spatial relationships. As a result, you cannot identify precise locations, measure distances, or overlay point data meaningfully. In Figure \@ref(fig:sugarbag-plot), the sugarbag approach was overlaid on top of the original geography, and it is difficult to discern which tiles belong to which geographic area.
 
-### Cartograms: Thematic distortion
-
-The cartogram family intentionally distorts geographic areas to encode variables-population density reshapes regions so area becomes proportional to demographic weight. (See the diffusion cartograms in @gastner2004, for example.) Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`) shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportionally to population.
+A third approach is a cartogram plot. In these plots, areas are intentionally distorted to ensure an area reflects the density of a variable. The most common approach is to distort the shapes such that the area becomes proportional to population [@gastner2004]. Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`) shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportionally to population. Notice how, in comparison to \@ref(fig:cow-plot-plot), the areas in the south where the bulk of the Victorian population resides take up a majority of the plot.
 
 ```{r data-cart, include=FALSE}
 cartogram <- cartogram_cont(my_sf_merc_2024, "erp_n")
@@ -383,11 +377,13 @@ p <- p |>
 p
 ```
 
-This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. For example, a population cartogram enlarges Monash while shrinking La Trobe, prioritizing thematic insight over geographic fidelity. The reader can still somehow find the shape of Victoria familiars, as the cartogram preserves relative positions and topology, however, it shape and size are distorted. In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
+This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves relative positions and topology, however, the shape and size are distorted. 
 
-### Why FGC fisheye offers something distinct
+In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
 
-None of these approaches provide *continuous geometric magnification within a single, topology-preserving map*. Cartograms distort for data, not user-chosen focus. Tile maps abstract away geography. Multi-panel tools spatially separate context. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases like: examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
+### Focus-Glue-Context and the fisheye transformation
+
+None of these approaches provide continuous geometric magnification within a single, topology-preserving map. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases like: examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
 
 With this landscape established, we now turn to the technical implementation: how does the FGC transformation actually work, and how does this package make it accessible within R's spatial workflows?
 
@@ -502,12 +498,6 @@ ggplot() +
 
 ```
 
-```{r diagnostics-output, echo=TRUE}
-# Inspect diagnostics returned by fisheye_fgc()
-head(transform_df[, c("x_new", "y_new", "zone", "r_orig", "r_new")])
-table(transform_df$zone)
-```
-
 Consider a point $P = (x, y)$ in a projected coordinate system. The analyst chooses a center $C = (c_x, c_y)$ and two radii: $r_{\text{in}}$ delineating the focus region and $r_{\text{out}}$ marking the glue boundary. Points inside the focus magnify, points between the radii focus on the center and then compress according to a smooth curve, and points outside remain unchanged. This radial scheme keeps angular coordinates intact, thereby preserving bearings and relative direction.
 
 ## Algorithm
@@ -523,7 +513,7 @@ Let $(r, \theta)$ denote the polar form of point $P = (x, y)$ relative to center
  \end{cases}
 \end{equation}
 
-where $z \> 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue compression, and $u = { (r - r_{\text{in}}) }/{ (r_{\text{out}} - r_{\text{in}}) }$ normalizes the glue radius to $[0,1]$. The function $h(u; s)$ is chosen so that $h(0; s) = 0$, $h(1; s) = 1$, and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve:
+where $z > 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue compression, and $u = { (r - r_{\text{in}}) }/{ (r_{\text{out}} - r_{\text{in}}) }$ normalizes the glue radius to $[0,1]$. The function $h(u; s)$ is chosen so that $h(0; s) = 0$, $h(1; s) = 1$, and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve function,
 
 \begin{equation} 
  h(u; s) = 
@@ -533,7 +523,7 @@ where $z \> 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue
  \end{cases}
 \end{equation}
 
-which compresses radii near both boundaries and emphasizes the mid-glue region. Analysts seeking outward compression can choose alternative methods (for example: the `"outward"` mode) that bias the curve towards $r_{\text{out}}$. The demonstration on how original and transformed radius can be seen at the Figure \@ref(fig:radial-curve). The transform optionally introduces rotation within the glue zone to accentuate the flow from detail to context. Let $\phi(u)$ denote the angular adjustment. We employ a bell-shaped profile: $\phi(u) = \rho \cdot 4u(1-u)$, where $\rho$ is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries, ensuring continuity.
+which compresses radii near both boundaries and emphasizes the mid-glue region. An alternative approach which implements outward compression which biases the curve towards $r_{\text{out}}$ is also implemented with parameter `"outward"`. A demonstration on how original and transformed radius can be seen at the Figure \@ref(fig:radial-curve). The transform optionally introduces rotation within the glue zone to accentuate the flow from detail to context. Let $\phi(u)$ denote the angular adjustment. We employ a bell-shaped profile: $\phi(u) = \rho \cdot 4u(1-u)$, where $\rho$ is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries, ensuring continuity.
 
 ```{r radial-curve, fig.cap="Radial mapping function of the FGC fisheye. The plot shows original radius r against warped radius r', with shaded focus, glue, and context regions and a reference identity line. The curve demonstrates expansion in the focus, smooth compression in the glue, and identity mapping outside.", out.width="120%"}
 r_in  <- 0.34
@@ -752,7 +742,7 @@ A bounding box defines the normalizing scale. With `preserve_aspect = TRUE`, a u
 
 ### Core transformation
 
-At the heart of the package is `fisheye_fgc()`, a vectorized function mapping an $n \times 2$ coordinate matrix to a new $n \times 2$ matrix via the FGC rule. Its contract is minimal: numeric arrays and scalar parameters defining center, radii, magnification, compression, method, and revolution. Internally it converts to polar form, applies the piecewise radial map with smooth boundary conditions, optionally perturbs angle via bell-shaped rotation, and converts back to Cartesian.
+The main function of the `mapycusmaximus` package is the `fisheye_fgc()` function, which maps an $n \times 2$ coordinate matrix to a new $n \times 2$ matrix using the equations given in Section **xxx**. The function takes arguments `cx` and `cy`, corresponding to the center point, `r_in` and `r_out`, denoting the borders of the transformed regions, `zoom_factor` corresponding to $z$ in the previous section, a squeeze factor, and potential angular transformation through the `revolution` argument, which corresponds to $\rho$.
 
 ```{r basic-example, fig.cap="Basic numeric example of an FGC fisheye transformation. A synthetic grid is shown before and after warping. The example isolates the core radial mapping independent of spatial geometry reconstruction.", fig.align="center", out.width="80%"}
 original <- create_test_grid()
@@ -760,7 +750,7 @@ fisheye_org <- fisheye_fgc(original, r_in = 0.34, r_out = 0.55)
 plot_fisheye_fgc(original, fisheye_org)
 ```
 
-It attaches diagnostic attributes (zone labels, original and new radii) consumed by plotting utilities but not affecting geometry reconstruction.
+The resulting matrix contains the transformed coordinates in the same order as the input coordinates. The zone of each point, and the original and transformed radii of each point from the specified center are returned as invisible attributes named `zones`, `original_radius` and `new_radius` respectively. The choice to return a 2-column matrix was specifically made to ensure ease of operation with `sf` coordinate construction functions.
 
 ```{r fisheye-attributes}
 fisheye_org |> head()
@@ -860,7 +850,7 @@ plot_1 + plot_2
 
 At the top level is an all-in-one function `sf_fisheye()`, which presents the user-facing interface while keeping the numeric core untouched. It validates input, selects working CRS, resolves center, constructs normalization closures, and invokes `st_transform_custom()` to rebuild geometries.
 
-The geometry walker `st_transform_custom()` acts as a drop-in analogue to `sf::st_transform()` but applies an arbitrary coordinate function. For each feature, it extracts coordinates via `sf::st_coordinates()`, yielding a matrix with columns $(x, y, L1, L2, \dots)$ where L1 and L2 index polygon rings and multi-polygon parts. Geometries are split by type:
+The geometry walker `st_transform_custom()` applies a user-specified function which transforms coordinates from one coordinate system to another. For each feature, it extracts coordinates via `sf::st_coordinates()`, yielding a matrix with columns $(x, y, L1, L2, \dots)$ where L1 and L2 index polygon rings and multi-polygon parts. Geometries are split by type:
 
 -   **POINT**: direct warp
 -   **LINESTRING**: warp each vertex, retain order
