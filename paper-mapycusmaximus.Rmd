@@ -59,6 +59,97 @@ library(stringr)
 library(janitor)
 library(plotly)
 library(sugarbag)
+
+sf_fisheye <- function(
+  sf_obj,
+  center = NULL,              # accepts c(lon,lat), c(x,y in map units), normalized pair, or sf/sfc POINT
+  center_crs = NULL,          # e.g. "EPSG:4326"; if NULL we auto-guess (lon/lat vs map units)
+  normalized_center = FALSE,  # TRUE if 'center' is in [-1,1] normalized coords
+  cx = NULL, cy = NULL,       # legacy map-unit center still supported; ignored if 'center' given
+  r_in = 0.34, r_out = 0.5,
+  zoom_factor = 1.5,
+  squeeze_factor = 0.35,
+  method = "expand",
+  revolution = 0.0,
+  target_crs = NULL,
+  preserve_aspect = TRUE
+) {
+  stopifnot(r_out > r_in)
+  stopifnot(inherits(sf_obj, c("sf", "sfc")))
+  if (inherits(sf_obj, "sf")) {
+    sf_obj <- sf_obj[!sf::st_is_empty(sf_obj), ]
+  }
+  sf_obj <- sf::st_zm(sf_obj, drop = TRUE, what = "ZM")
+  # --- choose working CRS (projected) ---
+  original_crs <- sf::st_crs(sf_obj)
+  if (!is.null(target_crs)) {
+    sf_obj <- sf::st_transform(sf_obj, target_crs)
+  } else if (sf::st_is_longlat(sf_obj)) {
+    bb <- sf::st_bbox(sf_obj)
+    lon_center <- (bb["xmin"] + bb["xmax"]) / 2
+    lat_center <- (bb["ymin"] + bb["ymax"]) / 2
+    if (lon_center > 140 && lon_center < 150 && lat_center > -40 && lat_center < -30) {
+      sf_obj <- sf::st_transform(sf_obj, "EPSG:7855")  # GDA2020 / MGA Zone 55
+    } else {
+      utm_zone <- floor((lon_center + 180) / 6) + 1
+      epsg <- if (lat_center >= 0) {
+        paste0("EPSG:", 32600 + utm_zone)
+      } else {
+        paste0("EPSG:", 32700 + utm_zone)
+      }
+      sf_obj <- sf::st_transform(sf_obj, epsg)
+    }
+  }
+  working_crs <- sf::st_crs(sf_obj)
+  # --- bbox + scale ---
+  bb <- sf::st_bbox(sf_obj)
+  sx <- (bb["xmax"] - bb["xmin"]) / 2; if (sx == 0) sx <- 1
+  sy <- (bb["ymax"] - bb["ymin"]) / 2; if (sy == 0) sy <- 1
+  s  <- max(sx, sy)
+  norm_fun <- if (preserve_aspect) {
+    function(M, cxy) cbind((M[, 1] - cxy[1]) / s,  (M[, 2] - cxy[2]) / s)
+  } else {
+    function(M, cxy) cbind((M[, 1] - cxy[1]) / sx, (M[, 2] - cxy[2]) / sy)
+  }
+  denorm_fun <- if (preserve_aspect) {
+    function(M, cxy) cbind(cxy[1] + M[, 1] * s,  cxy[2] + M[, 2] * s)
+  } else {
+    function(M, cxy) cbind(cxy[1] + M[, 1] * sx, cxy[2] + M[, 2] * sy)
+  }
+  # --- resolve center precedence ---
+  if (!is.null(center)) {
+    cxy <- mapycusmaximus:::.resolve_center(center, center_crs, working_crs, bb,
+                           preserve_aspect, normalized_center)
+  } else {
+    if (is.null(cx) || is.null(cy)) {
+      cxy <- c((bb["xmin"] + bb["xmax"]) / 2, (bb["ymin"] + bb["ymax"]) / 2)
+    } else {
+      cxy <- c(cx, cy)
+    }
+  }
+  # --- fisheye wrapper ---
+  base_args <- list(
+    cx = 0, cy = 0,
+    r_in = r_in, r_out = r_out,
+    zoom_factor = zoom_factor,
+    squeeze_factor = squeeze_factor,
+    method = method,
+    revolution = revolution
+  )
+  wrapped_fisheye <- function(coords, ...) {
+    M <- as.matrix(coords[, 1:2, drop = FALSE])
+    N <- norm_fun(M, cxy)
+    T <- do.call(fisheye_fgc, c(list(N), base_args))
+    denorm_fun(T, cxy)
+  }
+  out <- st_transform_custom(sf_obj, transform_fun = wrapped_fisheye, args = list())
+  # restore original CRS if needed
+  if (!identical(sf::st_crs(out), original_crs)) {
+    out <- sf::st_transform(out, original_crs)
+  }
+  return(out)
+}
+
 ```
 
 # Introduction
@@ -1275,7 +1366,7 @@ cowplot::ggdraw(focus) +
 
 We could also include an interactive version of the plot above, thanks to the natively support and integration of `ggplotly` with sf object.
 
-```{r fisheye-plotly, cho = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
+```{r fisheye-plotly, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
 ggplotly(focus) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
