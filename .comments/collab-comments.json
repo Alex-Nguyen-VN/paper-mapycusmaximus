@@ -1,3 +1,327 @@
 {
-  "comments": []
+  "comments": [
+    {
+      "id": "1769037744167",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:22:24.167Z",
+      "text": "I don't get if this is \"extension\". It's too light on details at the moment to grasp.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 76,
+          "character": 405
+        },
+        "end": {
+          "line": 76,
+          "character": 413
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769037807374",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:23:27.374Z",
+      "text": "What does this review teach us though? What is missing in the field (from this review) that this package is addressing",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 76,
+          "character": 811
+        },
+        "end": {
+          "line": 76,
+          "character": 820
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769037888793",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:24:48.793Z",
+      "text": "I don't know what this means.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 78,
+          "character": 180
+        },
+        "end": {
+          "line": 78,
+          "character": 304
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769037946723",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:25:46.723Z",
+      "text": "Do any of these references include those earlier fisheye maps?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 78,
+          "character": 565
+        },
+        "end": {
+          "line": 78,
+          "character": 572
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769037961356",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:26:01.356Z",
+      "text": "Claims like this must be suppoted by references.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 78,
+          "character": 578
+        },
+        "end": {
+          "line": 78,
+          "character": 687
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769039494654",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:51:34.654Z",
+      "text": "This seciton needs a revisit. The fisheye bit is only the glue right? Stressing the fisheye transformation makes me think the cartogram looks very fisheye-y and has the same problem.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 383,
+          "character": 4
+        },
+        "end": {
+          "line": 383,
+          "character": 53
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769039730122",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-21T23:55:30.122Z",
+      "text": "with respect to what variable? Presumably s.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 515,
+          "character": 287
+        },
+        "end": {
+          "line": 515,
+          "character": 304
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769040285724",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:04:45.724Z",
+      "text": "I think this is accurate mathematically but it doesn't appear on the plot or anywhere else in the manuscript.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 525,
+          "character": 461
+        },
+        "end": {
+          "line": 525,
+          "character": 465
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769040325188",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:05:25.188Z",
+      "text": "The labels are covering each other and that is making the figure very hard to read",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 527,
+          "character": 20
+        },
+        "end": {
+          "line": 527,
+          "character": 72
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769040405499",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:06:45.499Z",
+      "text": "Surely the victoria map we are using has a CRS already",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 620,
+          "character": 198
+        },
+        "end": {
+          "line": 620,
+          "character": 236
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769040440003",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:07:20.003Z",
+      "text": "What does this mean? You say at the top you use a CRS if it already exists - so why is there a need to restore the CRS?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 620,
+          "character": 303
+        },
+        "end": {
+          "line": 620,
+          "character": 343
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769040501612",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:08:21.612Z",
+      "text": "I don't understand most of the boxes on this diagram I'm afraid.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 624,
+          "character": 29
+        },
+        "end": {
+          "line": 624,
+          "character": 67
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769041107255",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:18:27.255Z",
+      "text": "The squeeze_factor isn't mentioned here as far as I can see",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 502,
+          "character": 3
+        },
+        "end": {
+          "line": 502,
+          "character": 12
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769042812951",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:46:52.951Z",
+      "text": "This plot is linear on a log-log scale which means it follows a power law, not linear.",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 759,
+          "character": 199
+        },
+        "end": {
+          "line": 759,
+          "character": 307
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769043066523",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:51:06.523Z",
+      "text": "This really needs an example of a transform_fun - is this our transformer or is the user expected to know what this is?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 852,
+          "character": 0
+        },
+        "end": {
+          "line": 852,
+          "character": 144
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769043103781",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:51:43.781Z",
+      "text": "What is this?",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 861,
+          "character": 105
+        },
+        "end": {
+          "line": 861,
+          "character": 113
+        }
+      },
+      "replies": [],
+      "resolved": false
+    },
+    {
+      "id": "1769043126004",
+      "author": "Michael Lydeamore",
+      "timestamp": "2026-01-22T00:52:06.004Z",
+      "text": "There has to be a better way to show this than this table",
+      "filePath": "paper-mapycusmaximus.Rmd",
+      "range": {
+        "start": {
+          "line": 861,
+          "character": 116
+        },
+        "end": {
+          "line": 861,
+          "character": 221
+        }
+      },
+      "replies": [],
+      "resolved": false
+    }
+  ]
 }
