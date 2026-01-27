@@ -393,40 +393,19 @@ For the current approach, the shiny app only use the default dataset included in
 
 \section{Application to Victorian ambulance transfer records}\label{application-to-victorian-ambulance-transfer-records}
 
-We focus on one application: Victorian hospitals, residential aged care facilities (RACFs) and ambulance transfer act as connection between these two during COVID-19 period. All of the data was synthetic, except for the location of the hospitals and RACF, which is publicly available. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens.
+To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitalsin Victoria, over a period that includes the COVID-19 pandemic period. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. To simplify the visualizations we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
 
-First, we can plot separately the sampled hospitals and the age care facilities to see where they actually are.
+Figure \ref{fig:hospitals-basic-plot} shows the geographical map with the local government areas coloured, locations of RACFs (blue) and hospitals (red) overlaid, and transfers shown as lines. The rural transfers are easy to see, but the volume of transfers happens in the metropolitan area which is too concentrated to see on this map. The fisheye can be used to alleviate this.
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf}}
-\caption{\label{fig:hospitals-point-plot}Standard maps of hospitals and RACFs in Victoria. Hospitals (red) and residential aged care facilities (blue) are plotted separately over a grey basemap. The figure shows their true spatial distribution prior to any fisheye distortion.}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1} \caption{Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the mtropolitan region cannot be seen.}\label{fig:hospitals-basic-plot}
 \end{figure}
 
-Afterward, we can plot the connection between the hospital and the age care facilities to see the movement of the patient between the two as shown in the Figure \ref{fig:hospitals-basic-plot}.
-
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf}}
-\caption{\label{fig:hospitals-basic-plot}Standard Victorian map of a sampled hospital-RACF network. Points represent hospitals and RACFs, and lines indicate simulated transfer counts. At state scale, metropolitan structure is visually compressed and difficult to discern.}
-\end{figure}
-
-As we can see, comparing to the scale of Victoria, with the default scale method, the network mostly invisible. To magnify the network, we can apply a fisheye lens.
-
-\begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf}}
-\caption{\label{fig:fisheye-plot}Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/fisheye-plot-1} \caption{Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.}\label{fig:fisheye-plot}
 \end{figure}
 
 We could also include an interactive version of the plot above, thanks to the natively support and integration of \texttt{ggplotly} with sf object.
-
-\begin{verbatim}
-ggplotly(focus) |>
-  layout(hovermode = "closest", 
-  xaxis = list(autorange = TRUE), 
-  yaxis = list(autorange = TRUE))
-\end{verbatim}
 
 The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same center and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. To inspect a different hub (for example: Geelong), change \texttt{center} to that polygon; multiple center can be explored by re-running \texttt{sf\_fisheye()} with alternative center and comparing panels side by side.
 

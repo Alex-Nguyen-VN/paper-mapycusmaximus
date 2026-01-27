@@ -1284,7 +1284,7 @@ For the current approach, the shiny app only use the default dataset included in
 
 # Application to Victorian ambulance transfer records
 
-We focus on one application: Victorian hospitals, residential aged care facilities (RACFs) and ambulance transfer act as connection between these two during COVID-19 period. All of the data was synthetic, except for the location of the hospitals and RACF, which is publicly available. We sample 10 hospitals and 10 RACFs to avoid clutter, use a grey basemap for contrast, and highlight how points, polygons, and connection lines behave under the same lens. 
+To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitalsin Victoria, over a period that includes the COVID-19 pandemic period. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. To simplify the visualizations we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
 
 ```{r preparing-hosp-data}
 
@@ -1326,9 +1326,9 @@ hosp_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_
 racf_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 ```
 
-First, we can plot separately the sampled hospitals and the age care facilities to see where they actually are.
+<!-- First, we can plot separately the sampled hospitals and the age care facilities to see where they actually are.-->
 
-```{r hospitals-point-plot, fig.cap="Standard maps of hospitals and RACFs in Victoria. Hospitals (red) and residential aged care facilities (blue) are plotted separately over a grey basemap. The figure shows their true spatial distribution prior to any fisheye distortion."}
+```{r hospitals-point-plot, fig.cap="Standard maps of hospitals and RACFs in Victoria. Hospitals (red) and residential aged care facilities (blue) are plotted separately over a grey basemap. The figure shows their true spatial distribution prior to any fisheye distortion.", eval=FALSE}
 # Standard plot
 plot_hosp <- ggplot(vic) + 
   geom_sf(fill = "grey90") +
@@ -1350,23 +1350,23 @@ plot_racf <- ggplot(vic) +
 plot_hosp + plot_racf
 ```
 
-Afterward, we can plot the connection between the hospital and the age care facilities to see the movement of the patient between the two as shown in the Figure \@ref(fig:hospitals-basic-plot).
+Figure \@ref(fig:hospitals-basic-plot) shows the geographical map with the local government areas coloured, locations of RACFs (blue) and hospitals (red) overlaid, and transfers shown as lines. The rural transfers are easy to see, but the volume of transfers happens in the metropolitan area which is too concentrated to see on this map. The fisheye can be used to alleviate this.
 
-```{r hospitals-basic-plot, fig.cap="Standard Victorian map of a sampled hospital-RACF network. Points represent hospitals and RACFs, and lines indicate simulated transfer counts. At state scale, metropolitan structure is visually compressed and difficult to discern."}
+```{r hospitals-basic-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the mtropolitan region cannot be seen.", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 ggplot() +
-  geom_sf(data = vic, fill = "grey65", color = "white", linewidth = 0.5) +
-  geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
-  geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
-  scale_size(range = c(0.2, 1.2), guide = "none") +
-  geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
-  geom_sf(data = racf_pts, color = "blue", size = 0.5) +
+  geom_sf(data = vic, fill = "grey85", color = "white", 
+          linewidth = 0.5) +
+  geom_sf(data = conn_metro_10, color = "black", linewidth = 1) +
+  geom_sf(data = conn_outer_10, color = "black", linewidth = 1) +
+  geom_sf(data = hosp_pts, color = "red", size = 2,) +
+  geom_sf(data = racf_pts, color = "blue", size = 2) +
+  #scale_size(range = c(0.2, 1.2), guide = "none") +
   coord_sf() +
-  ggtitle("Victorian hospital-RACF network (sampled)") +
+  #ggtitle("Victorian hospital-RACF network (sampled)") +
   theme_map() +
   theme(panel.background = element_rect(fill = "white", color = NA))
 ```
 
-As we can see, comparing to the scale of Victoria, with the default scale method, the network mostly invisible. To magnify the network, we can apply a fisheye lens.
 
 ```{r fisheye-preparation, echo = FALSE}
 hosp_point2 <- hosp_pts |>
@@ -1393,13 +1393,14 @@ transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-
 
 ```{r fisheye-plot-prepare}
 focus <- ggplot() +
-  geom_sf(data = vic_w, fill = "grey65", color = "white") +
-  geom_sf(data = transfers_w, color = "black", size = 0.3) +
-  geom_sf(data = pts_w, aes(color = type), size = 1) +
+  geom_sf(data = vic_w, fill = "grey85", color = "white") +
+  geom_sf(data = transfers_w, color = "black", size = 1) +
+  geom_sf(data = pts_w, aes(color = type), size = 2) +
   scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
-  ggtitle("Fisheye on greater Melbourne") +
+  #ggtitle("Fisheye on greater Melbourne") +
   theme_map() +
-  theme(panel.background = element_rect(fill = "grey98", color = NA))
+  theme(legend.position = "none", 
+        panel.background = element_rect(fill = "white", color = NA))
 
 overview <- ggplot() +
   geom_sf(data = vic, fill = NA, color = "grey", linewidth = 0.5) +
@@ -1413,15 +1414,16 @@ overview <- ggplot() +
   ggtitle("Original size")
 ```
 
-```{r fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_latex_output()}
-cowplot::ggdraw(focus) +
-  cowplot::draw_plot(overview, x = 0.62, y = 0.62, width = 0.33, height = 0.33, scale = 1)
+```{r fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_latex_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+#cowplot::ggdraw(focus) +
+#  cowplot::draw_plot(overview, x = 0.62, y = 0.62, width = 0.33, height = 0.33, scale = 1)
+focus
 ```
 
 We could also include an interactive version of the plot above, thanks to the natively support and integration of `ggplotly` with sf object.
 
-```{r fisheye-plotly, echo = TRUE, out.width="100%", fig.width = 6, fig.height=5, layout="l-body", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
-ggplotly(focus) |>
+```{r fisheye-plotly, echo = FALSE, out.width="100%", fig.width = 8, fig.height=6, layout="l-text", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. This makes it possible to see the transfers in the metropolition area as well as in the rural locations.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
+ggplotly(focus, width=800, height=600) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
   yaxis = list(autorange = TRUE))

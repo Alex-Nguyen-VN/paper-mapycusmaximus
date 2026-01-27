@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  23 JAN 2026 09:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  27 JAN 2026 15:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1061,39 +1061,29 @@ Package pdftex.def Info: figures/screenshot.jpeg  used on input line 303.
 reenshot.jpeg>]
 
 [14]
-<paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf, id=327, 43
-5.6275pt x 169.63374pt>
-File: paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf Graphi
-c file (type pdf)
-<use paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-poin
-t-plot-1.pdf  used on input line 402.
-(pdftex.def)             Requested size: 435.62643pt x 169.63332pt.
-<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=329, 38
-7.4475pt x 299.1175pt>
+<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=328, 51
+3.92pt x 365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf Graphi
 c file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basi
-c-plot-1.pdf  used on input line 410.
-(pdftex.def)             Requested size: 387.44655pt x 299.11676pt.
-
-
-[15 <./paper-mapycusmaximus_files/figure-latex/hospitals-point-plot-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=343, 456.70625p
-t x 293.095pt>
+c-plot-1.pdf  used on input line 401.
+(pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
+<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=329, 513.92pt x
+ 365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf Graphic file (
 type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1
-.pdf  used on input line 418.
-(pdftex.def)             Requested size: 456.70512pt x 293.09427pt.
+.pdf  used on input line 405.
+(pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
 
 
-[16 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>]
+[15]
 
-[17 <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 457--458
+[16 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf> <./p
+aper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 436--437
 \T1/ppl/m/n/10 (+20) The github repo for this pa-per is [][]$\T1/zi4/m/n/10 htt
 ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
  []
@@ -1103,21 +1093,23 @@ ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
 \openout6 = `RJwrapper.brf'.
 
 
+
+[17]
 Underfull \hbox (badness 1490) in paragraph at lines 61--61
 \T1/ppl/m/it/10 (+20) The R Jour-nal\T1/ppl/m/n/10 (+20) , 10:439--446, 2018.  
 ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
  []
 
+)
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 450.
+
+LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
+(Font)              scaled to size 10.20004pt on input line 450.
 
 
 [18])
-
-LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 471.
-
-LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 471.
-)
 
 [19] (./RJwrapper.aux)
  ***********
@@ -1133,11 +1125,11 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: 2947933CA307C84E1A32CE5FD77B3855;799.
  ) 
 Here is how much of TeX's memory you used:
- 27703 strings out of 473190
- 505052 string characters out of 5715800
- 916207 words of memory out of 5000000
- 50035 multiletter control sequences out of 15000+600000
- 604265 words of font info for 321 fonts, out of 8000000 for 9000
+ 27692 strings out of 473190
+ 504683 string characters out of 5715800
+ 915866 words of memory out of 5000000
+ 50031 multiletter control sequences out of 15000+600000
+ 604021 words of font info for 317 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  117i,12n,131p,1854b,862s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/inconsolata/Inconsolat
@@ -1149,10 +1141,10 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (19 pages, 1654129 bytes).
+Output written on RJwrapper.pdf (19 pages, 1338406 bytes).
 PDF statistics:
- 468 PDF objects out of 1000 (max. 8388607)
- 383 compressed objects within 4 object streams
- 73 named destinations out of 1000 (max. 500000)
- 55536 words of extra memory for PDF output out of 61914 (max. 10000000)
+ 452 PDF objects out of 1000 (max. 8388607)
+ 370 compressed objects within 4 object streams
+ 72 named destinations out of 1000 (max. 500000)
+ 55531 words of extra memory for PDF output out of 61914 (max. 10000000)
 
