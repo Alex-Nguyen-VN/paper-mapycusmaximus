@@ -158,7 +158,7 @@ The resulting matrix contains the transformed coordinates in the same order as t
 
 \begin{verbatim}
 #> [1] "dim"             "dimnames"        "zones"           "original_radius"
-#> [5] "new_radius"
+#> [5] "new_radius"      "class"
 \end{verbatim}
 
 Numeric stability at zone boundaries is ensured by clamping expansions in the focus so radii do not exceed \(r_{in}\), and using smooth power curves in the glue so derivatives match across boundaries. The radial mapping is vectorized and runs in linear time in the number of vertices as seen in the benchmark \ref{fig:bench-plot}.
@@ -199,23 +199,23 @@ Table \ref{tab:transformation-table} illustrates coordinate transformations acro
 \hline
 x & y & x\_new & y\_new & zone & r\_orig & r\_new\\
 \hline
--1.0 & -1 & -1.000 & -1.000 & context & 1.414 & 1.414\\
+-1.0 & -1 & -1.000000e+00 & -1.0000000 & context & 1.414 & 1.414\\
 \hline
--0.9 & -1 & -0.900 & -1.000 & context & 1.345 & 1.345\\
+-0.9 & -1 & -9.000000e-01 & -1.0000000 & context & 1.345 & 1.345\\
 \hline
--0.8 & -1 & -0.800 & -1.000 & context & 1.281 & 1.281\\
+-0.8 & -1 & -8.000000e-01 & -1.0000000 & context & 1.281 & 1.281\\
 \hline
--0.7 & -1 & -0.108 & -0.323 & focus & 0.316 & 0.340\\
+-0.7 & -1 & -1.075174e-01 & -0.3225523 & focus & 0.316 & 0.340\\
 \hline
--0.6 & -1 & 0.000 & -0.340 & focus & 0.300 & 0.340\\
+-0.6 & -1 & 2.081900e-17 & -0.3400000 & focus & 0.300 & 0.340\\
 \hline
--0.5 & -1 & 0.108 & -0.323 & focus & 0.316 & 0.340\\
+-0.5 & -1 & 1.075174e-01 & -0.3225523 & focus & 0.316 & 0.340\\
 \hline
--0.4 & -1 & 0.000 & -0.500 & glue & 0.500 & 0.500\\
+-0.4 & -1 & 3.061617e-17 & -0.5000000 & glue & 0.500 & 0.500\\
 \hline
--0.3 & -1 & -0.300 & -0.400 & glue & 0.500 & 0.500\\
+-0.3 & -1 & -3.000000e-01 & -0.4000000 & glue & 0.500 & 0.500\\
 \hline
--0.2 & -1 & -0.200 & -0.400 & glue & 0.447 & 0.448\\
+-0.2 & -1 & -2.001946e-01 & -0.4003892 & glue & 0.447 & 0.448\\
 \hline
 \end{tabular}
 \end{table}
