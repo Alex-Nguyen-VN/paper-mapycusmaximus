@@ -112,73 +112,6 @@ pop <- pop |>
 save(pop, file="data/pop.rda")
 ```
  
-```{r new-lga-source, eval=FALSE}
-remotes::install_github("JustinCally/vicspatial")
-library(vicspatial)
-check_geoserver()
-available_layers <- listLayers()
-sf_lga_vic <- vicmap_query(layer = "open-data-platform:ad_lga_area_polygon") |> collect()
-sf_lga_vic <- sf_lga_vic |>
-  filter(state=="VIC")
-sf_lga_vic <- sf_lga_vic |>
-  filter(!str_detect(official_name, "UNINC"))
-
-sf_lga_vic_pop <- left_join(sf_lga_vic, pop, by = c("name" = "lga_key"))
-
-remotes::install_github("runapp-aus/strayr")
-library(strayr)
-vic_lga <- read_absmap("lga2022")
-vic_lga <- vic_lga |>
-  filter(state_name_2021 == "Victoria") |>
-  filter(!(lga_name_2022 %in% c("Unincorporated Vic", "No usual address (Vic.)", "Migratory - Offshore - Shipping (Vic.)")))
-
-vic_lga2 <- vic_lga |> 
-  rename(LGA_NAME =lga_name_2022) |>
-  mutate(lga_key = clean_lga(LGA_NAME))
-
-vic_lga2_pop <- left_join(vic_lga2, pop, by = "lga_key")
-
-ggplot() +
- geom_sf(data = vic_lga2_pop, aes(fill = pop), color = "grey85") +
-  scale_fill_distiller("Population", "BuPu") +
-  theme_map() +
-  theme(
-    legend.position = "top",
-    legend.direction = "horizontal",
-    plot.title = element_text(size = 12, face = "bold"),
-    legend.title = element_text(size = 9),
-    legend.text  = element_text(size = 8)
-  )
-
-# https://discover.data.vic.gov.au/dataset/vicmap-lite-local-government-area-lga-polygon-1-250000-to-1-5000000
-vic_lga <- read_sf("data/VMLITE/VMLITE_LGA.shp")
-vic_lga <- vic_lga |>
-  filter(STATE == "VIC")
-```
-
-```{r fix-vic, eval=FALSE}
-remove_holes <- function(map_data) {
-  map_data <- st_make_valid(map_data)
-
-  st_sfc(lapply(map_data, function(g) {
-    if (inherits(g, "POLYGON")) {
-      st_polygon(list(g[[1]]))   # keep only exterior ring
-    } else if (inherits(g, "MULTIPOLYGON")) {
-      st_multipolygon(lapply(g, function(p) list(p[[1]])))
-    } else {
-      g
-    }
-  }), crs = st_crs(map_data))
-}
-
-vic_fixed <- vic |>
-  rename(lga_key = LGA_NAME) |>
-  filter(!str_detect(lga_key, "UNINC")) 
-
-st_geometry(vic) <- remove_holes(st_geometry(vic))
-
-save(vic_fixed, file="data/vic_fixed.rda")
-```
 
 ```{r merge-pop-with-spatial}
 # Join to geography, only the regions in the spatial polygon data
@@ -193,76 +126,12 @@ load("data/pop.rda")
 pop <- pop |> 
   mutate(lga_key = clean_lga(label))
 
-load("data/vic_fixed.rda")
-vic_pop_sf <- left_join(vic_fixed, pop, by = "lga_key")
+data("vic")
+vic <- vic |>
+  rename(lga_key = LGA_NAME)
+vic_pop_sf <- left_join(vic, pop, by = "lga_key")
 vic_pop_merc <- st_transform(vic_pop_sf, 3857)
 
-# Do I need this? Why isn't this done in the version of the data in the package? There are 8 UNINC areas which are not LGAs, to be removed also
-# vic2 <- vic |> 
-#   filter(!str_detect(LGA_NAME, "UNINC")) |>
-#   mutate(lga_key = clean_lga(LGA_NAME))
-# 
-# vic_pop_sf <- left_join(vic2, pop, by = "lga_key")
-# vic_pop_merc <- st_transform(vic_pop_sf, 3857)
-# 
-# # Why do we need this one?
-# vic_pop <- vic_pop_merc |>
-#   select(LGA_NAME, pop, geometry) |>
-#   st_make_valid() |>
-#   st_transform(7844)
-
-#pal <- brewer.pal(nlevels(vic_pop$population_round), "BuPu")
-
-#-------NOT USED---TO BE REMOVED
-# pop <- pop |>
-#   mutate(across(where(is.character), ~ na_if(.x, "-")))
-# pop <- pop |>
-#   clean_names() |>
-#   rename_with(~ str_replace_all(.x, c(
-#     "estimated_resident_population" = "erp",
-#     "population_density" = "pop_density",
-#     "persons_km2" = "per_km2",
-#     "years" = "yr",
-#     "percentage" = "pct",
-#     "percent" = "pct",
-#     "no" = "n",
-#     "aged_" = "age_",
-#     "and_over" = "plus"
-#   )))
-# 
-# pop <- pop |>
-#   mutate(across(-c(label, year), ~ parse_number(.x)))
-# 
-# clean_lga <- function(x) {
-#   x |>
-#     str_to_upper() |>
-#     str_replace_all("\\s*\\(.*\\)$", "") |>   # drop trailing "(NSW)" etc.
-#     str_squish()
-# }
-# 
-# pop2 <- pop |> 
-#   mutate(lga_key = clean_lga(pop$label))
-# 
-# vic2 <- vic |> 
-#   mutate(lga_key = clean_lga(vic$LGA_NAME))
-# 
-# my_sf <- left_join(vic2, pop2, by = "lga_key")
-# 
-# 
-# # Compute the cartogram, using this population information
-# # First we need to change the projection, we use Mercator (AKA Google Maps, EPSG 3857)
-# my_sf_merc <- st_transform(my_sf, 3857)
-# my_sf_merc <- my_sf_merc |>
-#   mutate(erp_n = erp_n / 100000)
-# my_sf_merc_2024 <- my_sf_merc |> filter(year == 2024)
-# my_sf_merc_2024 <- my_sf_merc_2024 |>
-#   mutate(erp_round = factor(round(erp_n)))
-# my_sf <- my_sf_merc_2024 |>
-#   select(LGA_NAME, erp_n, erp_round, geometry) |>
-#   st_make_valid() |>
-#   st_transform(7844)
-# 
-# pal <- brewer.pal(nlevels(my_sf$erp_round), "BuPu")
 ```
 
 Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \@ref(fig:cow-plot-plot)).
@@ -282,21 +151,7 @@ greater_melbourne <- c(
 lga_inset <- vic_pop_sf[vic_pop_merc$lga_key %in% greater_melbourne, ]
 main_map <- ggplot() +
  geom_sf(data = vic_pop_merc, aes(fill = pop), color = "white") +
- geom_sf(data = lga_inset, aes(fill = pop), color = "black") + # Highlight the inset area
-  #scale_fill_manual(
-  #  values = pal,
-  #  name   = "population (in 100,000)",
-   # drop   = TRUE,              # don't show unused levels
-   # na.translate = FALSE,       # don't show NA in legend
-   # guide  = guide_legend(
-   #   title.position = "top",
-   #   label.position = "bottom",
-   #   keyheight = unit(3, "mm"),
-   #   keywidth  = unit(12, "mm")
-   # )
-  #) +
-  #ggtitle("Another look on the Victoria population with inset map") +
-  #scale_fill_distiller("Pop ('00000)", palette="YlGnBu", direction = 1) +
+ geom_sf(data = lga_inset, aes(fill = pop), color = "black") + 
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   theme_map() +
   theme(
@@ -307,7 +162,8 @@ main_map <- ggplot() +
     legend.text  = element_text(size = 8)
   )
 inset_map <- ggplot() +
-  geom_sf(data = lga_inset, aes(fill = pop), color = "white", linewidth = 0.2) +
+  geom_sf(data = lga_inset, aes(fill = pop), 
+          color = "white", linewidth = 0.2) +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   labs(title = "Greater Melbourne") +
   theme_map() +
@@ -317,10 +173,10 @@ inset_map <- ggplot() +
   )
 ```
 
-```{r cow-plot-plot, echo=FALSE, fig.cap="Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels."}
+```{r cow-plot-plot, echo=FALSE, fig.cap="Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 final_map <- ggdraw() +
  draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
- draw_plot(inset_map, x = 0.5, y = 0.5, width = 0.5, height = 0.5) # Inset map position and size
+ draw_plot(inset_map, x = 0.5, y = 0.5, width = 0.4, height = 0.4) # Inset map position and size
 
 print(final_map)
 ```
@@ -369,18 +225,18 @@ hextilemap <- ggplot() +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   theme_map() +
   theme(
-    legend.position = "top",
-    legend.direction = "horizontal"
+    legend.position = c(0.5, 0.9),
+    legend.direction = "horizontal",
   )
 ```
 
 
-```{r sugarbag-plot-pdf, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.", eval=knitr::is_latex_output()}
+```{r sugarbag-plot-pdf, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.", eval=knitr::is_latex_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 hextilemap
 ```
 
-```{r sugarbag-plot-html, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.", eval=knitr::is_html_output()}
-ggplotly(hextilemap, tooltip = "label") |> layout(
+```{r sugarbag-plot-html, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.", eval=knitr::is_html_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+ggplotly(hextilemap, tooltip = "label", width=800, height=500) |> layout(
   #title = list(text = "Another look on the Victoria population", x = 0.5),
   legend = list(
     orientation = "h",
@@ -404,7 +260,8 @@ cartogram <- st_transform(cartogram, st_crs(vic_pop_sf)) |>
   st_cast("MULTIPOLYGON")
 
 carto_plot <- ggplot(cartogram) +
-  geom_sf(aes(fill = pop, label=lga_key), linewidth = 0.05, alpha = 0.9, color = "black") +
+  geom_sf(aes(fill = pop, label=lga_key),
+          color = "white") +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   theme_void() +
   theme(
@@ -413,17 +270,16 @@ carto_plot <- ggplot(cartogram) +
     text = element_text(color = "#22211d"),
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA),
-    legend.background = element_rect(fill = "white", color = NA),
-    plot.title = element_text(size = 20, hjust = 0.5, color = "#4e4d47", margin = margin(b = -0.1, t = 0.4, l = 2, unit = "cm")),
+    legend.background = element_rect(fill = "white", color = NA)
   )
 ```
 
-```{r plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_latex_output(), fig.align="center", out.width="80%"}
+```{r plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 carto_plot
 ```
 
-```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", out.width="100%"}
+```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 ggplotly(carto_plot, tooltip = "label", width=800, height=500) |> 
   layout(
@@ -682,7 +538,7 @@ If the layer is already in a projected CRS, that CRS is used. If it is geographi
 
 #### Normalization
 
-```{r norm-diagram, fig.cap="Workflow diagram of the normalization and CRS handling pipeline. The flowchart depicts CRS selection, normalization, center resolution, fisheye application, and CRS restoration. This highlights the staged design ensuring projection awareness and parameter stability.", eval=knitr::is_html_output(), fig.align="center", out.width="100%"}
+```{r norm-diagram, fig.cap="Workflow diagram of the normalization and CRS handling pipeline. The flowchart depicts CRS selection, normalization, center resolution, fisheye application, and CRS restoration. This highlights the staged design ensuring projection awareness and parameter stability.", eval=knitr::is_html_output(), fig.align="center", width=1, height=4, out.width="200%", layout="l-body"}
 grViz("
 digraph fgc {
   rankdir=TB; nodesep=0.25; ranksep=0.4;
@@ -1192,7 +1048,7 @@ For the current approach, the shiny app only use the default dataset included in
 To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitalsin Victoria, over a period that includes the COVID-19 pandemic period. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. To simplify the visualizations we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
 
 ```{r preparing-hosp-data}
-
+# Select a sample of LGAs
 metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
 
 metro_center <- st_union(vic[vic$LGA_NAME %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))

@@ -29,9 +29,7 @@ First, we briefly review the current R-based solutions to the detail-versus-cont
 Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \ref{fig:cow-plot-plot}).
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf}}
-\caption{\label{fig:cow-plot-plot}Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1} \caption{Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}\label{fig:cow-plot-plot}
 \end{figure}
 
 These are potentially the most practical approach to the detail-versus-context tradeoff, and may effective for static reports, but require viewers to mentally integrate separate views, and don't preserve the \emph{embedded} relationship between focus and context within a single continuous geography. The lack of continuous geography also presents challenges if additional elements such as fill colour are introduced to the plot.
@@ -39,9 +37,7 @@ These are potentially the most practical approach to the detail-versus-context t
 A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the \texttt{sugarbag} package {[}REF{]}. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf}}
-\caption{\label{fig:sugarbag-plot-pdf}Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1} \caption{Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.}\label{fig:sugarbag-plot-pdf}
 \end{figure}
 
 The challenge with tile maps is that they abstract away precise geography entirely, treating space as a topology-preserving tessellation where ``neighbors touch'' matters more than accurate boundaries. Tile maps excel at avoiding size bias. However, they abandon continuous spatial relationships. As a result, you cannot identify precise locations, measure distances, or overlay point data meaningfully. In Figure \ref{fig:sugarbag-plot-pdf}, the sugarbag approach was overlaid on top of the original geography, and it is difficult to discern which tiles belong to which geographic area.
@@ -50,7 +46,7 @@ A third approach is a cartogram plot. In these plots, areas are intentionally di
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/plot-cart-1} 
+{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/plot-cart-1} 
 
 }
 
