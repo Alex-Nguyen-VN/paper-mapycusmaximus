@@ -1155,15 +1155,14 @@ racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
 all_points <- bind_rows(hosp_point2, racf_point2)
 bind <- dplyr::bind_rows(
   vic |> dplyr::mutate(.layer="vic"),
-  all_points |> dplyr::mutate(.layer="pts"),
+  hosp_point2 |> dplyr::mutate(.layer="hosp_pt"),
+  racf_point2 |> dplyr::mutate(.layer="racf_pt"),
   total_trans |> dplyr::mutate(.layer="transfers"))
 bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
 vic_w   <- bind_w |> dplyr::filter(.layer == "vic") |> dplyr::select(-.layer)
-pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
+hosp_w   <- bind_w |> dplyr::filter(.layer == "hosp_pt") |> dplyr::select(-.layer)
+racf_w   <- bind_w |> dplyr::filter(.layer == "racf_pt") |> dplyr::select(-.layer)
 transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
-
-hosp_pts_w <- pts_w |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
-racf_pts_w <- pts_w |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
   
 #vic_w <- sf_fisheye(vic, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
 #pts_w <- sf_fisheye(conn_fish_sub, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
@@ -1173,8 +1172,8 @@ racf_pts_w <- pts_w |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","la
 focus <- ggplot() +
   geom_sf(data = vic_w, fill = "grey85", color = "white") +
   geom_sf(data = transfers_w, color = "black", size = 0.5) +
-  geom_sf(data = hosp_pts_w, aes(label = hosp_name), color = "red", size = 1) +
-  geom_sf(data = racf_pts_w, aes(label = racf_name), color = "blue", size = 1) +
+  geom_sf(data = hosp_w, aes(label = hosp_name), color = "red", size = 1) +
+  geom_sf(data = racf_w, aes(label = racf_name), color = "blue", size = 1) +
   #scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
   #ggtitle("Fisheye on greater Melbourne") +
   coord_sf(default_crs = NULL) +
