@@ -1051,7 +1051,7 @@ To illustrate the use we use data summarising transfers between residential aged
 # Select a sample of LGAs
 metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
 
-metro_center <- st_union(vic[vic$LGA_NAME %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))
+metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))
 vic <- vic |> st_transform(st_crs(4326))
 vic <- vic |> mutate(distance = as.numeric(st_distance(metro_center, vic)))
 
@@ -1169,6 +1169,7 @@ focus <- ggplot() +
   geom_sf(data = pts_w, aes(color = type), size = 2) +
   scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
   #ggtitle("Fisheye on greater Melbourne") +
+  coord_sf(default_crs = NULL) +
   theme_map() +
   theme(legend.position = "none", 
         panel.background = element_rect(fill = "white", color = NA))
