@@ -389,12 +389,14 @@ For the current approach, the shiny app only use the default dataset included in
 
 \section{Application to Victorian ambulance transfer records}\label{application-to-victorian-ambulance-transfer-records}
 
-To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitalsin Victoria, over a period that includes the COVID-19 pandemic period. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. To simplify the visualizations we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
+To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitals in Victoria, over a period that includes the COVID-19 pandemic period. This data is provided with the package in the data object \texttt{conn\_fish}. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate.
 
-Figure \ref{fig:hospitals-basic-plot} shows the geographical map with the local government areas coloured, locations of RACFs (blue) and hospitals (red) overlaid, and transfers shown as lines. The rural transfers are easy to see, but the volume of transfers happens in the metropolitan area which is too concentrated to see on this map. The fisheye can be used to alleviate this.
+To simplify the illustration we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
+
+Figure \ref{fig:hospitals-basic-plot} shows the geographical map of local government areas c overlaid by locations of RACFs (blue) and hospitals (red) overlaid with transfers shown as lines. The rural transfers are easy to see, but transfers in the metropolitan area cannot be seen on this map. The fisheye transformation can be used to alleviate this.
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1} \caption{Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the mtropolitan region cannot be seen.}\label{fig:hospitals-basic-plot}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1} \caption{Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.}\label{fig:hospitals-basic-plot}
 \end{figure}
 
 \begin{figure}

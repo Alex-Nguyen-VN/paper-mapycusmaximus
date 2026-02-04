@@ -1045,81 +1045,81 @@ For the current approach, the shiny app only use the default dataset included in
 
 # Application to Victorian ambulance transfer records
 
-To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitalsin Victoria, over a period that includes the COVID-19 pandemic period. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. To simplify the visualizations we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
+To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitals in Victoria, over a period that includes the COVID-19 pandemic period. This data is provided with the package in the data object `conn_fish`. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. 
+
+To simplify the illustration we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
 
 ```{r preparing-hosp-data}
-# Select a sample of LGAs
+# Select a sample of LGAs in the metropolitan region from which to calculate
+# a centre to run the fisheye transformation
 metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
-
 metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))
 vic <- vic |> st_transform(st_crs(4326))
 vic <- vic |> mutate(distance = as.numeric(st_distance(metro_center, vic)))
 
+data(conn_fish)
 conn_fish <- st_transform(conn_fish, 4326)
-metro_poly <- vic %>%
-  arrange(distance) %>% head(10) %>%
-  st_union()
+# Set labels for RACFs, which are currently NA
+conn_fish <- conn_fish |>
+  mutate(racf_name = paste0("racf", source))
+hosp_selection <- conn_fish |>
+  arrange(desc(weight)) |>
+  slice_head(n=10) |>
+  pull(hosp_name) |>
+  unique()
+# Add a couple of smaller rural hospoitals
+hosp_selection <- c(hosp_selection, 
+                    "Castlemaine Health", 
+                    "Bendigo Day Surgery",
+                    "Central Highlands Rural Health")
 
-outer_poly <- vic %>%
-  arrange(desc(distance)) %>% head(50) %>%
-  st_union()
+conn_fish_sub <- conn_fish |>
+  filter(hosp_name %in% hosp_selection)
 
-conn_pts <- conn_fish |> st_drop_geometry() |>
-  select(long_racf, lat_racf, long_hosp, lat_hosp) 
+hosp_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+racf_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 
-hosp_pts <- st_as_sf(conn_pts, coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
-racf_pts <- st_as_sf(conn_pts, coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
-
-in_metro_h <- st_within(hosp_pts, metro_poly, sparse = FALSE)[,1]
-in_metro_r <- st_within(racf_pts, metro_poly, sparse = FALSE)[,1]
-
-in_outer_h <- st_within(hosp_pts, outer_poly, sparse = FALSE)[,1]
-in_outer_r <- st_within(racf_pts, outer_poly, sparse = FALSE)[,1]
-
-conn_metro <- conn_fish %>% filter(in_metro_h & in_metro_r)
-conn_outer <- conn_fish %>% filter(in_outer_h & in_outer_r)
-
-set.seed(1092)
-conn_metro_10 <- conn_metro %>% slice_sample(n = 5)
-conn_outer_10 <- conn_outer %>% slice_sample(n = 5)
-
-hosp_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
-racf_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
+# not necessary
+# metro_poly <- vic %>%
+#   arrange(distance) %>% head(10) %>%
+#   st_union()
+# 
+# outer_poly <- vic %>%
+#   arrange(desc(distance)) %>% head(50) %>%
+#   st_union()
+# 
+# conn_pts <- conn_fish |> st_drop_geometry() |>
+#   select(long_racf, lat_racf, long_hosp, lat_hosp) 
+# hosp_pts <- st_as_sf(conn_pts, coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+# racf_pts <- st_as_sf(conn_pts, coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
+# 
+# in_metro_h <- st_within(hosp_pts, metro_poly, sparse = FALSE)[,1]
+# in_metro_r <- st_within(racf_pts, metro_poly, sparse = FALSE)[,1]
+# 
+# in_outer_h <- st_within(hosp_pts, outer_poly, sparse = FALSE)[,1]
+# in_outer_r <- st_within(racf_pts, outer_poly, sparse = FALSE)[,1]
+# 
+# conn_metro <- conn_fish %>% filter(in_metro_h & in_metro_r)
+# conn_outer <- conn_fish %>% filter(in_outer_h & in_outer_r)
+# 
+# set.seed(1092)
+# conn_metro_10 <- conn_metro %>% slice_sample(n = 5)
+# conn_outer_10 <- conn_outer %>% slice_sample(n = 5)
+# 
+# hosp_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+# racf_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 ```
 
-<!-- First, we can plot separately the sampled hospitals and the age care facilities to see where they actually are.-->
-
-```{r hospitals-point-plot, fig.cap="Standard maps of hospitals and RACFs in Victoria. Hospitals (red) and residential aged care facilities (blue) are plotted separately over a grey basemap. The figure shows their true spatial distribution prior to any fisheye distortion.", eval=FALSE}
-# Standard plot
-plot_hosp <- ggplot(vic) + 
-  geom_sf(fill = "grey90") +
-  geom_sf(data = hosp_pts, color = "red", size = 0.3, alpha = 1) +
-  ggtitle("Melbourne hospitals") +
-  theme(
-  plot.title = element_text(size = 8) # adjust here
-  ) +
-  theme_map() 
-plot_racf <- ggplot(vic) + 
-  geom_sf(fill = "grey90") +
-  geom_sf(data = racf_pts, color = "blue", size = 0.3, alpha = 1) +
-  ggtitle("Melbourne RACFs") +
-  theme(
-  plot.title = element_text(size = 8) # adjust here
-  ) +
-  theme_map()
-
-plot_hosp + plot_racf
-```
-
-Figure \@ref(fig:hospitals-basic-plot) shows the geographical map with the local government areas coloured, locations of RACFs (blue) and hospitals (red) overlaid, and transfers shown as lines. The rural transfers are easy to see, but the volume of transfers happens in the metropolitan area which is too concentrated to see on this map. The fisheye can be used to alleviate this.
+Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'hospitals-interactive-plot', 'hospitals-basic-plot')`) shows the geographical map of local government areas c overlaid by locations of RACFs (blue) and hospitals (red) overlaid with transfers shown as lines. The rural transfers are easy to see, but transfers in the metropolitan area cannot be seen on this map. The fisheye transformation can be used to alleviate this.
 
 ```{r transfers-plot-setup}
 transfers_plot <- ggplot() +
   geom_sf(data = vic, fill = "grey85", color = "white") +
-  geom_sf(data = conn_metro_10, color = "black", linewidth = 1) +
-  geom_sf(data = conn_outer_10, color = "black", linewidth = 1) +
-  geom_sf(data = hosp_pts, color = "red", size = 2) +
-  geom_sf(data = racf_pts, color = "blue", size = 2) +
+  #geom_sf(data = conn_metro_10, color = "black", linewidth = 1) +
+  #geom_sf(data = conn_outer_10, color = "black", linewidth = 1) +
+  geom_sf(data = conn_fish_sub, color = "black", linewidth = 0.5) +
+  geom_sf(data = hosp_pts, aes(label = hosp_name), color = "red", size = 1) +
+  geom_sf(data = racf_pts, aes(label = racf_name), color = "blue", size = 1) +
   #scale_size(range = c(0.2, 1.2), guide = "none") +
   coord_sf() +
   #ggtitle("Victorian hospital-RACF network (sampled)") +
@@ -1127,11 +1127,11 @@ transfers_plot <- ggplot() +
   theme(panel.background = element_rect(fill = "white", color = NA))
 ```
 
-```{r hospitals-basic-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the mtropolitan region cannot be seen.", fig.width=8, fig.height=6, layout="l-body", out.width="100%", eval=knitr::is_latex_output()}
+```{r hospitals-basic-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.", fig.width=8, fig.height=6, layout="l-body", out.width="100%", eval=knitr::is_latex_output()}
 transfers_plot 
 ```
 
-```{r hospitals-interactive-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the mtropolitan region cannot be seen.", out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", eval=knitr::is_html_output()}
+```{r hospitals-interactive-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.", out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", eval=knitr::is_html_output()}
 ggplotly(transfers_plot, width=800, height=500) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
@@ -1148,7 +1148,8 @@ racf_point2 <- racf_pts |>
   mutate(type = "racf") |>
   rename(id = source)
 
-total_trans <- bind_rows(conn_metro_10, conn_outer_10) |> st_transform(st_crs(vic))
+#total_trans <- bind_rows(conn_metro_10, conn_outer_10) |> st_transform(st_crs(vic))
+total_trans <- conn_fish_sub |> st_transform(st_crs(vic))
 hosp_point2 <- hosp_point2 |> st_transform(st_crs(vic))
 racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
 all_points <- bind_rows(hosp_point2, racf_point2)
@@ -1160,30 +1161,38 @@ bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom 
 vic_w   <- bind_w |> dplyr::filter(.layer == "vic") |> dplyr::select(-.layer)
 pts_w   <- bind_w |> dplyr::filter(.layer == "pts") |> dplyr::select(-.layer)
 transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
+
+hosp_pts_w <- pts_w |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
+racf_pts_w <- pts_w |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
+  
+#vic_w <- sf_fisheye(vic, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
+#pts_w <- sf_fisheye(conn_fish_sub, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
 ```
 
 ```{r fisheye-plot-prepare}
 focus <- ggplot() +
   geom_sf(data = vic_w, fill = "grey85", color = "white") +
-  geom_sf(data = transfers_w, color = "black", size = 1) +
-  geom_sf(data = pts_w, aes(color = type), size = 2) +
-  scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
+  geom_sf(data = transfers_w, color = "black", size = 0.5) +
+  geom_sf(data = hosp_pts_w, aes(label = hosp_name), color = "red", size = 1) +
+  geom_sf(data = racf_pts_w, aes(label = racf_name), color = "blue", size = 1) +
+  #scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
   #ggtitle("Fisheye on greater Melbourne") +
   coord_sf(default_crs = NULL) +
   theme_map() +
   theme(legend.position = "none", 
         panel.background = element_rect(fill = "white", color = NA))
 
-overview <- ggplot() +
-  geom_sf(data = vic, fill = NA, color = "grey", linewidth = 0.5) +
-  geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
-  geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
-  scale_size(range = c(0.2, 1.2), guide = "none") +
-  geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
-  geom_sf(data = racf_pts, color = "blue", size = 0.5) +
-  coord_sf() +
-  theme_void() +
-  ggtitle("Original size")
+# Don't show overview!!
+# overview <- ggplot() +
+#   geom_sf(data = vic, fill = NA, color = "grey", linewidth = 0.5) +
+#   geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
+#   geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
+#   scale_size(range = c(0.2, 1.2), guide = "none") +
+#   geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
+#   geom_sf(data = racf_pts, color = "blue", size = 0.5) +
+#   coord_sf() +
+#   theme_void() +
+#   ggtitle("Original size")
 ```
 
 ```{r fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_latex_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}

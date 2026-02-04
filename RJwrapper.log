@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  4 FEB 2026 15:16
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  4 FEB 2026 16:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1067,7 +1067,7 @@ File: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf Graphi
 c file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basi
-c-plot-1.pdf  used on input line 397.
+c-plot-1.pdf  used on input line 399.
 (pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
 <paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=328, 513.92pt x
  365.365pt>
@@ -1075,7 +1075,7 @@ File: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf Graphic file (
 type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1
-.pdf  used on input line 401.
+.pdf  used on input line 403.
 (pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
 
 
@@ -1083,7 +1083,7 @@ Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1
 
 [16 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf> <./p
 aper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 432--433
+Underfull \hbox (badness 10000) in paragraph at lines 434--435
 \T1/ppl/m/n/10 (+20) The github repo for this pa-per is [][]$\T1/zi4/m/n/10 htt
 ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
  []
@@ -1103,10 +1103,10 @@ ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
 )
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 446.
+(Font)              using `T1/zi4/m/n' instead on input line 448.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 446.
+(Font)              scaled to size 10.20004pt on input line 448.
 
 
 [18])
@@ -1127,7 +1127,7 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 Here is how much of TeX's memory you used:
  27696 strings out of 473190
  504935 string characters out of 5715800
- 915866 words of memory out of 5000000
+ 915873 words of memory out of 5000000
  50035 multiletter control sequences out of 15000+600000
  604021 words of font info for 317 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1141,7 +1141,7 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (19 pages, 1731129 bytes).
+Output written on RJwrapper.pdf (19 pages, 1734556 bytes).
 PDF statistics:
  451 PDF objects out of 1000 (max. 8388607)
  366 compressed objects within 4 object streams
