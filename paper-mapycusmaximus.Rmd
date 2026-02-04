@@ -846,7 +846,7 @@ The principal user interface is `sf_fisheye()`, which accepts an `sf` or `sfc` o
 
 **Return value and side effects.** The function returns an object of the same top-level class as its input (`sf` or `sfc`). For `sf` inputs, non-geometry columns are preserved verbatim; only the geometry column is replaced. The original CRS is restored before return so that downstream plotting and analysis code does not need to change. On malformed geometries, the implementation emits a warning and returns an empty geometry of the appropriate family to preserve row count and indices. For exploratory diagnostics, the low-level `fisheye_fgc()` returns a coordinate matrix with attributes `"zones"`, `"original_radius"`, and `"new_radius"`; these can be used to plot scale curves and verify parameter effects prior to applying the transform to complex geometries.
 
-## Common choices
+## Controlling the transformation
 
 Although the parameter space is continuous, certain regimes recur in practice and can serve as reliable starting points. We describe these regimes and articulate the trade-offs that motivate each choice. The recommendations assume the default `preserve_aspect = TRUE`; when per-axis scaling is enabled, translate radii to semi-axes using the bbox half-spans.
 
@@ -977,7 +977,7 @@ To support interactive exploration of Focus-Glue-Context (FGC) parameters, the p
 
 ## App structure
 
-```{r shiny-screenshot, fig.cap= "Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.", out.width="80%"}
+```{r shiny-screenshot, fig.cap= "Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.", out.width="100%"}
 
 knitr::include_graphics("figures/screenshot.jpeg")
 ```
@@ -1078,36 +1078,6 @@ conn_fish_sub <- conn_fish |>
 
 hosp_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
 racf_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
-
-# not necessary
-# metro_poly <- vic %>%
-#   arrange(distance) %>% head(10) %>%
-#   st_union()
-# 
-# outer_poly <- vic %>%
-#   arrange(desc(distance)) %>% head(50) %>%
-#   st_union()
-# 
-# conn_pts <- conn_fish |> st_drop_geometry() |>
-#   select(long_racf, lat_racf, long_hosp, lat_hosp) 
-# hosp_pts <- st_as_sf(conn_pts, coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
-# racf_pts <- st_as_sf(conn_pts, coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
-# 
-# in_metro_h <- st_within(hosp_pts, metro_poly, sparse = FALSE)[,1]
-# in_metro_r <- st_within(racf_pts, metro_poly, sparse = FALSE)[,1]
-# 
-# in_outer_h <- st_within(hosp_pts, outer_poly, sparse = FALSE)[,1]
-# in_outer_r <- st_within(racf_pts, outer_poly, sparse = FALSE)[,1]
-# 
-# conn_metro <- conn_fish %>% filter(in_metro_h & in_metro_r)
-# conn_outer <- conn_fish %>% filter(in_outer_h & in_outer_r)
-# 
-# set.seed(1092)
-# conn_metro_10 <- conn_metro %>% slice_sample(n = 5)
-# conn_outer_10 <- conn_outer %>% slice_sample(n = 5)
-# 
-# hosp_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_hosp","lat_hosp"), crs = 4326, remove = FALSE)
-# racf_pts <- bind_rows(conn_metro_10, conn_outer_10) |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 ```
 
 Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'hospitals-interactive-plot', 'hospitals-basic-plot')`) shows the geographical map of local government areas c overlaid by locations of RACFs (blue) and hospitals (red) overlaid with transfers shown as lines. The rural transfers are easy to see, but transfers in the metropolitan area cannot be seen on this map. The fisheye transformation can be used to alleviate this.
@@ -1115,14 +1085,12 @@ Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'hospitals-interactive-plot'
 ```{r transfers-plot-setup}
 transfers_plot <- ggplot() +
   geom_sf(data = vic, fill = "grey85", color = "white") +
-  #geom_sf(data = conn_metro_10, color = "black", linewidth = 1) +
-  #geom_sf(data = conn_outer_10, color = "black", linewidth = 1) +
-  geom_sf(data = conn_fish_sub, color = "black", linewidth = 0.5) +
+  geom_sf(data = conn_fish_sub, aes(size=weight, alpha=weight, label=weight), color = "black") +
   geom_sf(data = hosp_pts, aes(label = hosp_name), color = "red", size = 1) +
   geom_sf(data = racf_pts, aes(label = racf_name), color = "blue", size = 1) +
-  #scale_size(range = c(0.2, 1.2), guide = "none") +
+  scale_size(range = c(0.2, 2), guide = "none") +
+  scale_alpha(range = c(0.4, 1), guide = "none") + 
   coord_sf() +
-  #ggtitle("Victorian hospital-RACF network (sampled)") +
   theme_map() +
   theme(panel.background = element_rect(fill = "white", color = NA))
 ```
@@ -1132,7 +1100,7 @@ transfers_plot
 ```
 
 ```{r hospitals-interactive-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.", out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", eval=knitr::is_html_output()}
-ggplotly(transfers_plot, width=800, height=500) |>
+ggplotly(transfers_plot, width=800, height=610) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
   yaxis = list(autorange = TRUE)) 
@@ -1158,24 +1126,22 @@ bind <- dplyr::bind_rows(
   hosp_point2 |> dplyr::mutate(.layer="hosp_pt"),
   racf_point2 |> dplyr::mutate(.layer="racf_pt"),
   total_trans |> dplyr::mutate(.layer="transfers"))
-bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
+bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 4, squeeze = 0.35)
 vic_w   <- bind_w |> dplyr::filter(.layer == "vic") |> dplyr::select(-.layer)
 hosp_w   <- bind_w |> dplyr::filter(.layer == "hosp_pt") |> dplyr::select(-.layer)
 racf_w   <- bind_w |> dplyr::filter(.layer == "racf_pt") |> dplyr::select(-.layer)
 transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
-  
-#vic_w <- sf_fisheye(vic, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
-#pts_w <- sf_fisheye(conn_fish_sub, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 7, squeeze = 0.35)
 ```
 
 ```{r fisheye-plot-prepare}
 focus <- ggplot() +
   geom_sf(data = vic_w, fill = "grey85", color = "white") +
-  geom_sf(data = transfers_w, color = "black", size = 0.5) +
+  geom_sf(data = transfers_w, aes(size=weight, alpha=weight, label=weight), 
+          color = "black") +
   geom_sf(data = hosp_w, aes(label = hosp_name), color = "red", size = 1) +
   geom_sf(data = racf_w, aes(label = racf_name), color = "blue", size = 1) +
-  #scale_color_manual(values = c("hospital" = "red", "racf" = "blue")) +
-  #ggtitle("Fisheye on greater Melbourne") +
+  scale_size(range = c(0.2, 2), guide = "none") +
+  scale_alpha(range = c(0.4, 1), guide = "none") + 
   coord_sf(default_crs = NULL) +
   theme_map() +
   theme(legend.position = "none", 
@@ -1203,7 +1169,7 @@ focus
 We could also include an interactive version of the plot above, thanks to the natively support and integration of `ggplotly` with sf object.
 
 ```{r fisheye-plotly, echo = FALSE, out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. This makes it possible to see the transfers in the metropolition area as well as in the rural locations.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
-ggplotly(focus, width=800, height=500) |>
+ggplotly(focus, width=800, height=610) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
   yaxis = list(autorange = TRUE))

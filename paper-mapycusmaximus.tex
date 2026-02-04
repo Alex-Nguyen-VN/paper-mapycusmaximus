@@ -261,7 +261,7 @@ The principal user interface is \texttt{sf\_fisheye()}, which accepts an \texttt
 
 \textbf{Return value and side effects.} The function returns an object of the same top-level class as its input (\texttt{sf} or \texttt{sfc}). For \texttt{sf} inputs, non-geometry columns are preserved verbatim; only the geometry column is replaced. The original CRS is restored before return so that downstream plotting and analysis code does not need to change. On malformed geometries, the implementation emits a warning and returns an empty geometry of the appropriate family to preserve row count and indices. For exploratory diagnostics, the low-level \texttt{fisheye\_fgc()} returns a coordinate matrix with attributes \texttt{"zones"}, \texttt{"original\_radius"}, and \texttt{"new\_radius"}; these can be used to plot scale curves and verify parameter effects prior to applying the transform to complex geometries.
 
-\subsection{Common choices}\label{common-choices}
+\subsection{Controlling the transformation}\label{controlling-the-transformation}
 
 Although the parameter space is continuous, certain regimes recur in practice and can serve as reliable starting points. We describe these regimes and articulate the trade-offs that motivate each choice. The recommendations assume the default \texttt{preserve\_aspect\ =\ TRUE}; when per-axis scaling is enabled, translate radii to semi-axes using the bbox half-spans.
 
@@ -296,7 +296,7 @@ To support interactive exploration of Focus-Glue-Context (FGC) parameters, the p
 \subsection{App structure}\label{app-structure}
 
 \begin{figure}
-\includegraphics[width=0.8\linewidth]{figures/screenshot} \caption{Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.}\label{fig:shiny-screenshot}
+\includegraphics[width=1\linewidth]{figures/screenshot} \caption{Interactive Focus-Glue-Context Shiny application. Users control lens centre, radii, zoom, and compression via sliders and drag the lens directly on the map, with points, lines, and polygons warped together in real time. The app enables rapid exploration of fisheye parameters before committing to static figures.}\label{fig:shiny-screenshot}
 \end{figure}
 
 The interface is divided into two coordinated panels:

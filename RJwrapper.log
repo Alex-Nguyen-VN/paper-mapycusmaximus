@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  4 FEB 2026 16:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  5 FEB 2026 08:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1054,7 +1054,7 @@ pdf  used on input line 285.
 File: figures/screenshot.jpeg Graphic file (type jpg)
 <use figures/screenshot.jpeg>
 Package pdftex.def Info: figures/screenshot.jpeg  used on input line 299.
-(pdftex.def)             Requested size: 318.67207pt x 117.72995pt.
+(pdftex.def)             Requested size: 398.33858pt x 147.16896pt.
 
 
 [13 <./paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf> <./figures/sc
@@ -1088,13 +1088,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 434--435
 ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
  []
 
-(./RJwrapper.bbl (./RJwrapper.brf)
+
+
+[17] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
 \openout6 = `RJwrapper.brf'.
 
 
-
-[17]
 Underfull \hbox (badness 1490) in paragraph at lines 61--61
 \T1/ppl/m/it/10 (+20) The R Jour-nal\T1/ppl/m/n/10 (+20) , 10:439--446, 2018.  
 ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
@@ -1120,14 +1120,14 @@ L3 programming layer <2025-01-18>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
-(rerunfilecheck)             Checksum: A55974C37F8B5045CA7E0E41487010AB;3026.
+(rerunfilecheck)             Checksum: 97149AFD233ACB1CC3030B5FEF5F5ACA;3109.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: 2947933CA307C84E1A32CE5FD77B3855;799.
  ) 
 Here is how much of TeX's memory you used:
  27696 strings out of 473190
- 504935 string characters out of 5715800
- 915873 words of memory out of 5000000
+ 504951 string characters out of 5715800
+ 915889 words of memory out of 5000000
  50035 multiletter control sequences out of 15000+600000
  604021 words of font info for 317 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1141,10 +1141,10 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (19 pages, 1734556 bytes).
+Output written on RJwrapper.pdf (19 pages, 1736760 bytes).
 PDF statistics:
- 451 PDF objects out of 1000 (max. 8388607)
- 366 compressed objects within 4 object streams
+ 504 PDF objects out of 1000 (max. 8388607)
+ 418 compressed objects within 5 object streams
  72 named destinations out of 1000 (max. 500000)
  55531 words of extra memory for PDF output out of 61914 (max. 10000000)
 
