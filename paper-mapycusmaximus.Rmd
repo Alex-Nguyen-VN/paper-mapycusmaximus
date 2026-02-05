@@ -1204,7 +1204,7 @@ The fisheye clarifies dense metro structure without losing state context. Hospit
 
 We can learn several interesting details about transfers from this transformed view:
 
-- Most transfers occur between an ACF and the closest hospital, such as RACF108 and the Northern Hospital, racf506 and St Vincent's Hospital, racf751 and Latrobe Regional Hospital (which can be easily seen with the interactive plot in the html format of the paper).
+- Most transfers occur between an ACF and the closest hospital, such as racf108 and the Northern Hospital, racf506 and St Vincent's Hospital, racf751 and Latrobe Regional Hospital (which can be easily seen with the interactive plot in the html format of the paper).
 - Some transfers are occuring to distant hospitals. This would make sense if the medical condition only was treatable at a particular hospital. But the pattern appears more irregular than this, and could be due to congestion at particular hospitals or other reasons. For example, racf152 regularly sends patients to the Northern Hospital or St Vincent's Hospital instead of the closest hospital, Central Highlands Rural Health.
 
 This data is synthetic, so these patterns do not indicate actual operations. 
