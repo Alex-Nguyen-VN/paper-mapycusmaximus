@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  5 FEB 2026 12:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  5 FEB 2026 12:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1108,10 +1108,10 @@ ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
 )
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 560.
+(Font)              using `T1/zi4/m/n' instead on input line 562.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 560.
+(Font)              scaled to size 10.20004pt on input line 562.
 
 
 [20])
@@ -1125,7 +1125,7 @@ L3 programming layer <2025-01-18>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
-(rerunfilecheck)             Checksum: 97149AFD233ACB1CC3030B5FEF5F5ACA;3109.
+(rerunfilecheck)             Checksum: 9D01116D3EBF09E5FEC6867839B25D20;3109.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
 (rerunfilecheck)             Checksum: 63432C1E6EDC00907FC6490C8FF75E8C;896.
  ) 
@@ -1146,7 +1146,7 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (21 pages, 1714155 bytes).
+Output written on RJwrapper.pdf (21 pages, 1714183 bytes).
 PDF statistics:
  526 PDF objects out of 1000 (max. 8388607)
  438 compressed objects within 5 object streams

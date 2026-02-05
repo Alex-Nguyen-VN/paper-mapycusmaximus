@@ -1223,7 +1223,7 @@ Planned extensions include anisotropic or elliptical profiles, multi-focus blend
 
 FGC fisheye transformations offer a concise, CRS-aware way to emphasize local structure without losing geographic context. By starting from a point-wise radial map and integrating carefully with sf for geometry reconstruction, the approach keeps figures continuous and overlays aligned. The examples demonstrate clearer narratives for metropolitan focus while maintaining state or nation-level context.
 
-# AI Use Declaration
+# AI use declaration
 
 We used AI tools to assist with code refactoring and drafting portions of the text. All methods, parameter settings, and claims were designed and reviewed by the authors, and we verified outputs with the package's test suite and example renders.
 
@@ -1232,3 +1232,5 @@ We used AI tools to assist with code refactoring and drafting portions of the te
 The github repo for this paper is <https://github.com/Alex-Nguyen-VN/paper-mapycusmaximus>.
 
 The mapycusmaximus package is available at <https://github.com/Alex-Nguyen-VN/mapycusmaximus>.
+
+Packages used in this work are XXX.
