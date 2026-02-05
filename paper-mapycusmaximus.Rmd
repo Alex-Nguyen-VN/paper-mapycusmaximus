@@ -1203,11 +1203,14 @@ ggplotly(fgc_transfers_plot, width=800, height=610) |>
   yaxis = list(autorange = TRUE))
 ```
 
-The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same center and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. To inspect a different hub (for example: Geelong), change `center` to that polygon; multiple center can be explored by re-running `sf_fisheye()` with alternative center and comparing panels side by side.
+The fisheye clarifies dense metro structure without losing state context. Hospitals and RACFs that previously overlapped separate cleanly; transfer lines remain connected to their endpoints because every layer uses the same center and radii. Outside the glue zone, geometry remains stable, so readers can still place Melbourne within Victoria. It can take some adjusting of parameters to get an ideal view, here we have used `zoom = 4` which provides just enough zoom inside the focus layer to spread out the points, and `squeeze = 0.35` to minimize the glue zone. Other parameters such as `center` can shift the focus, e.g. another metroplition region like Geelong, or the `r_in` and `r_out` to set the size of the focus and glue. 
 
-For polygons beyond metro Melbourne, the same lens settings apply; polygon edges bend smoothly but retain adjacency. Because transfer counts are simulated, readers should treat magnitude as illustrative only; spatial relationships (what becomes readable after zoom vs. what remains hidden) follow from the geometry.
+We can learn several interesting details about transfers from this transformed view:
 
-In this case, we can see that some point and connection that was inside the context zone stay the same, while the zoom-in effect was applied to the focus zone.
+- Most transfers occur between an ACF and the closest hospital, such as RACF108 and the Northern Hospital, racf506 and St Vincent's Hospital, racf751 and Latrobe Regional Hospital (which can be easily seen with the interactive plot in the html format of the paper).
+- Some transfers are occuring to distant hospitals. This would make sense if the medical condition only was treatable at a particular hospital. But the pattern appears more irregular than this, and could be due to congestion at particular hospitals or other reasons. For example, racf152 regularly sends patients to the Northern Hospital or St Vincent's Hospital instead of the closest hospital, Central Highlands Rural Health.
+
+This data is synthetic, so these patterns do not indicate actual operations. 
 
 # Discussion
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  5 FEB 2026 11:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  5 FEB 2026 12:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1087,33 +1087,33 @@ Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1
 
 
 [18 <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 538--539
+Underfull \hbox (badness 10000) in paragraph at lines 546--547
 \T1/ppl/m/n/10 (+20) The github repo for this pa-per is [][]$\T1/zi4/m/n/10 htt
 ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
  []
 
-(./RJwrapper.bbl (./RJwrapper.brf)
+
+
+[19] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
 \openout6 = `RJwrapper.brf'.
 
 
-
-[19]
 Underfull \hbox (badness 1490) in paragraph at lines 61--61
 \T1/ppl/m/it/10 (+20) The R Jour-nal\T1/ppl/m/n/10 (+20) , 10:439--446, 2018.  
 ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
  []
 
-)
-
-LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 552.
-
-LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 552.
 
 
 [20])
+
+LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 560.
+
+LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
+(Font)              scaled to size 10.20004pt on input line 560.
+)
 
 [21] (./RJwrapper.aux)
  ***********
@@ -1145,7 +1145,7 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (21 pages, 1741633 bytes).
+Output written on RJwrapper.pdf (21 pages, 1742200 bytes).
 PDF statistics:
  522 PDF objects out of 1000 (max. 8388607)
  434 compressed objects within 5 object streams
