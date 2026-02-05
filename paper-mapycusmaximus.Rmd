@@ -1049,14 +1049,7 @@ To illustrate the use we use data summarising transfers between residential aged
 
 To simplify the illustration we use a sample 10 hospitals and 10 RACFs. Most of the hospitals are located in the Melbourne metropolitan area, and zooming in on this helps to helps to see the transfer volume.
 
-```{r preparing-hosp-data}
-# Select a sample of LGAs in the metropolitan region from which to calculate
-# a centre to run the fisheye transformation
-metro_names <- c("MELBOURNE", "PORT PHILLIP", "STONNINGTON", "YARRA", "MARIBYRNONG", "MOONEE VALLEY", "BOROONDARA", "GLEN EIRA", "BAYSIDE")
-metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> st_centroid() |> st_transform(st_crs(4326))
-vic <- vic |> st_transform(st_crs(4326))
-vic <- vic |> mutate(distance = as.numeric(st_distance(metro_center, vic)))
-
+```{r preparing-map}
 data(conn_fish)
 conn_fish <- st_transform(conn_fish, 4326)
 # Set labels for RACFs, which are currently NA
@@ -1080,14 +1073,26 @@ hosp_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_hos
 racf_pts <- conn_fish_sub |> st_drop_geometry() |> st_as_sf(coords = c("long_racf","lat_racf"), crs = 4326, remove = FALSE)
 ```
 
-Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'hospitals-interactive-plot', 'hospitals-basic-plot')`) shows the geographical map of local government areas c overlaid by locations of RACFs (blue) and hospitals (red) overlaid with transfers shown as lines. The rural transfers are easy to see, but transfers in the metropolitan area cannot be seen on this map. The fisheye transformation can be used to alleviate this.
+Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'hospitals-interactive-plot', 'hospitals-basic-plot')`) shows the geographical map of local government areas overlaid by locations of RACFs (blue) and hospitals (red) overlaid with transfers shown as lines. The rural transfers are easy to see, but transfers in the metropolitan area cannot be seen on this map. The fisheye transformation can be used to alleviate this. The plot is generated using the code below. Notice that the polygon data forms the background, on which points for the ACFs and the hospitals, and the connections between points for the transfers. The plot can be made interactive by directly passing to `ggplotly()` [@ggplotly].
 
-```{r transfers-plot-setup}
-transfers_plot <- ggplot() +
+```{r transfers-plot-setup, echo=TRUE}
+vic_transfers_plot <- ggplot() +
   geom_sf(data = vic, fill = "grey85", color = "white") +
-  geom_sf(data = conn_fish_sub, aes(size=weight, alpha=weight, label=weight), color = "black") +
-  geom_sf(data = hosp_pts, aes(label = hosp_name), color = "red", size = 1) +
-  geom_sf(data = racf_pts, aes(label = racf_name), color = "blue", size = 1) +
+  geom_sf(data = conn_fish_sub, 
+          aes(size=weight, alpha=weight, label=weight), 
+          color = "black") +
+  geom_sf(data = hosp_pts, 
+          aes(label = hosp_name), 
+          color = "#4DAF8F", 
+          shape = 16,
+          alpha = 0.8,
+          size = 1.5) +
+  geom_sf(data = racf_pts, 
+          aes(label = racf_name), 
+          color = "#984EA3", 
+          shape = 4,
+          alpha = 0.8,
+          size = 1.5) +
   scale_size(range = c(0.2, 2), guide = "none") +
   scale_alpha(range = c(0.4, 1), guide = "none") + 
   coord_sf() +
@@ -1095,81 +1100,104 @@ transfers_plot <- ggplot() +
   theme(panel.background = element_rect(fill = "white", color = NA))
 ```
 
-```{r hospitals-basic-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.", fig.width=8, fig.height=6, layout="l-body", out.width="100%", eval=knitr::is_latex_output()}
-transfers_plot 
+```{r hospitals-basic-plot, fig.cap="Victorian map overlaid by locations of RACFs (purple cross) and hospitals (green circle), and lines indicating transfers. Line thickness maps to number of transfers, with thicker indicating more. Transfers in the metropolitan region cannot be fully seen because the area is very condensed geographically.", fig.width=8, fig.height=6, layout="l-body", out.width="100%", eval=knitr::is_latex_output()}
+vic_transfers_plot 
 ```
 
-```{r hospitals-interactive-plot, fig.cap="Victorian map overlaid by locations of RACFs (blue) and hospitals (red), and lines indicating transfers. Transfers in the metropolitan region cannot be fully seen.", out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", eval=knitr::is_html_output()}
-ggplotly(transfers_plot, width=800, height=610) |>
+```{r hospitals-interactive-plot, fig.cap="Victorian map overlaid by locations of RACFs (purple cross) and hospitals (green circle), and lines indicating transfers. Line thickness maps to number of transfers, with thicker indicating more. Transfers in the metropolitan region cannot be fully seen because the area is very condensed geographically.", out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", eval=knitr::is_html_output()}
+ggplotly(vic_transfers_plot, width=800, height=610) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
   yaxis = list(autorange = TRUE)) 
 ```
 
+The first step is to decide on a center for the transformation. In the code below,  we choose a selection of the LGAs that are in the Melbourne's metropolitan area, but the user can simply input values but it needs to be an `sf` spatial point object. Note that the `st_transform()` function ensures that the same projection as used in the `vic` polygon data is used. 
 
-```{r fisheye-preparation, echo = FALSE}
+```{r computing-centre, echo=TRUE}
+# Select a sample of LGAs in the metropolitan region from which to calculate
+# a centre to run the fisheye transformation
+metro_names <- c("MELBOURNE", "PORT PHILLIP", 
+                 "STONNINGTON", "YARRA", 
+                 "MARIBYRNONG", "MOONEE VALLEY", 
+                 "BOROONDARA", "GLEN EIRA", "BAYSIDE")
+metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> 
+  st_centroid() |> st_transform(st_crs(4326))
+```
+
+The transformation can be applied to multiple layers, if all are in the same object. Thus, the next step is to combine the points, transfers and LGA data into one `sf` object. The following code does this.  
+
+```{r fisheye-preparation, echo = TRUE}
+# Add indicator variable for type of institution, preparing for the join
 hosp_point2 <- hosp_pts |>
   mutate(type = "hospital") |>
   rename(id = destination)
-
 racf_point2 <- racf_pts |>
   mutate(type = "racf") |>
   rename(id = source)
 
-#total_trans <- bind_rows(conn_metro_10, conn_outer_10) |> st_transform(st_crs(vic))
+# Ensure that all are on the same projection
 total_trans <- conn_fish_sub |> st_transform(st_crs(vic))
 hosp_point2 <- hosp_point2 |> st_transform(st_crs(vic))
 racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
+
+# Join the different objects
 all_points <- bind_rows(hosp_point2, racf_point2)
-bind <- dplyr::bind_rows(
+vic_all <- dplyr::bind_rows(
   vic |> dplyr::mutate(.layer="vic"),
   hosp_point2 |> dplyr::mutate(.layer="hosp_pt"),
   racf_point2 |> dplyr::mutate(.layer="racf_pt"),
   total_trans |> dplyr::mutate(.layer="transfers"))
-bind_w <- sf_fisheye(bind, center = metro_center, r_in = 0.2, r_out = 0.3, zoom = 4, squeeze = 0.35)
-vic_w   <- bind_w |> dplyr::filter(.layer == "vic") |> dplyr::select(-.layer)
-hosp_w   <- bind_w |> dplyr::filter(.layer == "hosp_pt") |> dplyr::select(-.layer)
-racf_w   <- bind_w |> dplyr::filter(.layer == "racf_pt") |> dplyr::select(-.layer)
-transfers_w <- bind_w |> dplyr::filter(.layer == "transfers") |> dplyr::select(-.layer)
+
+# Transform all objects simultaneously
+vic_all_w <- sf_fisheye(vic_all, center = metro_center, 
+                        r_in = 0.2, r_out = 0.3, 
+                        zoom = 4, squeeze = 0.35)
+
+# Extract the layers for plotting control
+vic_w   <- vic_all_w |> dplyr::filter(.layer == "vic") |> 
+  dplyr::select(-.layer)
+hosp_w   <- vic_all_w |> dplyr::filter(.layer == "hosp_pt") |>
+  dplyr::select(-.layer)
+racf_w   <- vic_all_w |> dplyr::filter(.layer == "racf_pt") |>
+  dplyr::select(-.layer)
+transfers_w <- vic_all_w |> dplyr::filter(.layer == "transfers") |>
+  dplyr::select(-.layer)
 ```
 
-```{r fisheye-plot-prepare}
-focus <- ggplot() +
+The plot of the transformed data (Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'fisheye-plotly', 'fisheye-plot')`)) is constructed in the same fashion as the geographic map, using the code below. 
+
+```{r fisheye-plot-prepare, echo=TRUE}
+fgc_transfers_plot <- ggplot() +
   geom_sf(data = vic_w, fill = "grey85", color = "white") +
-  geom_sf(data = transfers_w, aes(size=weight, alpha=weight, label=weight), 
+  geom_sf(data = transfers_w, 
+          aes(size=weight, alpha=weight, label=weight), 
           color = "black") +
-  geom_sf(data = hosp_w, aes(label = hosp_name), color = "red", size = 1) +
-  geom_sf(data = racf_w, aes(label = racf_name), color = "blue", size = 1) +
+  geom_sf(data = hosp_w, 
+          aes(label = hosp_name),           
+          color = "#4DAF8F", 
+          shape = 16,
+          alpha = 0.8,
+          size = 1.5) +
+  geom_sf(data = racf_w, 
+          aes(label = racf_name), 
+          color = "#984EA3", 
+          shape = 4,
+          alpha = 0.8,
+          size = 1.5) +
   scale_size(range = c(0.2, 2), guide = "none") +
   scale_alpha(range = c(0.4, 1), guide = "none") + 
-  coord_sf(default_crs = NULL) +
+  coord_sf() +
   theme_map() +
   theme(legend.position = "none", 
         panel.background = element_rect(fill = "white", color = NA))
-
-# Don't show overview!!
-# overview <- ggplot() +
-#   geom_sf(data = vic, fill = NA, color = "grey", linewidth = 0.5) +
-#   geom_sf(data = conn_metro_10, color = "black", linewidth = 0.3) +
-#   geom_sf(data = conn_outer_10, color = "black", linewidth = 0.3) +
-#   scale_size(range = c(0.2, 1.2), guide = "none") +
-#   geom_sf(data = hosp_pts, color = "red", size = 0.5,) +
-#   geom_sf(data = racf_pts, color = "blue", size = 0.5) +
-#   coord_sf() +
-#   theme_void() +
-#   ggtitle("Original size")
 ```
 
-```{r fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context. A fisheye lens enlarges metropolitan Melbourne while retaining Victoria's outline, with an inset showing the original scale. All layers remain aligned, revealing dense urban structure without losing context.", eval=knitr::is_latex_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
-#cowplot::ggdraw(focus) +
-#  cowplot::draw_plot(overview, x = 0.62, y = 0.62, width = 0.33, height = 0.33, scale = 1)
-focus
+```{r fisheye-plot, fig.cap="Fisheye magnification of Greater Melbourne with statewide context, allows the transfers within the city region to be more visible. Locations of RACFs (purple cross) and hospitals (green circle), and lines indicating transfers. Line thickness maps to number of transfers, with thicker indicating more.", eval=knitr::is_latex_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+fgc_transfers_plot
 ```
 
-We could also include an interactive version of the plot above, thanks to the natively support and integration of `ggplotly` with sf object.
-
-```{r fisheye-plotly, echo = FALSE, out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", fig.cap="Fisheye magnification of Greater Melbourne with statewide context. This makes it possible to see the transfers in the metropolition area as well as in the rural locations.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
-ggplotly(focus, width=800, height=610) |>
+```{r fisheye-plotly, echo = FALSE, out.width="100%", fig.width = 8, fig.height=6, layout="l-body-outset", fig.cap="Fisheye magnification of Greater Melbourne with statewide context, allows the transfers within the city region to be more visible. Locations of RACFs (purple cross) and hospitals (green circle), and lines indicating transfers. Line thickness maps to number of transfers, with thicker indicating more.", eval=knitr::is_html_output(), fig.alt = "A fisheye view of Greater Melbourne, with points, lines, and polygons aligned."}
+ggplotly(fgc_transfers_plot, width=800, height=610) |>
   layout(hovermode = "closest", 
   xaxis = list(autorange = TRUE), 
   yaxis = list(autorange = TRUE))
