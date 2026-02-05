@@ -67,13 +67,6 @@ Maps that reveal fine local structure without losing broader context face a pers
 
 We introduce `mapycusmaximus`, an R package which implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports a reproducible, pipeline-oriented cartography within the R `sf` and `ggplot2` ecosystem. An optional glue-zone twist (the `revolution` parameter) can gently rotate features to aid continuity.
 
-```{r intro-snippet, eval=FALSE}
-# Minimal usage: warp an sf layer around a focal polygon
-melb <- vic |> dplyr::filter(LGA_NAME == "MELBOURNE")
-vic_fish <- sf_fisheye(vic, center = melb, r_in = 0.33, r_out = 0.60,
-                       zoom = 1.8, squeeze = 0.35)
-```
-
 The development of focus+context visualization traces back to @furnas1986's *degree-of-interest* (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. @sarkar1992 [@sarkar1994] extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. A 2008 review from @cockburn2008's covers two decades of research across overview+detail, zooming, and focus+context paradigms.
 
 In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. An influential contribution came from @yamamoto2009 [@yamamoto2012], who introduced the **Focus+Glue+Context model**, in which the intermediate "glue" region absorbs distortion, preventing the excessively warped roads and boundaries that were seen in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
@@ -139,13 +132,17 @@ Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one 
 ```{r data-cow-plot, include=FALSE}
 # Select the LGAs in the Greater Melbourne area to create inset map
 greater_melbourne <- c(
-  "BANYULE", "BAYSIDE", "BOROONDARA", "BRIMBANK", "CARDINIA", "CASEY",
+  "BANYULE", "BAYSIDE", "BOROONDARA", "BRIMBANK", #"CARDINIA", "CASEY",
   "DAREBIN", "FRANKSTON", "GLEN EIRA", "GREATER DANDENONG",
-  "HOBSONS BAY", "HUME", "KINGSTON", "KNOX", "MARIBYRNONG",
-  "MANNINGHAM", "MAROONDAH", "MELBOURNE", "MELTON", "MERRI-BEK",
-  "MONASH", "MOONEE VALLEY", "MORNINGTON PENINSULA",
-  "NILLUMBIK", "PORT PHILLIP", "STONNINGTON", "WHITEHORSE",
-  "WHITTLESEA", "WYNDHAM", "YARRA", "YARRA RANGES"
+  "HOBSONS BAY", #"HUME", 
+  "KINGSTON", "KNOX", "MARIBYRNONG",
+  "MANNINGHAM", "MAROONDAH", "MELBOURNE", #"MELTON", 
+  "MERRI-BEK",
+  "MONASH", "MOONEE VALLEY", "MORELAND", #"MORNINGTON PENINSULA",
+  #"NILLUMBIK", 
+  "PORT PHILLIP", "STONNINGTON", "WHITEHORSE",
+  #"WHITTLESEA", "WYNDHAM", 
+  "YARRA"#, "YARRA RANGES"
 )
 
 lga_inset <- vic_pop_sf[vic_pop_merc$lga_key %in% greater_melbourne, ]
@@ -165,7 +162,7 @@ inset_map <- ggplot() +
   geom_sf(data = lga_inset, aes(fill = pop), 
           color = "white", linewidth = 0.2) +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
-  labs(title = "Greater Melbourne") +
+  labs(title = "Melbourne") +
   theme_map() +
   theme(
     legend.position = "none",
@@ -176,7 +173,7 @@ inset_map <- ggplot() +
 ```{r cow-plot-plot, echo=FALSE, fig.cap="Overview map with inset showing Greater Melbourne. The main panel displays Victoria, while a secondary inset zooms into metropolitan Melbourne. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 final_map <- ggdraw() +
  draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
- draw_plot(inset_map, x = 0.5, y = 0.5, width = 0.4, height = 0.4) # Inset map position and size
+ draw_plot(inset_map, x = 0.5, y = 0.65, width = 0.35, height = 0.35) # Inset map position and size
 
 print(final_map)
 ```
