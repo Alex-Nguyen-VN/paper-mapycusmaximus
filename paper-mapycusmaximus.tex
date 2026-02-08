@@ -424,7 +424,7 @@ vic_transfers_plot <- ggplot() +
 \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1} \caption{Victorian map overlaid by locations of RACFs (purple cross) and hospitals (green circle), and lines indicating transfers. Line thickness maps to number of transfers, with thicker indicating more. Transfers in the metropolitan region cannot be fully seen because the area is very condensed geographically.}\label{fig:hospitals-basic-plot}
 \end{figure}
 
-The first step is to decide on a center for the transformation. In the code below, we choose a selection of the LGAs that are in the Melbourne's metropolitan area, but the user can simply input values but it needs to be an \texttt{sf} spatial point object. Note that the \texttt{st\_transform()} function ensures that the same projection as used in the \texttt{vic} polygon data is used.
+The first step is to decide on a center for the transformation. In the code below, we choose a selection of the LGAs that are in the Melbourne's metropolitan area, but the user can simply input values but it needs to be an \texttt{sf} spatial point object.
 
 \begin{verbatim}
 # Select a sample of LGAs in the metropolitan region from which to calculate
@@ -434,7 +434,7 @@ metro_names <- c("MELBOURNE", "PORT PHILLIP",
                  "MARIBYRNONG", "MOONEE VALLEY", 
                  "BOROONDARA", "GLEN EIRA", "BAYSIDE")
 metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> 
-  st_centroid() |> st_transform(st_crs(4326))
+  st_centroid() 
 \end{verbatim}
 
 The transformation can be applied to multiple layers, if all are in the same object. Thus, the next step is to combine the points, transfers and LGA data into one \texttt{sf} object. The following code does this.
@@ -449,9 +449,9 @@ racf_point2 <- racf_pts |>
   rename(id = source)
 
 # Ensure that all are on the same projection
-total_trans <- conn_fish_sub |> st_transform(st_crs(vic))
-hosp_point2 <- hosp_point2 |> st_transform(st_crs(vic))
-racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
+total_trans <- conn_fish_sub 
+hosp_point2 <- hosp_point2 
+racf_point2 <- racf_point2 
 
 # Join the different objects
 all_points <- bind_rows(hosp_point2, racf_point2)
@@ -516,7 +516,7 @@ We can learn several interesting details about transfers from this transformed v
 \begin{itemize}
 \tightlist
 \item
-  Most transfers occur between an ACF and the closest hospital, such as RACF108 and the Northern Hospital, racf506 and St Vincent's Hospital, racf751 and Latrobe Regional Hospital (which can be easily seen with the interactive plot in the html format of the paper).
+  Most transfers occur between an ACF and the closest hospital, such as racf108 and the Northern Hospital, racf506 and St Vincent's Hospital, racf751 and Latrobe Regional Hospital (which can be easily seen with the interactive plot in the html format of the paper).
 \item
   Some transfers are occuring to distant hospitals. This would make sense if the medical condition only was treatable at a particular hospital. But the pattern appears more irregular than this, and could be due to congestion at particular hospitals or other reasons. For example, racf152 regularly sends patients to the Northern Hospital or St Vincent's Hospital instead of the closest hospital, Central Highlands Rural Health.
 \end{itemize}

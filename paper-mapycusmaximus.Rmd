@@ -1108,7 +1108,7 @@ ggplotly(vic_transfers_plot, width=800, height=610) |>
   yaxis = list(autorange = TRUE)) 
 ```
 
-The first step is to decide on a center for the transformation. In the code below,  we choose a selection of the LGAs that are in the Melbourne's metropolitan area, but the user can simply input values but it needs to be an `sf` spatial point object. Note that the `st_transform()` function ensures that the same projection as used in the `vic` polygon data is used. 
+The first step is to decide on a center for the transformation. In the code below,  we choose a selection of the LGAs that are in the Melbourne's metropolitan area, but the user can simply input values but it needs to be an `sf` spatial point object.  
 
 ```{r computing-centre, echo=TRUE}
 # Select a sample of LGAs in the metropolitan region from which to calculate
@@ -1118,7 +1118,7 @@ metro_names <- c("MELBOURNE", "PORT PHILLIP",
                  "MARIBYRNONG", "MOONEE VALLEY", 
                  "BOROONDARA", "GLEN EIRA", "BAYSIDE")
 metro_center <- st_union(vic[vic$lga_key %in% metro_names, ]) |> 
-  st_centroid() |> st_transform(st_crs(4326))
+  st_centroid() 
 ```
 
 The transformation can be applied to multiple layers, if all are in the same object. Thus, the next step is to combine the points, transfers and LGA data into one `sf` object. The following code does this.  
@@ -1133,9 +1133,9 @@ racf_point2 <- racf_pts |>
   rename(id = source)
 
 # Ensure that all are on the same projection
-total_trans <- conn_fish_sub |> st_transform(st_crs(vic))
-hosp_point2 <- hosp_point2 |> st_transform(st_crs(vic))
-racf_point2 <- racf_point2 |> st_transform(st_crs(vic))
+total_trans <- conn_fish_sub 
+hosp_point2 <- hosp_point2 
+racf_point2 <- racf_point2 
 
 # Join the different objects
 all_points <- bind_rows(hosp_point2, racf_point2)
