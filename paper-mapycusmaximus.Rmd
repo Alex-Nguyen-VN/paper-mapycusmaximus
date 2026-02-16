@@ -222,8 +222,10 @@ hextilemap <- ggplot() +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   theme_map() +
   theme(
-    legend.position = c(0.5, 0.9),
+    legend.position = c(0.7, 0.8),
     legend.direction = "horizontal",
+    legend.title = element_text(size = 9),
+    legend.text  = element_text(size = 8)
   )
 ```
 
@@ -233,12 +235,13 @@ hextilemap
 ```
 
 ```{r sugarbag-plot-html, echo=FALSE, fig.cap="Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.", eval=knitr::is_html_output(), fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
-ggplotly(hextilemap, tooltip = "label", width=800, height=500) |> layout(
+ggplotly(hextilemap, tooltip = "label", width=800, height=500) |> 
+  layout(
   #title = list(text = "Another look on the Victoria population", x = 0.5),
   legend = list(
     orientation = "h",
-    x = 0.5, xanchor = "center",
-    y = 1.07, yanchor = "top"  # inside the plot area
+    x = 1, xanchor = "right",
+    y = 1, yanchor = "top"  # inside the plot area
   ),
   margin = list(t = 60)
 )
@@ -262,9 +265,12 @@ carto_plot <- ggplot(cartogram) +
   scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   theme_void() +
   theme(
-    legend.position = c(0.5, 0.9),
+    legend.position = c(0.7, 0.8),
     legend.direction = "horizontal",
-    text = element_text(color = "#22211d"),
+    legend.title = element_text(size = 9),
+    legend.text  = element_text(size = 8),
+    #legend.position = c(0.5, 0.9),
+    #text = element_text(color = "#22211d"),
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA),
     legend.background = element_rect(fill = "white", color = NA)
@@ -282,8 +288,8 @@ ggplotly(carto_plot, tooltip = "label", width=800, height=500) |>
   layout(
   legend = list(
     orientation = "h",
-    x = 0.5, xanchor = "center",
-    y = 1.07, yanchor = "top"  # inside the plot area
+    x = 1, xanchor = "right",
+    y = 1, yanchor = "top"  # inside the plot area
   ),
   margin = list(t = 60)
 )
@@ -306,11 +312,18 @@ As a demonstration, the below code snippet transforms a subset of hospitals in m
 
 ```{r build-usage-demo, echo=TRUE}
 filtered_locations <-  mapycusmaximus::hospital_locations |>
-  filter(longitude >= 144, longitude <= 146, latitude <= -37, latitude >= -39)
+  filter(longitude >= 144, 
+         longitude <= 146, 
+         latitude <= -37, 
+         latitude >= -39)
 
-hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], cy = 145, cx = -37.8, r_in = 0.3, r_out = 0.5, zoom_factor = 2)
+hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], 
+                                     cy = 145, cx = -37.8, 
+                                     r_in = 0.3, r_out = 0.5, 
+                                     zoom_factor = 2)
 
-head(hospitals_transformed)
+hospitals_transformed |>
+  head()
 ```
 
 The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). Points near the specified centre are more spread in the transformed data (panel (b)) compared to in the original data (panel (a)). Here, points are coloured based on whether they are part of the context, glue, or focus sections. Points in the context and glue section do not move, while those in the focus layer are generally pushed outwards from the centre.
@@ -318,39 +331,88 @@ The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). P
 ```{r usage-demo, fig.cap="Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are coloured by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily."}
 
 hospitals_original <- filtered_locations |>
-  filter(longitude >= 144, longitude <= 146, latitude <= -37, latitude >= -39) |>
-  ggplot(aes(x=longitude, y = latitude)) + geom_point() +
-  theme_void() +
-  coord_fixed() +
-  theme(panel.border = element_rect(colour = "black", fill = NA))
+  filter(longitude >= 144, longitude <= 146, 
+         latitude <= -37, latitude >= -39) |>
+  ggplot(aes(x=longitude, y = latitude)) + 
+    geom_point() +
+    ggtitle("a") +
+    theme_minimal() +
+  #coord_fixed() +
+    theme(aspect.ratio=1,
+        #plot.background = element_rect(colour = "black", fill = NA))
+        panel.border = element_rect(colour = "black", fill = NA),
+        axis.text = element_blank(),
+        axis.title = element_blank())
 
 hospitals_fisheye_plot <- hospitals_transformed |>
   as_tibble() |>
-  mutate(zone = attr(hospitals_transformed, "zone"), zone = factor(zone, levels = c("context", "glue", "focus")))
+  mutate(zone = attr(hospitals_transformed, "zone"), 
+         zone = factor(zone, levels = c("context", "glue", "focus")))
 
 hospitals_fisheye <- hospitals_fisheye_plot |>
-  ggplot(aes(x=y_new, y = x_new, colour = zone)) + geom_point() +
-  theme_void() +
-  coord_fixed() + 
-  scale_color_manual(values = c("focus" = "#c60000ff", 
+  ggplot(aes(x=y_new, y = x_new, colour = zone)) + 
+    geom_point() +
+    theme_minimal() +
+    ggtitle("b") +
+    #coord_fixed() + 
+    scale_color_manual(values = c("focus" = "#c60000ff", 
       "glue" = "#a5a9e8ff", 
       "context" = "#FFCC00")) +
-  theme(legend.position = "bottom", legend.title = element_blank(), panel.border = element_rect(colour = "black", fill = NA))
+    theme(aspect.ratio=1,
+          legend.position = "bottom",
+        #plot.background = element_rect(colour = "black", fill = NA))
+        panel.border = element_rect(colour = "black", fill = NA),
+        axis.text = element_blank(),
+        axis.title = element_blank())
 
-hospitals_original + hospitals_fisheye + plot_annotation(tag_levels = list(c("(a)", '(b)'))) & theme(plot.tag.position = c(0.04, 0.97))
+hospitals_original + hospitals_fisheye #+ 
+  #plot_annotation(tag_levels = list(c("a", "b"))) & 
+  #theme(plot.tag.position = c(0.04, 0.97))
 ```
 
 A second function, `sf_fisheye`, extends the `fisheye_fgc` function for use in spatial contexts. This function takes a spatial object, which can be multilayered, and then similar to the function on points, a center, radius and zoom factor. The resulting object is also an `sf` object, which can be used as a drop-in replacement in downstream visualisations.
 
-This process is shown in Figure \@ref(fig:sf-usage-map). Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
+This process is shown in Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')`). Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
 
-```{r sf-usage-map, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps."}
-sf_fisheye(mapycusmaximus::vic, center = c(145, -37.8)) |>
+```{r sf-usage-map}
+vic_fgc_map <- sf_fisheye(vic_pop_merc, center = c(145, -37.8), 
+                        r_in = 0.2, r_out = 0.3, 
+                        zoom = 4, squeeze = 0.35) |>
   ggplot() +
-  geom_sf(fill = "grey85", color = "white") +
+  geom_sf(aes(fill = pop, label=lga_key), #fill = "grey85", 
+    color = "black") +
+  scale_fill_viridis_c("Pop ('00000)", direction = -1) +
   coord_sf() +
-  theme_map()
+  theme_map() +
+  theme(
+    legend.position = c(0.7, 0.8),
+    legend.direction = "horizontal",
+    legend.title = element_text(size = 9),
+    legend.text  = element_text(size = 8),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA),
+    legend.background = element_rect(fill = "white", color = NA)
+  )
 ```
+
+```{r plot-fgc, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+
+vic_fgc_map
+```
+
+```{r plot-fgc-html, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+
+ggplotly(vic_fgc_map, tooltip = "label", width=800, height=500) |> 
+  layout(
+  legend = list(
+    orientation = "h",
+    x = 1, xanchor = "right",
+    y = 1, yanchor = "top"  # inside the plot area
+  ),
+  margin = list(t = 60)
+)
+```
+
 
 # Implementation
 

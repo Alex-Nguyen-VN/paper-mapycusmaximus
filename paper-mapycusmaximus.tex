@@ -69,11 +69,18 @@ As a demonstration, the below code snippet transforms a subset of hospitals in m
 
 \begin{verbatim}
 filtered_locations <-  mapycusmaximus::hospital_locations |>
-  filter(longitude >= 144, longitude <= 146, latitude <= -37, latitude >= -39)
+  filter(longitude >= 144, 
+         longitude <= 146, 
+         latitude <= -37, 
+         latitude >= -39)
 
-hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], cy = 145, cx = -37.8, r_in = 0.3, r_out = 0.5, zoom_factor = 2)
+hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], 
+                                     cy = 145, cx = -37.8, 
+                                     r_in = 0.3, r_out = 0.5, 
+                                     zoom_factor = 2)
 
-head(hospitals_transformed)
+hospitals_transformed |>
+  head()
 \end{verbatim}
 
 \begin{verbatim}
@@ -96,12 +103,15 @@ The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Po
 
 A second function, \texttt{sf\_fisheye}, extends the \texttt{fisheye\_fgc} function for use in spatial contexts. This function takes a spatial object, which can be multilayered, and then similar to the function on points, a center, radius and zoom factor. The resulting object is also an \texttt{sf} object, which can be used as a drop-in replacement in downstream visualisations.
 
-This process is shown in Figure \ref{fig:sf-usage-map}. Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
+This process is shown in Figure \ref{fig:plot-fgc}. Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
 
 \begin{figure}
-\centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/sf-usage-map-1.pdf}}
-\caption{\label{fig:sf-usage-map}Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.}
+
+{\centering \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/plot-fgc-1} 
+
+}
+
+\caption{Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.}\label{fig:plot-fgc}
 \end{figure}
 
 \section{Implementation}\label{implementation}
