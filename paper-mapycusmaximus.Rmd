@@ -129,7 +129,7 @@ vic_pop_merc <- st_transform(vic_pop_sf, 3857)
 
 ```
 
-Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \@ref(fig:cow-plot-plot)).
+Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \@ref(fig:cow-plot-plot)). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the *embedded* relationship between focus and context with a single continuous geography. 
 
 ```{r data-cow-plot, include=FALSE}
 # Select the LGAs in the Greater Melbourne area to create inset map
@@ -179,8 +179,6 @@ final_map <- ggdraw() +
 
 print(final_map)
 ```
-
-These are potentially the most practical approach to the detail-versus-context tradeoff, and may effective for static reports, but require viewers to mentally integrate separate views, and don't preserve the *embedded* relationship between focus and context within a single continuous geography. The lack of continuous geography also presents challenges if additional elements such as fill colour are introduced to the plot.
 
 A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the `sugarbag` package [@RJ-2023-021]. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
 

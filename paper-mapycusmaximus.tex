@@ -28,13 +28,11 @@ The paper is organised as follows. \hyperref[background]{Section 2} describes cu
 
 There are three possible ways to accomplish visualizing maps with re-focused attention on small areas: multi-panel approaches, hexagon tile maps and cartograms. Here we describe the capabilities and limitations of each.
 
-Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \ref{fig:cow-plot-plot}).
+Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \ref{fig:cow-plot-plot}). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the \emph{embedded} relationship between focus and context with a single continuous geography.
 
 \begin{figure}
 \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1} \caption{Map of Victorian local government areas (LGAs) coloured by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}\label{fig:cow-plot-plot}
 \end{figure}
-
-These are potentially the most practical approach to the detail-versus-context tradeoff, and may effective for static reports, but require viewers to mentally integrate separate views, and don't preserve the \emph{embedded} relationship between focus and context within a single continuous geography. The lack of continuous geography also presents challenges if additional elements such as fill colour are introduced to the plot.
 
 A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the \texttt{sugarbag} package \citep{RJ-2023-021}. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
 
