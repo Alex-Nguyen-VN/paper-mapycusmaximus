@@ -67,15 +67,17 @@ Maps commonly have important information in small polygons that can be hidden wh
 
 We introduce `mapycusmaximus`, an R package which implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports a reproducible, pipeline-oriented cartography within the R `sf` and `ggplot2` ecosystem. An optional glue-zone twist (the `revolution` parameter) can gently rotate features to aid continuity.
 
-The development of focus+context visualization traces back to @furnas1986's *degree-of-interest* (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. @sarkar1992 [@sarkar1994] extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. A 2008 review from @cockburn2008's covers two decades of research across overview+detail, zooming, and focus+context paradigms.
+The development of focus+context visualization traces back to @furnas1986's *degree-of-interest* (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. @sarkar1992 [@sarkar1994] extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies [@lamping1995], distortion-view frameworks [@carpendale2001], and "magic lens" overlays [@bier1993]. @cockburn2008's provides a review of two decades of research across **overview+detail** and **focus+context** paradigms.
 
-In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. An influential contribution came from @yamamoto2009 [@yamamoto2012], who introduced the **Focus+Glue+Context model**, in which the intermediate "glue" region absorbs distortion, preventing the excessively warped roads and boundaries that were seen in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
+In cartography, the need for nonlinear magnification emerged independently. @snyder1987 developed "magnifying-glass" azimuthal projections with variable radial scales. @harrie2002 created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. The **Focus+Glue+Context model** [@yamamoto2009, @yamamoto2012] introduced the intermediate "glue" region to absorb distortion, preventing excessively warped roads and boundaries that were problematic in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
 
 Despite the Focus+Glue+Context model being introduced more than a decade ago, there is currently no native R solution for implementing these models. The package `mapycusmaximus` fills this niche by providing a general function to perform these transformations, as well as integrations to work natively within the R spatial ecosystem with `sf` [@RJ-2018-009].
 
-# Background
+The paper is organised as follows. [Section 2](#background) describes current software available in R with similar functionality. [Section 3](#usage) provides the basics on getting started using the package, and [Section 4](#implementation) provides the details on the algorithm and how it is implemented. The user can explore the parameters of the transformation using the Shiny app described in [Section 5](#shiny). An application to ambulance transfers in Victoria is shown in [Section 6](#application), and the last section describes potential new directions for the package.
 
-First, we briefly review the current R-based solutions to the detail-versus-context tradeoff. Ths includes multi-panel approaches, hexagon tile maps and cartograms.
+# Resources currently available in R {#background}
+
+There are three possible ways to accomplish visualizing maps with re-focused attention on small areas: multi-panel approaches, hexagon tile maps and cartograms. Here we describe the capabilities and limitations of each.
 
 ```{r data-preparation-pop, eval=FALSE}
 # Library
@@ -300,11 +302,9 @@ This approach fundamentally differs from focus+context methods. Cartograms subst
 
 In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
 
-### Focus-Glue-Context and the fisheye transformation
-
 None of these approaches provide continuous geometric magnification within a single, topology-preserving map. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases such as examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
 
-# Usage
+# Usage {#usage}
 
 The primary functionality is from two functions: `fisheye_fgc` which operates on a `data.frame` or `tibble`, and `sf_fisheye` which operates on an `sf` object. Operationally, both are the same, except that the elements in the object being transformed are different: The first two columns in the former, and the geographic coordinates in the latter. 
 
@@ -414,7 +414,7 @@ ggplotly(vic_fgc_map, tooltip = "label", width=800, height=500) |>
 ```
 
 
-# Implementation
+# Implementation {#implementation}
 
 ```{r preparing-data, include=FALSE}
 
@@ -918,9 +918,9 @@ Similarly, start with `"expand"` and adopt `"outward"` only when outer stability
 
 **Simple tweaks.** If linework kinks, raise `squeeze_factor` slightly (for example: 0.45). If the focus feels too tight, lower `zoom_factor` toward 4-6. For reproducible comparisons, keep `normalized_center = TRUE` and reuse the same radii across runs.
 
-# Exploring the implementation using Shiny
+# Exploring the transformation parameter choices interactively {#shiny}
 
-To support interactive exploration of Focus-Glue-Context (FGC) parameters, the package includes a Shiny-based *lens explorer*. The app allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
+To support interactive exploration of Focus-Glue-Context (FGC) parameters, the package includes a *lens explorer* implemented in a Shiny app. It allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
 
 ## App structure
 
@@ -990,7 +990,7 @@ The app deliberately separates *parameter exploration* from *final figure genera
 
 For the current approach, the shiny app only use the default dataset included in the `mapycusmaximus` package, which are the 2016 Victorian Local Government Areas (LGA) and their boundaries, accompany with the synthetic transfer network between hospital and RACF. In the future stable, we will open up the app for users to upload their own spatial data or piping it directly to the Shiny app from R.
 
-# Application to Victorian ambulance transfer records
+# Application to Victorian ambulance transfer records {#application}
 
 To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitals in Victoria, over a period that includes the COVID-19 pandemic period. This data is provided with the package in the data object `conn_fish`. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate. 
 

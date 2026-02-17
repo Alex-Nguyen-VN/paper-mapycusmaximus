@@ -16,15 +16,17 @@ Maps commonly have important information in small polygons that can be hidden wh
 
 We introduce \texttt{mapycusmaximus}, an R package which implements a Focus-Glue-Context (FGC) fisheye transformation that continuously warps geographic space. The transformation magnifies a chosen focus region, compresses surrounding areas into a transitional glue zone, and maintains stability in the outer context. The approach operates directly on vector geometry coordinates, preserves topology, and supports a reproducible, pipeline-oriented cartography within the R \texttt{sf} and \texttt{ggplot2} ecosystem. An optional glue-zone twist (the \texttt{revolution} parameter) can gently rotate features to aid continuity.
 
-The development of focus+context visualization traces back to \citet{furnas1986}'s \emph{degree-of-interest} (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. \citeauthor{sarkar1992} \citetext{\citeyear{sarkar1992}; \citealp{sarkar1994}} extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies \citep{lamping1995}, distortion-view frameworks \citep{carpendale2001}, and ``magic lens'' overlays \citep{bier1993}. A 2008 review from \citet{cockburn2008}'s covers two decades of research across overview+detail, zooming, and focus+context paradigms.
+The development of focus+context visualization traces back to \citet{furnas1986}'s \emph{degree-of-interest} (DOI) function, which introduced a formal method to rank information elements by combining intrinsic importance with distance from the user's focus. In this model, items with low DOI are de-emphasized or hidden, enabling emphasis on salient regions without losing global structure. \citeauthor{sarkar1992} \citetext{\citeyear{sarkar1992}; \citealp{sarkar1994}} extended this to geometric distortion, demonstrating smooth magnification transitions for graph visualization. Other approaches to this problem include hyperbolic geometry for hierarchies \citep{lamping1995}, distortion-view frameworks \citep{carpendale2001}, and ``magic lens'' overlays \citep{bier1993}. \citet{cockburn2008}'s provides a review of two decades of research across \textbf{overview+detail} and \textbf{focus+context} paradigms.
 
-In cartography, the need for nonlinear magnification emerged independently. \citet{snyder1987} developed ``magnifying-glass'' azimuthal projections with variable radial scales. \citet{harrie2002} created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. An influential contribution came from \citeauthor{yamamoto2009} \citetext{\citeyear{yamamoto2009}; \citealp{yamamoto2012}}, who introduced the \textbf{Focus+Glue+Context model}, in which the intermediate ``glue'' region absorbs distortion, preventing the excessively warped roads and boundaries that were seen in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
+In cartography, the need for nonlinear magnification emerged independently. \citet{snyder1987} developed ``magnifying-glass'' azimuthal projections with variable radial scales. \citet{harrie2002} created variable-scale functions for mobile devices where user position appears large-scale against small-scale surroundings. The \textbf{Focus+Glue+Context model} \citep[\citet{yamamoto2012}]{yamamoto2009} introduced the intermediate ``glue'' region to absorb distortion, preventing excessively warped roads and boundaries that were problematic in earlier fisheye maps. This three-zone architecture proved particularly effective for pedestrian navigation and mobile web services.
 
 Despite the Focus+Glue+Context model being introduced more than a decade ago, there is currently no native R solution for implementing these models. The package \texttt{mapycusmaximus} fills this niche by providing a general function to perform these transformations, as well as integrations to work natively within the R spatial ecosystem with \texttt{sf} \citep{RJ-2018-009}.
 
-\section{Background}\label{background}
+The paper is organised as follows. \hyperref[background]{Section 2} describes current software available in R with similar functionality. \hyperref[usage]{Section 3} provides the basics on getting started using the package, and \hyperref[implementation]{Section 4} provides the details on the algorithm and how it is implemented. The user can explore the parameters of the transformation using the Shiny app described in \hyperref[shiny]{Section 5}. An application to ambulance transfers in Victoria is shown in \hyperref[application]{Section 6}, and the last section describes potential new directions for the package.
 
-First, we briefly review the current R-based solutions to the detail-versus-context tradeoff. Ths includes multi-panel approaches, hexagon tile maps and cartograms.
+\section{Resources currently available in R}\label{background}
+
+There are three possible ways to accomplish visualizing maps with re-focused attention on small areas: multi-panel approaches, hexagon tile maps and cartograms. Here we describe the capabilities and limitations of each.
 
 Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another shows zoomed detail (Figure \ref{fig:cow-plot-plot}).
 
@@ -56,8 +58,6 @@ Another approach is a cartogram plot. In these plots, areas are intentionally di
 This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves relative positions and topology, however, the shape and size are distorted.
 
 In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
-
-\subsubsection{Focus-Glue-Context and the fisheye transformation}\label{focus-glue-context-and-the-fisheye-transformation}
 
 None of these approaches provide continuous geometric magnification within a single, topology-preserving map. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric \emph{warp} rather than a data-driven \emph{substitution} or panel-based \emph{separation}. This matters for use cases such as examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
 
@@ -239,9 +239,9 @@ Similarly, start with \texttt{"expand"} and adopt \texttt{"outward"} only when o
 
 \textbf{Simple tweaks.} If linework kinks, raise \texttt{squeeze\_factor} slightly (for example: 0.45). If the focus feels too tight, lower \texttt{zoom\_factor} toward 4-6. For reproducible comparisons, keep \texttt{normalized\_center\ =\ TRUE} and reuse the same radii across runs.
 
-\section{Exploring the implementation using Shiny}\label{exploring-the-implementation-using-shiny}
+\section{Exploring the transformation parameter choices interactively}\label{shiny}
 
-To support interactive exploration of Focus-Glue-Context (FGC) parameters, the package includes a Shiny-based \emph{lens explorer}. The app allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
+To support interactive exploration of Focus-Glue-Context (FGC) parameters, the package includes a \emph{lens explorer} implemented in a Shiny app. It allows users to experiment with fisheye settings on a realistic spatial example - Victorian LGAs with a synthetic sampled hospital - Residential Aged Care Facility (RACF) transfer network during COVID 19 - and to observe how points, lines, and polygons respond under a shared geometric warp.
 
 \subsection{App structure}\label{app-structure}
 
@@ -337,7 +337,7 @@ The app deliberately separates \emph{parameter exploration} from \emph{final fig
 
 For the current approach, the shiny app only use the default dataset included in the \texttt{mapycusmaximus} package, which are the 2016 Victorian Local Government Areas (LGA) and their boundaries, accompany with the synthetic transfer network between hospital and RACF. In the future stable, we will open up the app for users to upload their own spatial data or piping it directly to the Shiny app from R.
 
-\section{Application to Victorian ambulance transfer records}\label{application-to-victorian-ambulance-transfer-records}
+\section{Application to Victorian ambulance transfer records}\label{application}
 
 To illustrate the use we use data summarising transfers between residential aged care facilities (RACFs) and Victorian hospitals in Victoria, over a period that includes the COVID-19 pandemic period. This data is provided with the package in the data object \texttt{conn\_fish}. The transfer data is synthetic, for privacy reasons, but locations of the RACFs and hospitals is publicly available, and accurate.
 
