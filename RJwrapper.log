@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  17 FEB 2026 11:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  17 FEB 2026 12:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -862,13 +862,13 @@ Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
 (./paper-mapycusmaximus.tex
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 17
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 10
 .
 (/usr/local/texlive/2025/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.20004pt on input line 17.
+(Font)              scaled to size 10.20004pt on input line 10.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `zi4' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
@@ -879,7 +879,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 ocal/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 {/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
-<paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf, id=135, 502.87875
+<paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf, id=136, 502.87875
 pt x 404.51125pt>
 File: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf Graphic file 
 (type pdf)
@@ -887,7 +887,7 @@ File: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf Graphic file
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-
 1.pdf  used on input line 32.
 (pdftex.def)             Requested size: 398.33858pt x 320.41833pt.
-<paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf, id=138, 513.9
+<paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf, id=139, 513.9
 2pt x 365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf Graphic f
 ile (type pdf)
@@ -898,7 +898,7 @@ pdf-1.pdf  used on input line 40.
 
 
 [2 <./paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf, id=161, 525.965pt x 3
+<paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf, id=162, 525.965pt x 3
 71.3875pt>
 File: paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf Graphic file (typ
 e pdf)
@@ -1014,7 +1014,11 @@ File: diagram.png Graphic file (type png)
 <use diagram.png>
 Package pdftex.def Info: diagram.png  used on input line 181.
 (pdftex.def)             Requested size: 318.67207pt x 427.01117pt.
-
+LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 1
+95.
+(/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ts1ppl.fd
+File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
+)
 
 [7]
 
@@ -1022,11 +1026,6 @@ Package pdftex.def Info: diagram.png  used on input line 181.
 cusmaximus_files/figure-latex/basic-example-1.pdf>]
 
 [9 <./diagram.png>]
-LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 1
-95.
-(/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ts1ppl.fd
-File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
-)
 
 [10]
 <paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf, id=291, 445.66
@@ -1133,14 +1132,14 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
 (rerunfilecheck)             Checksum: 079F64400B7ED25EA55C9FD5FF54DE31;3084.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
-(rerunfilecheck)             Checksum: 66B10B81C697C700F688D159C73B314F;896.
+(rerunfilecheck)             Checksum: 35E83E081B8A4AA03F3E4865E92036E4;896.
  ) 
 Here is how much of TeX's memory you used:
- 27709 strings out of 473190
- 505414 string characters out of 5715800
+ 27706 strings out of 473190
+ 505390 string characters out of 5715800
  915989 words of memory out of 5000000
  50042 multiletter control sequences out of 15000+600000
- 604052 words of font info for 319 fonts, out of 8000000 for 9000
+ 603967 words of font info for 317 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  117i,12n,131p,1854b,901s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/inconsolata/Inconsolat
@@ -1152,7 +1151,7 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (20 pages, 1926828 bytes).
+Output written on RJwrapper.pdf (20 pages, 1926676 bytes).
 PDF statistics:
  535 PDF objects out of 1000 (max. 8388607)
  444 compressed objects within 5 object streams
