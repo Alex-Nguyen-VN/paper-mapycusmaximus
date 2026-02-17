@@ -28,10 +28,10 @@ The paper is organised as follows. \hyperref[background]{Section 2} describes cu
 
 There are three possible ways to accomplish visualizing maps with re-focused attention on small areas: multi-panel approaches, hexagon tile maps and cartograms. Here we describe the capabilities and limitations of each.
 
-Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \ref{fig:cow-plot-plot}). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the \emph{embedded} relationship between focus and context with a single continuous geography.
+Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \ref{fig:cow-plot-plot}). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the \emph{embedded} relationship between focus and context with a single continuous geography. Here population is used to color the polygons, with darker indicating higher values. When insets are used to show zoomed detail, it can be more difficult to interpret the color values, and the designer needs to ensure the inset is produced with a scale common to the main plot.
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1} \caption{Map of Victorian local government areas (LGAs) coloured by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}\label{fig:cow-plot-plot}
+\includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1} \caption{Map of Victorian local government areas (LGAs) colored by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}\label{fig:cow-plot-plot}
 \end{figure}
 
 A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the \texttt{sugarbag} package \citep{RJ-2023-021}. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
@@ -50,7 +50,7 @@ Another approach is a cartogram plot. In these plots, areas are intentionally di
 
 }
 
-\caption{Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.}\label{fig:plot-cart}
+\caption{Population of Victorian LGAs shown as a diffusion cartogram. Color (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.}\label{fig:plot-cart}
 \end{figure}
 
 This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves relative positions and topology, however, the shape and size are distorted.
@@ -91,15 +91,15 @@ hospitals_transformed |>
 #> [6,] -37.71986 145.0819
 \end{verbatim}
 
-The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Points near the centre can be seen to be more spread in the transformed data (b). The points are coloured based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
+The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Points near the centre can be seen to be more spread in the transformed data (b). The points are colored based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
 
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf}}
-\caption{\label{fig:usage-demo}Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are coloured by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily.}
+\caption{\label{fig:usage-demo}Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are colored by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily.}
 \end{figure}
 
-Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, for the data used in Figures \ref{fig:cow-plot-plot}, \ref{fig:sugarbag-plot-pdf} and \ref{fig:plot-cart}. The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the colouring by population showing that features such as shading polygons will work as expected.
+Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, for the data used in Figures \ref{fig:cow-plot-plot}, \ref{fig:sugarbag-plot-pdf} and \ref{fig:plot-cart}. The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the coloring by population showing that features such as shading polygons will work as expected.
 
 \begin{figure}
 
@@ -115,7 +115,7 @@ Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, f
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf}}
-\caption{\label{fig:fgc-zones}Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, coloured by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context.}
+\caption{\label{fig:fgc-zones}Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context.}
 \end{figure}
 
 Before detailing the algorithm behind the fisheye transforming, we need to establish a baseline notation.
@@ -218,13 +218,13 @@ Although the parameter space is continuous, certain regimes recur in practice an
 In this simple example, we demo the effect of zoom factor 1.5 and 2 on a synthetic grid to demonstrate how the point movement was effected by the zoom factor.
 
 \begin{figure}
-\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1} \caption{Effect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points coloured by zone. Higher zoom increases magnification in the focus while preserving context stability.}\label{fig:zoom-factor-plot}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1} \caption{Effect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points colored by zone. Higher zoom increases magnification in the focus while preserving context stability.}\label{fig:zoom-factor-plot}
 \end{figure}
 
 However, as demonstrated below, the revolution effect might make the distortion of the linestring object more obvious, comparing to just only the zoom factor effect.
 
 \begin{figure}
-\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1} \caption{Effect of angular revolution on line geometries. Line paths are shown with revolution set to 0 and pi/8, coloured by zone. Introducing revolution produces a visible rotational flow in the glue region without affecting the focus or context radii.}\label{fig:unnamed-chunk-1}
+\includegraphics[width=0.8\linewidth]{paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1} \caption{Effect of angular revolution on line geometries. Line paths are shown with revolution set to 0 and pi/8, colored by zone. Introducing revolution produces a visible rotational flow in the glue region without affecting the focus or context radii.}\label{fig:unnamed-chunk-1}
 \end{figure}
 
 As we can see, the revolution effect create a vortex or zoom wheel effect into the focus zone, which may be useful in some cases. For manuscripts and dashboards, prefer \texttt{revolution\ =\ 0}.

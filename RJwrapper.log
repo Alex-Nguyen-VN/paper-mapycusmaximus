@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  17 FEB 2026 13:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  17 FEB 2026 13:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -887,7 +887,10 @@ File: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf Graphic file
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/cow-plot-plot-
 1.pdf  used on input line 34.
 (pdftex.def)             Requested size: 398.33858pt x 320.41833pt.
-<paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf, id=143, 513.9
+
+
+[2 <./paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>]
+<paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf, id=159, 513.9
 2pt x 365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1.pdf Graphic f
 ile (type pdf)
@@ -895,9 +898,6 @@ ile (type pdf)
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/sugarbag-plot-
 pdf-1.pdf  used on input line 40.
 (pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
-
-
-[2 <./paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1.pdf>]
 <paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf, id=165, 525.965pt x 3
 71.3875pt>
 File: paper-mapycusmaximus_files/figure-latex/plot-cart-1.pdf Graphic file (typ
@@ -935,6 +935,12 @@ e pdf)
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pd
 f  used on input line 117.
 (pdftex.def)             Requested size: 378.41283pt x 309.15424pt.
+
+
+[5 <./paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf>]
+
+[6 <./paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf> <./paper-mapycusm
+aximus_files/figure-latex/fgc-zones-1.pdf>]
 LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 1
 23.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1ppl.fd
@@ -982,13 +988,7 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 7.91925pt on input line 123.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 6.25204pt on input line 123.
-
-
-[5 <./paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf>]
-
-[6 <./paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf> <./paper-mapycusm
-aximus_files/figure-latex/fgc-zones-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf, id=241, 387.4475pt
+<paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf, id=240, 387.4475pt
  x 316.18124pt>
 File: paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf Graphic file (
 type pdf)
@@ -1001,7 +1001,7 @@ Overfull \hbox (79.66649pt too wide) in paragraph at lines 157--157
 [][] 
  []
 
-<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=243, 451.6875p
+<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=242, 451.6875p
 t x 229.85875pt>
 File: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf Graphic file 
 (type pdf)
@@ -1009,7 +1009,7 @@ File: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf Graphic file
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/basic-example-
 1.pdf  used on input line 164.
 (pdftex.def)             Requested size: 318.67207pt x 162.17668pt.
-<diagram.png, id=244, 658.46pt x 882.29625pt>
+<diagram.png, id=243, 658.46pt x 882.29625pt>
 File: diagram.png Graphic file (type png)
 <use diagram.png>
 Package pdftex.def Info: diagram.png  used on input line 179.
@@ -1137,12 +1137,12 @@ Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  27702 strings out of 473190
- 505237 string characters out of 5715800
- 915952 words of memory out of 5000000
+ 505234 string characters out of 5715800
+ 916946 words of memory out of 5000000
  50041 multiletter control sequences out of 15000+600000
- 603882 words of font info for 315 fonts, out of 8000000 for 9000
+ 603878 words of font info for 315 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,12n,131p,1854b,899s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,12n,131p,1854b,892s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/inconsolata/Inconsolat
 a-zi4r.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cm
@@ -1152,7 +1152,7 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (20 pages, 1927032 bytes).
+Output written on RJwrapper.pdf (20 pages, 1927353 bytes).
 PDF statistics:
  539 PDF objects out of 1000 (max. 8388607)
  448 compressed objects within 5 object streams

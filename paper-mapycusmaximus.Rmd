@@ -129,7 +129,7 @@ vic_pop_merc <- st_transform(vic_pop_sf, 3857)
 
 ```
 
-Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \@ref(fig:cow-plot-plot)). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the *embedded* relationship between focus and context with a single continuous geography. 
+Tools like `cowplot::ggdraw()`[@cowplot] can create multi-panel plots, with one panel showing an overview, and another showing zoomed detail (Figure \@ref(fig:cow-plot-plot)). This is the most common current practice to the detail-versus-context tradeoff, and most familiarfor every day readers. However, they require viewers to mentally integrate separate views, and lose the *embedded* relationship between focus and context with a single continuous geography. Here population is used to color the polygons, with darker indicating higher values. When insets are used to show zoomed detail, it can be more difficult to interpret the color values, and the designer needs to ensure the inset is produced with a scale common to the main plot. 
 
 ```{r data-cow-plot, include=FALSE}
 # Select the LGAs in the Greater Melbourne area to create inset map
@@ -172,7 +172,7 @@ inset_map <- ggplot() +
   )
 ```
 
-```{r cow-plot-plot, echo=FALSE, fig.cap="Map of Victorian local government areas (LGAs) coloured by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+```{r cow-plot-plot, echo=FALSE, fig.cap="Map of Victorian local government areas (LGAs) colored by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 final_map <- ggdraw() +
  draw_plot(main_map, x = 0, y = 0, width = 1, height = 1) + # Main map occupies the whole canvas
  draw_plot(inset_map, x = 0.5, y = 0.65, width = 0.35, height = 0.35) # Inset map position and size
@@ -277,12 +277,12 @@ carto_plot <- ggplot(cartogram) +
   )
 ```
 
-```{r plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+```{r plot-cart, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Color (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 carto_plot
 ```
 
-```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. Colour (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+```{r plot-cart-html, echo=FALSE, fig.cap="Population of Victorian LGAs shown as a diffusion cartogram. color (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 ggplotly(carto_plot, tooltip = "label", width=800, height=500) |> 
   layout(
@@ -324,9 +324,9 @@ hospitals_transformed |>
   head()
 ```
 
-The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). Points near the centre can be seen to be more spread in the transformed data (b). The points are coloured based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
+The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). Points near the centre can be seen to be more spread in the transformed data (b). The points are colored based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
 
-```{r usage-demo, fig.cap="Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are coloured by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily."}
+```{r usage-demo, fig.cap="Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are colored by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily."}
 
 hospitals_original <- filtered_locations |>
   filter(longitude >= 144, longitude <= 146, 
@@ -370,7 +370,7 @@ hospitals_original + hospitals_fisheye #+
   #theme(plot.tag.position = c(0.04, 0.97))
 ```
 
-Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')`) shows the transformation of the spatial coordinates, for the data used in Figures \@ref(fig:cow-plot-plot), \@ref(fig:`r ifelse(knitr::is_html_output(), 'sugarbag-plot-html', 'sugarbag-plot-pdf')`) and \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`). The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the colouring by population showing that features such as shading polygons will work as expected.
+Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')`) shows the transformation of the spatial coordinates, for the data used in Figures \@ref(fig:cow-plot-plot), \@ref(fig:`r ifelse(knitr::is_html_output(), 'sugarbag-plot-html', 'sugarbag-plot-pdf')`) and \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`). The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the coloring by population showing that features such as shading polygons will work as expected.
 
 ```{r sf-usage-map}
 vic_fgc_map <- sf_fisheye(vic_pop_merc, center = c(145, -37.8), 
@@ -474,7 +474,7 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 }
 ```
 
-```{r fgc-zones, echo=FALSE, fig.cap="Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, coloured by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context."}
+```{r fgc-zones, echo=FALSE, fig.cap="Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context."}
 
 grid <- create_test_grid()
 grid_df <- as_tibble(grid)
@@ -813,7 +813,7 @@ grid_zoom_1 <- as_tibble(grid_zoom_1) |> mutate(zones = zones_1)
 grid_zoom_2 <- as_tibble(grid_zoom_2) |> mutate(zones = zones_2)
 ```
 
-```{r zoom-factor-plot, echo=FALSE, fig.cap="Effect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points coloured by zone. Higher zoom increases magnification in the focus while preserving context stability.", out.width="80%"}
+```{r zoom-factor-plot, echo=FALSE, fig.cap="Effect of zoom factor on fisheye distortion. Two panels compare zoom factors 1.5 and 2 applied to a synthetic grid, with points colored by zone. Higher zoom increases magnification in the focus while preserving context stability.", out.width="80%"}
 zone_scale <- scale_color_discrete(name = "Zone")
 
 plot_3 <- ggplot(grid_zoom_1) +
@@ -856,7 +856,7 @@ transform_grid_2 <- transform_grid_2 %>%
   mutate(seg = ceiling(row_number() / 21))
 ```
 
-```{r, echo=FALSE, fig.cap="Effect of angular revolution on line geometries. Line paths are shown with revolution set to 0 and pi/8, coloured by zone. Introducing revolution produces a visible rotational flow in the glue region without affecting the focus or context radii.", out.width="80%"}
+```{r, echo=FALSE, fig.cap="Effect of angular revolution on line geometries. Line paths are shown with revolution set to 0 and pi/8, colored by zone. Introducing revolution produces a visible rotational flow in the glue region without affecting the focus or context radii.", out.width="80%"}
 zone_scale <- scale_color_discrete(name = "Zone")
 
 plot_3 <- ggplot(transform_grid_1, aes(x_new, y_new)) +
