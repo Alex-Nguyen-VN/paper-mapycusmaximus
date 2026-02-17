@@ -306,11 +306,9 @@ None of these approaches provide continuous geometric magnification within a sin
 
 # Usage
 
-The primary functionality is from two functions: `fisheye_fgc` which operates on a data.frame, and `sf_fisheye` which operates on an `sf` object. Operationally, both are the same, except that the elements in the object being transformed are different. 
+The primary functionality is from two functions: `fisheye_fgc` which operates on a `data.frame` or `tibble`, and `sf_fisheye` which operates on an `sf` object. Operationally, both are the same, except that the elements in the object being transformed are different: The first two columns in the former, and the geographic coordinates in the latter. 
 
-The first two columns are the x and y coordinates to be transformed. Also specified are: `cx` and `cy`, denoting the 'center' of the fisheye transformation, `r_in` and `r_out`, which define the radius of the transformed circles, and `zoom_factor` which controls how zoomed the inner-most "focus" layer is.
-
-As a demonstration, the below code snippet transforms a subset of hospitals in metropolitan Victoria, using data from the `mapycusmaximus` package.
+Both also require the 'center' of the fisheye transformation to be specified using `cx` and `cy`. By default, these are both 0, which is unlikely to work for most spatial problems. The code snippet below transforms a subset of hospitals in metropolitan Victoria, using data from the `mapycusmaximus` package, where `r_in` and `r_out` specify the radius of the transformed circles, and `zoom_factor` which controls the appearance of the inner-most focus layer.
 
 ```{r build-usage-demo, echo=TRUE}
 filtered_locations <-  mapycusmaximus::hospital_locations |>
@@ -328,7 +326,7 @@ hospitals_transformed |>
   head()
 ```
 
-The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). Points near the specified centre are more spread in the transformed data (panel (b)) compared to in the original data (panel (a)). Here, points are coloured based on whether they are part of the context, glue, or focus sections. Points in the context and glue section do not move, while those in the focus layer are generally pushed outwards from the centre.
+The effect of this transformation can be seen in Figure \@ref(fig:usage-demo). Points near the centre can be seen to be more spread in the transformed data (b). The points are coloured based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
 
 ```{r usage-demo, fig.cap="Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are coloured by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily."}
 
@@ -374,9 +372,7 @@ hospitals_original + hospitals_fisheye #+
   #theme(plot.tag.position = c(0.04, 0.97))
 ```
 
-A second function, `sf_fisheye`, extends the `fisheye_fgc` function for use in spatial contexts. This function takes a spatial object, which can be multilayered, and then similar to the function on points, a center, radius and zoom factor. The resulting object is also an `sf` object, which can be used as a drop-in replacement in downstream visualisations.
-
-This process is shown in Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')`). Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
+Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')`) shows the transformation of the spatial coordinates, for the data used in Figures \@ref(fig:cow-plot-plot), \@ref(fig:`r ifelse(knitr::is_html_output(), 'sugarbag-plot-html', 'sugarbag-plot-pdf')`) and \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`). The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the colouring by population showing that features such as shading polygons will work as expected.
 
 ```{r sf-usage-map}
 vic_fgc_map <- sf_fisheye(vic_pop_merc, center = c(145, -37.8), 

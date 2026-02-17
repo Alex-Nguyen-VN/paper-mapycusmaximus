@@ -63,9 +63,9 @@ None of these approaches provide continuous geometric magnification within a sin
 
 \section{Usage}\label{usage}
 
-Two functions are provided to use the package. The first, \texttt{fisheye\_fgc}, takes a \texttt{data.frame} where the first two columns are the x and y coordinates to be transformed. Also specified are: \texttt{cx} and \texttt{cy}, denoting the `center' of the fisheye transformation, \texttt{r\_in} and \texttt{r\_out}, which define the radius of the transformed circles, and \texttt{zoom\_factor} which controls how zoomed the inner-most ``focus'' layer is.
+The primary functionality is from two functions: \texttt{fisheye\_fgc} which operates on a \texttt{data.frame} or \texttt{tibble}, and \texttt{sf\_fisheye} which operates on an \texttt{sf} object. Operationally, both are the same, except that the elements in the object being transformed are different: The first two columns in the former, and the geographic coordinates in the latter.
 
-As a demonstration, the below code snippet transforms a subset of hospitals in metropolitan Victoria, using data from the \texttt{mapycusmaximus} package.
+Both also require the `center' of the fisheye transformation to be specified using \texttt{cx} and \texttt{cy}. By default, these are both 0, which is unlikely to work for most spatial problems. The code snippet below transforms a subset of hospitals in metropolitan Victoria, using data from the \texttt{mapycusmaximus} package, where \texttt{r\_in} and \texttt{r\_out} specify the radius of the transformed circles, and \texttt{zoom\_factor} which controls the appearance of the inner-most focus layer.
 
 \begin{verbatim}
 filtered_locations <-  mapycusmaximus::hospital_locations |>
@@ -76,8 +76,8 @@ filtered_locations <-  mapycusmaximus::hospital_locations |>
 
 hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], 
                                      cy = 145, cx = -37.8, 
-                                     r_in = 0.3, r_out = 0.5, 
-                                     zoom_factor = 2)
+                                     r_in = 0.4, r_out = 0.7, 
+                                     zoom_factor = 1.8)
 
 hospitals_transformed |>
   head()
@@ -85,15 +85,15 @@ hospitals_transformed |>
 
 \begin{verbatim}
 #>          x_new    y_new
-#> [1,] -37.87029 144.9420
+#> [1,] -37.86326 144.9478
 #> [2,] -37.19449 145.7153
-#> [3,] -37.88968 144.9579
-#> [4,] -37.90002 145.3150
-#> [5,] -37.71120 145.1171
-#> [6,] -37.71096 145.0910
+#> [3,] -37.88071 144.9621
+#> [4,] -37.92105 145.3812
+#> [5,] -37.72008 145.1054
+#> [6,] -37.71986 145.0819
 \end{verbatim}
 
-The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Points near the specified centre are more spread in the transformed data (panel (b)) compared to in the original data (panel (a)). Here, points are coloured based on whether they are part of the context, glue, or focus sections. Points in the context and glue section do not move, while those in the focus layer are generally pushed outwards from the centre.
+The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Points near the centre can be seen to be more spread in the transformed data (b). The points are coloured based on whether they are part of the context, glue, or focus subsets of the data. Points in the focus are pushed outwards, but points in the context section remain in the original positions. Points in the glue may or may not move to smoothly adjust from the focus to context, depending on the choice of parameter. Here they remain in the original position.
 
 \begin{figure}
 \centering
@@ -101,9 +101,7 @@ The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Po
 \caption{\label{fig:usage-demo}Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are coloured by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily.}
 \end{figure}
 
-A second function, \texttt{sf\_fisheye}, extends the \texttt{fisheye\_fgc} function for use in spatial contexts. This function takes a spatial object, which can be multilayered, and then similar to the function on points, a center, radius and zoom factor. The resulting object is also an \texttt{sf} object, which can be used as a drop-in replacement in downstream visualisations.
-
-This process is shown in Figure \ref{fig:plot-fgc}. Although it is hard to tell from the figure, here the polygons are continuous, and boundaries are preserved. This means that features such as shading polygons will work as expected.
+Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, for the data used in Figures \ref{fig:cow-plot-plot}, \ref{fig:sugarbag-plot-pdf} and \ref{fig:plot-cart}. The result is similar to the cartogram, but more controllable. The polygons are continuous, and boundaries are preserved. Although it may be difficult to see this directly from this plot, it is demonstrated by the colouring by population showing that features such as shading polygons will work as expected.
 
 \begin{figure}
 
