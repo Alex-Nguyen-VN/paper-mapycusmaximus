@@ -306,7 +306,9 @@ None of these approaches provide continuous geometric magnification within a sin
 
 # Usage
 
-Two functions are provided to use the package. The first, `fisheye_fgc`, takes a `data.frame` where the first two columns are the x and y coordinates to be transformed. Also specified are: `cx` and `cy`, denoting the 'center' of the fisheye transformation, `r_in` and `r_out`, which define the radius of the transformed circles, and `zoom_factor` which controls how zoomed the inner-most "focus" layer is.
+The primary functionality is from two functions: `fisheye_fgc` which operates on a data.frame, and `sf_fisheye` which operates on an `sf` object. Operationally, both are the same, except that the elements in the object being transformed are different. 
+
+The first two columns are the x and y coordinates to be transformed. Also specified are: `cx` and `cy`, denoting the 'center' of the fisheye transformation, `r_in` and `r_out`, which define the radius of the transformed circles, and `zoom_factor` which controls how zoomed the inner-most "focus" layer is.
 
 As a demonstration, the below code snippet transforms a subset of hospitals in metropolitan Victoria, using data from the `mapycusmaximus` package.
 
@@ -319,8 +321,8 @@ filtered_locations <-  mapycusmaximus::hospital_locations |>
 
 hospitals_transformed <- fisheye_fgc(filtered_locations[, -1], 
                                      cy = 145, cx = -37.8, 
-                                     r_in = 0.3, r_out = 0.5, 
-                                     zoom_factor = 2)
+                                     r_in = 0.4, r_out = 0.7, 
+                                     zoom_factor = 1.8)
 
 hospitals_transformed |>
   head()
@@ -336,9 +338,10 @@ hospitals_original <- filtered_locations |>
   ggplot(aes(x=longitude, y = latitude)) + 
     geom_point() +
     ggtitle("a") +
+    coord_map() +
     theme_minimal() +
   #coord_fixed() +
-    theme(aspect.ratio=1,
+    theme(#aspect.ratio=1,
         #plot.background = element_rect(colour = "black", fill = NA))
         panel.border = element_rect(colour = "black", fill = NA),
         axis.text = element_blank(),
@@ -352,13 +355,14 @@ hospitals_fisheye_plot <- hospitals_transformed |>
 hospitals_fisheye <- hospitals_fisheye_plot |>
   ggplot(aes(x=y_new, y = x_new, colour = zone)) + 
     geom_point() +
+    coord_map() +
     theme_minimal() +
     ggtitle("b") +
     #coord_fixed() + 
     scale_color_manual(values = c("focus" = "#c60000ff", 
       "glue" = "#a5a9e8ff", 
       "context" = "#FFCC00")) +
-    theme(aspect.ratio=1,
+    theme(#aspect.ratio=1,
           legend.position = "bottom",
         #plot.background = element_rect(colour = "black", fill = NA))
         panel.border = element_rect(colour = "black", fill = NA),
