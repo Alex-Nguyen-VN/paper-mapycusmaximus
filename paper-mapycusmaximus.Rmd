@@ -180,7 +180,7 @@ final_map <- ggdraw() +
 print(final_map)
 ```
 
-A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the `sugarbag` package [@RJ-2023-021]. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
+A solution to small area problems is the hexagonal tilemap, such as that implemented by the `sugarbag` package [@RJ-2023-021]. The algorithm in this package represents each spatial polygon by a hexagon, and places it as close as possible to the centroid of its respective polygon. Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'sugarbag-plot-html', 'sugarbag-plot-pdf')`) shows the hexagon tile map overlaid on a spatial polygon map, constructed on the same data as used in Figure \@ref(fig:cow-plot-plot). The end result is that information hidden in the small polygons, such as dense populations in inner Melbourne here, are visible. However, the drawback is that it is not possible to place the tiles perfectly aligned with the original geography and preserve neighbourhood structure completely. 
 
 ```{r sugarbag-prepare, include=FALSE}
 centroids <- create_centroids(vic_pop_sf, "lga_key")
@@ -247,9 +247,7 @@ ggplotly(hextilemap, tooltip = "label", width=800, height=500) |>
 )
 ```
 
-The challenge with tile maps is that they abstract away precise geography entirely, treating space as a topology-preserving tessellation where "neighbors touch" matters more than accurate boundaries. Tile maps excel at avoiding size bias. However, they abandon continuous spatial relationships. As a result, you cannot identify precise locations, measure distances, or overlay point data meaningfully. In Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'sugarbag-plot-html', 'sugarbag-plot-pdf')`), the sugarbag approach was overlaid on top of the original geography, and it is difficult to discern which tiles belong to which geographic area.
-
-Another approach is a cartogram plot. In these plots, areas are intentionally distorted to ensure an area reflects the density of a variable. The most common approach is to distort the shapes such that the area becomes proportional to population [@gastner2004]. Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`) shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportionally to population. Notice how the metropolitan Melbourne LGAs are expanded in size relative to \@ref(fig:cow-plot-plot). Making the cartogram can be fiddly, and it is not very controllable. Using the defaults for the algorithm generates a plot where Melbourne LGAs completely dominate the rest of the state, and polygons get split. Here we used a very small number of iterations to get a very reasonable view of Melbourne while still getting clear views of the rural LGAs. This is almost accidental!
+Another approach is a cartogram [@gastner2004], where polygons are distorted to reflect the statistic being represented. Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-cart-html', 'plot-cart')`) shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportional to population. Notice how the metropolitan Melbourne LGAs are expanded in size relative to \@ref(fig:cow-plot-plot). Making the cartogram can be fiddly, and it is not very controllable. Using the defaults for the algorithm generates a plot where Melbourne LGAs completely dominate the rest of the state, and polygons get split. Here we used a very small number of iterations to get a very reasonable view of Melbourne while still getting clear views of the rural LGAs. This is almost accidental!
 
 ```{r data-cart, include=FALSE}
 cartogram <- cartogram_cont(vic_pop_merc, "pop", itermax = 3)
@@ -296,11 +294,9 @@ ggplotly(carto_plot, tooltip = "label", width=800, height=500) |>
 
 ```
 
-This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves relative positions and topology, however, the shape and size are distorted. 
+These approaches fundamentally differ from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves some relative positions and topology.  In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
 
-In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
-
-None of these approaches provide continuous geometric magnification within a single, topology-preserving map. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for use cases such as examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
+The FGC fisheye lens keeps everything in one frame - roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric *warp* rather than a data-driven *substitution* or panel-based *separation*. This matters for applications such as examining hospital networks in Melbourne while maintaining the tsate context, exploring Census tracts in a metro core without losing county boundaries, or studying transit lines with their regional hinterland visible.
 
 # Usage {#usage}
 
@@ -374,8 +370,8 @@ Figure \@ref(fig:`r ifelse(knitr::is_html_output(), 'plot-fgc-html', 'plot-fgc')
 
 ```{r sf-usage-map}
 vic_fgc_map <- sf_fisheye(vic_pop_merc, center = c(145, -37.8), 
-                        r_in = 0.2, r_out = 0.3, 
-                        zoom = 4, squeeze = 0.35) |>
+                        r_in = 0.2, r_out = 0.6, 
+                        zoom = 4, squeeze = 0.1) |>
   ggplot() +
   geom_sf(aes(fill = pop, label=lga_key), #fill = "grey85", 
     color = "black") +
