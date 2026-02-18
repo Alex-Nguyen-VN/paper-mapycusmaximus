@@ -389,12 +389,12 @@ vic_fgc_map <- sf_fisheye(vic_pop_merc, center = c(145, -37.8),
   )
 ```
 
-```{r plot-fgc, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+```{r plot-fgc, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, which cannot typically be seen in standard spatial maps.", eval=knitr::is_latex_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 vic_fgc_map
 ```
 
-```{r plot-fgc-html, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
+```{r plot-fgc-html, echo=FALSE, fig.cap="Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, which cannot typically be seen in standard spatial maps.", eval=knitr::is_html_output(), fig.align="center", fig.width=8, fig.height=6, layout="l-body", out.width="100%"}
 
 ggplotly(vic_fgc_map, tooltip = "label", width=800, height=500) |> 
   layout(
@@ -470,7 +470,7 @@ plot_fisheye_fgc <- function(original_coords, transformed_coords,
 }
 ```
 
-```{r fgc-zones, echo=FALSE, fig.cap="Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context."}
+```{r fgc-zones, echo=FALSE, fig.cap="Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly (inwards or outwards) in the glue, and remain fixed in the context."}
 
 grid <- create_test_grid()
 grid_df <- as_tibble(grid)
@@ -514,7 +514,8 @@ ggplot() +
      "context" = "#FFCC00")) +
   coord_equal() +
   theme_minimal(base_size = 14) +
-  labs(title = "Fisheye Transformation: Point Movement", x = "x", y = "y")
+  labs(#title = "Fisheye Transformation: Point Movement", 
+    x = "x", y = "y")
 
 ```
 

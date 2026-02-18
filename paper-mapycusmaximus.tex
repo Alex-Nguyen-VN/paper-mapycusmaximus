@@ -34,15 +34,13 @@ Tools like \texttt{cowplot::ggdraw()}\citep{cowplot} can create multi-panel plot
 \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/cow-plot-plot-1} \caption{Map of Victorian local government areas (LGAs) colored by population, with an inset showing metropolitan Melbourne at a larger scale. The separation highlights local detail but requires the reader to mentally integrate focus and context across panels.}\label{fig:cow-plot-plot}
 \end{figure}
 
-A solution to the lack of continuous geometry is the hexagonal tilemap, such as that implemented by the \texttt{sugarbag} package \citep{RJ-2023-021}. In these maps, a number of tiles are placed in each region of the map, approximately proportional to the size of the population of the region. As a result, large areas with small populations receive relatively few tiles, while small areas with large populations receive many more tiles, meaning that the density of tiles more accurately reflects the number of data points in a region.
+A solution to small area problems is the hexagonal tilemap, such as that implemented by the \texttt{sugarbag} package \citep{RJ-2023-021}. The algorithm in this package represents each spatial polygon by a hexagon, and places it as close as possible to the centroid of its respective polygon. Figure \ref{fig:sugarbag-plot-pdf} shows the hexagon tile map overlaid on a spatial polygon map, constructed on the same data as used in Figure \ref{fig:cow-plot-plot}. The end result is that information hidden in the small polygons, such as dense populations in inner Melbourne here, are visible. However, the drawback is that it is not possible to place the tiles perfectly aligned with the original geography and preserve neighbourhood structure completely.
 
 \begin{figure}
 \includegraphics[width=1\linewidth]{paper-mapycusmaximus_files/figure-latex/sugarbag-plot-pdf-1} \caption{Sugarbag hex tile map illustrating thematic spatial abstraction. Original LGA polygons are replaced by uniform hexagons, with fill indicating poplulation and original geography shown faintly beneath. This representation removes area bias but sacrifices precise geographic location.}\label{fig:sugarbag-plot-pdf}
 \end{figure}
 
-The challenge with tile maps is that they abstract away precise geography entirely, treating space as a topology-preserving tessellation where ``neighbors touch'' matters more than accurate boundaries. Tile maps excel at avoiding size bias. However, they abandon continuous spatial relationships. As a result, you cannot identify precise locations, measure distances, or overlay point data meaningfully. In Figure \ref{fig:sugarbag-plot-pdf}, the sugarbag approach was overlaid on top of the original geography, and it is difficult to discern which tiles belong to which geographic area.
-
-Another approach is a cartogram plot. In these plots, areas are intentionally distorted to ensure an area reflects the density of a variable. The most common approach is to distort the shapes such that the area becomes proportional to population \citep{gastner2004}. Figure \ref{fig:plot-cart} shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportionally to population. Notice how the metropolitan Melbourne LGAs are expanded in size relative to \ref{fig:cow-plot-plot}. Making the cartogram can be fiddly, and it is not very controllable. Using the defaults for the algorithm generates a plot where Melbourne LGAs completely dominate the rest of the state, and polygons get split. Here we used a very small number of iterations to get a very reasonable view of Melbourne while still getting clear views of the rural LGAs. This is almost accidental!
+Another approach is a cartogram \citep{gastner2004}, where polygons are distorted to reflect the statistic being represented. Figure \ref{fig:plot-cart} shows a cartogram for Victorian local government areas (LGAs) where color indicates population, and polygons are distorted proportional to population. Notice how the metropolitan Melbourne LGAs are expanded in size relative to \ref{fig:cow-plot-plot}. Making the cartogram can be fiddly, and it is not very controllable. Using the defaults for the algorithm generates a plot where Melbourne LGAs completely dominate the rest of the state, and polygons get split. Here we used a very small number of iterations to get a very reasonable view of Melbourne while still getting clear views of the rural LGAs. This is almost accidental!
 
 \begin{figure}
 
@@ -53,11 +51,9 @@ Another approach is a cartogram plot. In these plots, areas are intentionally di
 \caption{Population of Victorian LGAs shown as a diffusion cartogram. Color (and size) indicates population. We can see that the LGAs for greater Melbourne have the highest population, and these are massively exploded.}\label{fig:plot-cart}
 \end{figure}
 
-This approach fundamentally differs from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves relative positions and topology, however, the shape and size are distorted.
+These approaches fundamentally differ from focus+context methods. Cartograms substitute spatial accuracy for data encoding, often severely disrupting shapes and adjacencies. The reader can still extract geographic features and relationships, as the cartogram preserves some relative positions and topology. In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
 
-In contrast, the FGC fisheye transformation preserves relative positions and topology while magnifying a user-selected spatial region rather than a data-driven variable. The use cases are distinct: cartograms address the dominance of a variable in space, whereas fisheye lenses facilitate exploration of local detail within a broader geographic context.
-
-None of these approaches provide continuous geometric magnification within a single, topology-preserving map. The fisheye lens keeps everything in one frame-roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric \emph{warp} rather than a data-driven \emph{substitution} or panel-based \emph{separation}. This matters for use cases such as examining hospital networks in Melbourne while maintaining Victorian context, exploring census tracts in a metro core without losing county boundaries, or analyzing transit lines with their regional hinterland visible.
+The FGC fisheye lens keeps everything in one frame - roads bend smoothly, metropolitan detail enlarges, but you still see how the city sits within its state. It's a geometric \emph{warp} rather than a data-driven \emph{substitution} or panel-based \emph{separation}. This matters for applications such as examining hospital networks in Melbourne while maintaining the tsate context, exploring Census tracts in a metro core without losing county boundaries, or studying transit lines with their regional hinterland visible.
 
 \section{Usage}\label{usage}
 
@@ -107,7 +103,7 @@ Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, f
 
 }
 
-\caption{Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, cannot typically be seen in standard spatial maps.}\label{fig:plot-fgc}
+\caption{Fisheye transformation applied to the map of Victoria, Australia. The center is focussed on the Melbourne metropolitan region, which cannot typically be seen in standard spatial maps.}\label{fig:plot-fgc}
 \end{figure}
 
 \section{Implementation}\label{implementation}
@@ -115,7 +111,7 @@ Figure \ref{fig:plot-fgc} shows the transformation of the spatial coordinates, f
 \begin{figure}
 \centering
 \pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf}}
-\caption{\label{fig:fgc-zones}Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly in the glue, and remain fixed in the context.}
+\caption{\label{fig:fgc-zones}Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly (inwards or outwards) in the glue, and remain fixed in the context.}
 \end{figure}
 
 Before detailing the algorithm behind the fisheye transforming, we need to establish a baseline notation.
