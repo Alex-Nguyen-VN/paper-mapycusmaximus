@@ -410,6 +410,40 @@ ggplotly(vic_fgc_map, tooltip = "label", width=800, height=500) |>
 
 # Implementation {#implementation}
 
+To explain the implementation it will help to use some notation to describe the algorithm.
+A point in the original (i.e. non-transformed) space is denoted as $P = (x, y)$. The transformation operates around a chosen center, $C = (c_x, c_y)$. For simplicity, we will assume $C = (0, 0)$, which is also the default value in the software, and the descriptions below will hold for any $C$, by replacing $P$ with $P+C$.
+
+We will also require two radii: $r_{\text{in}}$ specifying the size of the circle corresponding to the focus region and $r_{\text{out}}$ specifying the size of the circle corresponding to the glue boundary. Points inside the focus magnify outwards from the center, points between the two radii could expand or compress according to a smooth curve, and points outside $r_{\text{out}}$ remain unchanged. 
+
+Let $(r, \theta)$ denote the polar form of the point $P$. The transformation defines a new radius $r'$ via a piecewise function:
+
+\begin{equation} 
+ r' = 
+ \begin{cases}
+   \min\left( z \cdot r, r_{\text{in}} \right) & \text{if } r \le r_{\text{in}}, \\
+   r_{\text{in}} + (r_{\text{out}} - r_{\text{in}}) \cdot h(u; s) & \text{if } r_{\text{in}} < r \le r_{\text{out}}, \\
+   r & \text{if } r > r_{\text{out}},
+ \end{cases}
+\end{equation}
+
+where $z \geq 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue compression, and $u = { (r - r_{\text{in}}) }/{ (r_{\text{out}} - r_{\text{in}}) }$ normalizes the glue radius to $[0,1]$. 
+
+The function $h(u; s)$ is chosen so that $h(0; s) = 0$, $h(1; s) = 1$, and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve function,
+
+\begin{equation} 
+ h(u; s) = 
+ \begin{cases}
+   \tfrac{1}{2} \cdot u^{1/s} & \text{if } 0 \le u \le 0.5, \\
+   1 - \tfrac{1}{2} \cdot (1 - u)^{1/s} & \text{if } 0.5 < u \le 1,
+ \end{cases}
+\end{equation}
+
+which compresses radii near both boundaries and emphasizes the mid-glue region. Figure \@ref(fig:radial-curve) illustrates the transformation on a fixed grid of points. Color indicates the region, and arrows indicate the movement of points within the focus and glue regions. You can see that within the focus all points move outwards from the center. In the glue some points move inwards and some outwards, an effect controlled by $h$.
+
+There are two additional options for the transformation. The first biases points towards the outer radius (as opposed to the inner radius).
+
+The second option can introduce rotation within the glue zone to accentuate the flow from detail to context. Let $\phi(u)$ denote the angular adjustment. We employ a bell-shaped profile: $\phi(u) = \rho \cdot 4u(1-u)$, where $\rho$ is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries.
+
 ```{r preparing-data, include=FALSE}
 
 plot_fisheye_fgc <- function(original_coords, transformed_coords, 
@@ -519,41 +553,6 @@ ggplot() +
 
 ```
 
-Before detailing the algorithm behind the fisheye transforming, we need to establish a baseline notation.
-
-Denote a point in the original (i.e. non-transformed) space to be $P = (x, y)$. The transformation operates around a chosen center $C = (c_x, c_y)$. For the sake of notational simplicity, we will assume $C = (0, 0)$, however the mathematics that follows is true for any $C$, simply by defining $P$ to be $P+C$.
-
-We will also require two radii: $r_{\text{in}}$ delineating the focus region and $r_{\text{out}}$ marking the glue boundary. Points inside the focus magnify, points between the radii focus on the center and then compress according to a smooth curve, and points outside remain unchanged. 
-
-Let $(r, \theta)$ denote the polar form of the point $P$. The transformation defines a new radius $r'$ via a piecewise function:
-
-\begin{equation} 
- r' = 
- \begin{cases}
-   \min\left( z \cdot r, r_{\text{in}} \right) & \text{if } r \le r_{\text{in}}, \\
-   r_{\text{in}} + (r_{\text{out}} - r_{\text{in}}) \cdot h(u; s) & \text{if } r_{\text{in}} < r \le r_{\text{out}}, \\
-   r & \text{if } r > r_{\text{out}},
- \end{cases}
-\end{equation}
-
-where $z \geq 1$ is the zoom factor within the focus, $s \in (0, 1]$ controls glue compression, and $u = { (r - r_{\text{in}}) }/{ (r_{\text{out}} - r_{\text{in}}) }$ normalizes the glue radius to $[0,1]$. 
-
-The function $h(u; s)$ is chosen so that $h(0; s) = 0$, $h(1; s) = 1$, and both the first derivatives and the radii match at the boundaries. We adopt a symmetric power curve function,
-
-\begin{equation} 
- h(u; s) = 
- \begin{cases}
-   \tfrac{1}{2} \cdot u^{1/s} & \text{if } 0 \le u \le 0.5, \\
-   1 - \tfrac{1}{2} \cdot (1 - u)^{1/s} & \text{if } 0.5 < u \le 1,
- \end{cases}
-\end{equation}
-
-which compresses radii near both boundaries and emphasizes the mid-glue region. A visual representation of the function $h$ is shown in Figure \@ref(fig:radial-curve). 
-
-There are two additional options for the transformation. The first biases points towards the outer radius (as opposed to the inner radius).
-
-The second option can introduce rotation within the glue zone to accentuate the flow from detail to context. Let $\phi(u)$ denote the angular adjustment. We employ a bell-shaped profile: $\phi(u) = \rho \cdot 4u(1-u)$, where $\rho$ is the revolution parameter (in radians). This function peaks at the glue midpoint and vanishes at the boundaries.
-
 ```{r radial-curve, fig.cap="Radial mapping function of the FGC fisheye. The plot shows original radius r against warped radius r', with shaded focus, glue, and context regions and a reference identity line. The curve demonstrates expansion in the focus, smooth compression in the glue, and identity mapping outside.", out.width="120%"}
 r_in  <- 0.34
 r_out <- 0.55
@@ -592,12 +591,12 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
               color = "grey40") +
   geom_hline(yintercept = c(r_in, r_out), linetype = c("dashed", "dotted"),
               color = "grey40") +
-  annotate("label", x = r_in,  y = 0.05, label = "r_in",  angle = 90, vjust = -0.5) +
-  annotate("label", x = r_out, y = 0.05, label = "r_out", angle = 90, vjust = -0.5) +
-  annotate("label", y = r_in + 0.03,  x = 0.05, label = "r_in") +
-  annotate("label", y = r_out  + 0.03, x = 0.05, label = "r_out") +
+  annotate("label", x = r_in,  y = 0.05, label = "r_in",  angle = 90, vjust = -0.5, alpha=0.2) +
+  annotate("label", x = r_out, y = 0.05, label = "r_out", angle = 90, vjust = -0.5, alpha=0.2) +
+  annotate("label", y = r_in + 0.03,  x = 0.05, label = "r_in", alpha=0.2) +
+  annotate("label", y = r_out  + 0.03, x = 0.05, label = "r_out", alpha=0.2) +
   annotate("label", x = 0.88, y = 0.88, label = "identity: r' = r",
-            color = "steelblue", fill = "white") +
+            color = "steelblue", fill = "white", alpha=0.2) +
   # Arrows to the curve at r_in / r_out
   annotate(
     "curve",
@@ -607,7 +606,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
     arrow = arrow(type = "closed", length = unit(6, "pt"))
   ) +
   annotate("label", x = r_in + 0.08, y = r_in + 0.04, label = "expansion at r_in",
-            color = "steelblue", fill = "white") +
+            color = "steelblue", fill = "white", alpha=0.2) +
   annotate(
     "curve",
     x = r_out - 0.12, y = r_out + 0.08,
@@ -616,7 +615,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
     arrow = arrow(type = "closed", length = unit(6, "pt"))
   ) +
   annotate("label", x = r_out - 0.13, y = r_out + 0.09, label = "compression at r_out",
-            color = "steelblue", fill = "white") +
+            color = "steelblue", fill = "white", alpha=0.2) +
   # Arrow to the inner radius
   geom_point(aes(x = r1, y = r2), data = xy2[i_maxF, ], size = 1, color = "black") +
   annotate(
@@ -628,7 +627,7 @@ ggplot(xy2, aes(r1, r2, color = zone)) +
   ) +
   annotate("label", x = r_in, y = r_in * 0.5,
             label = "shifted radius (expansion) in focus \n then flattened at r_in",
-            color = "steelblue", fill = "white") +
+            color = "steelblue", fill = "white", alpha=0.2) +
   # Visual cue for flattening at r_in (horizontal tangent/cap)
   scale_color_manual(values = c(focus = "#c60000", glue = "#6c8ae6", context = "#ffb000"),
                       name = "Zone") +

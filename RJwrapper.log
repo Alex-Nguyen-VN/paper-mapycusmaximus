@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  18 FEB 2026 16:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.17)  27 FEB 2026 17:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -927,36 +927,28 @@ File: paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf Graphic file (type
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf
   used on input line 102.
 (pdftex.def)             Requested size: 398.33858pt x 284.75557pt.
-<paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf, id=202, 401.5pt x 309
-.155pt>
-File: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf Graphic file (typ
-e pdf)
-<use paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>
-Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pd
-f  used on input line 113.
-(pdftex.def)             Requested size: 401.49901pt x 309.15424pt.
 LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 1
-19.
+12.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 )
 LaTeX Font Info:    Trying to load font information for OML+zplm on input line 
-119.
+112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omlzplm.fd
 File: omlzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OML/zplm.
 )
 LaTeX Font Info:    Trying to load font information for OMS+zplm on input line 
-119.
+112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omszplm.fd
 File: omszplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMS/zplm.
 )
 LaTeX Font Info:    Trying to load font information for OMX+zplm on input line 
-119.
+112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omxzplm.fd
 File: omxzplm.fd 2002/09/08 Fontinst v1.914 font definitions for OMX/zplm.
 )
 LaTeX Font Info:    Trying to load font information for OT1+zplm on input line 
-119.
+112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1zplm.fd
 File: ot1zplm.fd 2002/09/08 Fontinst v1.914 font definitions for OT1/zplm.
 )
@@ -965,163 +957,172 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 119.
+(Font)              scaled to size 10.42007pt on input line 112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 119.
+(Font)              scaled to size 7.91925pt on input line 112.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 119.
+(Font)              scaled to size 6.25204pt on input line 112.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 10.42007pt on input line 119.
+(Font)              scaled to size 10.42007pt on input line 112.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.91925pt on input line 119.
+(Font)              scaled to size 7.91925pt on input line 112.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 6.25204pt on input line 119.
+(Font)              scaled to size 6.25204pt on input line 112.
 
 
 [5 <./paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf>]
-
-[6 <./paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf> <./paper-mapycusm
-aximus_files/figure-latex/fgc-zones-1.pdf>]
-<paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf, id=242, 387.4475pt
+<paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf, id=217, 401.5pt x 309
+.155pt>
+File: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf Graphic file (typ
+e pdf)
+<use paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>
+Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pd
+f  used on input line 147.
+(pdftex.def)             Requested size: 401.49901pt x 309.15424pt.
+<paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf, id=218, 387.4475pt
  x 316.18124pt>
 File: paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf Graphic file (
 type pdf)
 <use paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/radial-curve-1
-.pdf  used on input line 153.
+.pdf  used on input line 152.
 (pdftex.def)             Requested size: 478.00507pt x 390.08745pt.
 
-Overfull \hbox (79.66649pt too wide) in paragraph at lines 153--153
+Overfull \hbox (79.66649pt too wide) in paragraph at lines 152--152
 [][] 
  []
 
-<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=244, 451.6875p
+
+
+[6 <./paper-mapycusmaximus_files/figure-latex/plot-fgc-1.pdf>]
+
+[7 <./paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf>]
+
+[8 <./paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf>]
+<paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf, id=273, 451.6875p
 t x 229.85875pt>
 File: paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf Graphic file 
 (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/basic-example-
-1.pdf  used on input line 160.
+1.pdf  used on input line 159.
 (pdftex.def)             Requested size: 318.67207pt x 162.17668pt.
-<diagram.png, id=245, 658.46pt x 882.29625pt>
+<diagram.png, id=274, 658.46pt x 882.29625pt>
 File: diagram.png Graphic file (type png)
 <use diagram.png>
-Package pdftex.def Info: diagram.png  used on input line 175.
+Package pdftex.def Info: diagram.png  used on input line 174.
 (pdftex.def)             Requested size: 318.67207pt x 427.01117pt.
 LaTeX Font Info:    Trying to load font information for TS1+ppl on input line 1
-89.
+88.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ts1ppl.fd
 File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
 )
 
-[7]
+[9 <./paper-mapycusmaximus_files/figure-latex/basic-example-1.pdf>]
 
-[8 <./paper-mapycusmaximus_files/figure-latex/radial-curve-1.pdf> <./paper-mapy
-cusmaximus_files/figure-latex/basic-example-1.pdf>]
-
-[9 <./diagram.png>]
-
-[10]
-<paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf, id=296, 445.66
+[10 <./diagram.png>]
+<paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf, id=297, 445.66
 5pt x 195.73125pt>
 File: paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf Graphic fi
 le (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/zoom-factor-pl
-ot-1.pdf  used on input line 217.
+ot-1.pdf  used on input line 216.
 (pdftex.def)             Requested size: 318.67207pt x 139.95871pt.
-<paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf, id=297, 458.713
+<paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf, id=298, 458.713
 75pt x 203.76125pt>
 File: paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf Graphic fil
 e (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/unnamed-chunk-
-1-1.pdf  used on input line 223.
+1-1.pdf  used on input line 222.
 (pdftex.def)             Requested size: 318.67207pt x 141.55923pt.
-<paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf, id=298, 458.71375pt
+<paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf, id=299, 458.71375pt
  x 204.765pt>
 File: paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf Graphic file (t
 ype pdf)
 <use paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/glue-method-1.
-pdf  used on input line 229.
+pdf  used on input line 228.
 (pdftex.def)             Requested size: 318.67207pt x 142.25656pt.
 
 
-[11 <./paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf> <./paper
+[11]
+
+[12 <./paper-mapycusmaximus_files/figure-latex/zoom-factor-plot-1.pdf> <./paper
 -mapycusmaximus_files/figure-latex/unnamed-chunk-1-1.pdf>]
-<figures/screenshot.jpeg, id=324, 2314.6475pt x 855.195pt>
+<figures/screenshot.jpeg, id=329, 2314.6475pt x 855.195pt>
 File: figures/screenshot.jpeg Graphic file (type jpg)
 <use figures/screenshot.jpeg>
-Package pdftex.def Info: figures/screenshot.jpeg  used on input line 243.
+Package pdftex.def Info: figures/screenshot.jpeg  used on input line 242.
 (pdftex.def)             Requested size: 398.33858pt x 147.16896pt.
 
 
-[12 <./paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf> <./figures/sc
+[13 <./paper-mapycusmaximus_files/figure-latex/glue-method-1.pdf> <./figures/sc
 reenshot.jpeg>]
 
-[13]
-
 [14]
-<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=352, 51
+
+[15]
+<paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf, id=357, 51
 3.92pt x 365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf Graphi
 c file (type pdf)
 <use paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/hospitals-basi
-c-plot-1.pdf  used on input line 368.
+c-plot-1.pdf  used on input line 367.
 (pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
 
 
-[15 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>]
+[16 <./paper-mapycusmaximus_files/figure-latex/hospitals-basic-plot-1.pdf>]
 
-[16]
-<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=395, 513.92pt x
+[17]
+<paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf, id=400, 513.92pt x
  365.365pt>
 File: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf Graphic file (
 type pdf)
 <use paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>
 Package pdftex.def Info: paper-mapycusmaximus_files/figure-latex/fisheye-plot-1
-.pdf  used on input line 453.
+.pdf  used on input line 452.
 (pdftex.def)             Requested size: 398.33858pt x 283.19954pt.
 
 
-[17 <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 490--491
+[18 <./paper-mapycusmaximus_files/figure-latex/fisheye-plot-1.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 489--490
 \T1/ppl/m/n/10 (+20) The github repo for this pa-per is [][]$\T1/zi4/m/n/10 htt
 ps : / / github . com / Alex -[] Nguyen -[] VN / paper -[]
  []
 
-(./RJwrapper.bbl (./RJwrapper.brf)
+
+
+[19] (./RJwrapper.bbl (./RJwrapper.brf)
 \tf@brf=\write6
 \openout6 = `RJwrapper.brf'.
 
 
-
-[18]
 Underfull \hbox (badness 1490) in paragraph at lines 69--69
 \T1/ppl/m/it/10 (+20) The R Jour-nal\T1/ppl/m/n/10 (+20) , 10:439--446, 2018.  
 ISSN 2073-4859.  doi: $10 . 32614 / RJ -[] 2018 -[] 009$.
  []
 
-)
+
+
+[20])
 
 LaTeX Font Warning: Font shape `T1/zi4/m/it' undefined
-(Font)              using `T1/zi4/m/n' instead on input line 506.
+(Font)              using `T1/zi4/m/n' instead on input line 505.
 
 LaTeX Font Info:    Font shape `T1/zi4/m/it' will be
-(Font)              scaled to size 10.20004pt on input line 506.
+(Font)              scaled to size 10.20004pt on input line 505.
+)
 
-
-[19])
-
-[20] (./RJwrapper.aux)
+[21] (./RJwrapper.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -1132,16 +1133,16 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 Package rerunfilecheck Info: File `RJwrapper.out' has not changed.
 (rerunfilecheck)             Checksum: 5649F0606C141CA0BE37E50E21BC4B60;3319.
 Package rerunfilecheck Info: File `RJwrapper.brf' has not changed.
-(rerunfilecheck)             Checksum: B6555C67FAE41C75ED5ECFACA64C22C0;848.
+(rerunfilecheck)             Checksum: 811C4965FCFF04646369C1404A3AE73E;848.
  ) 
 Here is how much of TeX's memory you used:
- 27705 strings out of 473190
- 505261 string characters out of 5715800
- 916974 words of memory out of 5000000
+ 27703 strings out of 473190
+ 505241 string characters out of 5715800
+ 914975 words of memory out of 5000000
  50041 multiletter control sequences out of 15000+600000
- 604033 words of font info for 317 fonts, out of 8000000 for 9000
+ 603894 words of font info for 315 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,11n,131p,1854b,899s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,12n,131p,1854b,896s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/inconsolata/Inconsolat
 a-zi4r.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cm
@@ -1151,10 +1152,10 @@ mi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
 b></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on RJwrapper.pdf (20 pages, 1926356 bytes).
+Output written on RJwrapper.pdf (21 pages, 1927283 bytes).
 PDF statistics:
- 540 PDF objects out of 1000 (max. 8388607)
- 449 compressed objects within 5 object streams
- 75 named destinations out of 1000 (max. 500000)
+ 545 PDF objects out of 1000 (max. 8388607)
+ 453 compressed objects within 5 object streams
+ 76 named destinations out of 1000 (max. 500000)
  55536 words of extra memory for PDF output out of 61914 (max. 10000000)
 
