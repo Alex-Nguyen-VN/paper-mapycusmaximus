@@ -57,7 +57,7 @@ The FGC fisheye lens keeps everything in one frame - roads bend smoothly, metrop
 
 \section{Usage}\label{usage}
 
-The primary functionality is from two functions: \texttt{fisheye\_fgc} which operates on a \texttt{data.frame} or \texttt{tibble}, and \texttt{sf\_fisheye} which operates on an \texttt{sf} object. Operationally, both are the same, except that the elements in the object being transformed are different: The first two columns in the former, and the geographic coordinates in the latter.
+The primary functionality is from two functions: \texttt{fisheye\_fgc} which operates on a \texttt{data.frame} or \texttt{tibble}, or \texttt{sf} object. Operationally, both are the same, except that the elements in the object being transformed are different: The first two columns in the former, and the geographic coordinates in the latter.
 
 Both also require the `center' of the fisheye transformation to be specified using \texttt{cx} and \texttt{cy}. By default, these are both 0, which is unlikely to work for most spatial problems. The code snippet below transforms a subset of hospitals in metropolitan Victoria, using data from the \texttt{mapycusmaximus} package, where \texttt{r\_in} and \texttt{r\_out} specify the radius of the transformed circles, and \texttt{zoom\_factor} which controls the appearance of the inner-most focus layer.
 
@@ -91,7 +91,7 @@ The effect of this transformation can be seen in Figure \ref{fig:usage-demo}. Po
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/paper-mapycusmaximus_files/figure-latex/usage-demo-1.pdf}}
 \caption{\label{fig:usage-demo}Original (a) and fisheye transformed (b) points representing the geographic location of a subset of hospitals in metropolitan Victoria. In (b), points are colored by whether they are part of the context, glue, or focus layer. The transformed data allows for the individual points near the center to be seen more easily.}
 \end{figure}
 
@@ -144,7 +144,7 @@ The second option can introduce rotation within the glue zone to accentuate the 
 
 \begin{figure}
 \centering
-\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{paper-mapycusmaximus_files/paper-mapycusmaximus_files/figure-latex/fgc-zones-1.pdf}}
 \caption{\label{fig:fgc-zones}Illustration of Focus-Glue-Context zones in a fisheye transformation. Original grid points are shown alongside their transformed positions, colored by zone, with arrows indicating displacement. Points expand in the focus, compress smoothly (inwards or outwards) in the glue, and remain fixed in the context.}
 \end{figure}
 
@@ -180,7 +180,7 @@ The pipeline broadly follows a process of \textbf{normalize} -\textgreater{} \te
 
 The first step in the pipeline is to normalise the spatial data. We choose to normalise, as from a visual perspective it may be easier for analyst to choose a center to be ``roughly two thirds across'' their data, rather than trying to pick out a specific latitude and longitude. Users can choose whether to keep a fixed aspect ratio (default, \texttt{preserve\_aspect\ =\ TRUE}) or scale each axis independently. In the normalised coordinates framework, we assume the center is at \((0, 0)\), and the spatial dataset is bounded between \(-1\) and \(1\).
 
-Fundamentally, spatial objects in the \texttt{sf} package are just lists of points, with a structure of how they are layered and connected together. Thus, the \texttt{sf\_fisheye} effectively loops over these layers, each time applying a transformation function to each layer, and then reconstructing the \texttt{sf} object based on it's original inputs. Geometries are split by type:
+Fundamentally, spatial objects in the \texttt{sf} package are just lists of points, with a structure of how they are layered and connected together. Thus, the \texttt{fisheye\_fgc} effectively loops over these layers, each time applying a transformation function to each layer, and then reconstructing the \texttt{sf} object based on it's original inputs. Geometries are split by type:
 
 \begin{itemize}
 \tightlist
@@ -258,7 +258,7 @@ Spatial data (LGAs, points, and transfer lines) are converted once into plain co
 
 \subsubsection{Selecting the lens center}\label{selecting-the-lens-center}
 
-Users begin by choosing an \textbf{Initial lens center (LGA)} from the sidebar. Internally, the selected LGA polygon is reduced to a representative point (\texttt{st\_point\_on\_surface()}), which becomes the fisheye center. This mirrors the common scripted workflow of passing a polygon or centroid as the \texttt{center} argument to \texttt{sf\_fisheye()}.
+Users begin by choosing an \textbf{Initial lens center (LGA)} from the sidebar. Internally, the selected LGA polygon is reduced to a representative point (\texttt{st\_point\_on\_surface()}), which becomes the fisheye center. This mirrors the common scripted workflow of passing a polygon or centroid as the \texttt{center} argument to \texttt{fisheye\_fgc()}.
 
 Once initialized, the center can be moved freely by dragging within the fisheye panel, allowing rapid scanning of different regions without changing parameters.
 
@@ -274,7 +274,7 @@ Two sliders control the spatial extent of distortion:
   \textbf{Outer radius (glue)} -\textgreater{} \texttt{r\_out} Sets the extent of the transition zone where compression occurs before geometry becomes fixed.
 \end{itemize}
 
-Together, these define the Focus-Glue-Context structure used by both \texttt{fisheye\_fgc()} and \texttt{sf\_fisheye()}. Increasing \texttt{r\_out} spreads distortion more gradually; decreasing it concentrates deformation closer to the focus.
+Together, these define the Focus-Glue-Context structure used by \texttt{fisheye\_fgc()}. Increasing \texttt{r\_out} spreads distortion more gradually; decreasing it concentrates deformation closer to the focus.
 
 \subsubsection{Controlling magnification and compression}\label{controlling-magnification-and-compression}
 
@@ -324,7 +324,7 @@ These observations help users choose sensible parameter ranges before producing 
 
 \subsection{Design rationale}\label{design-rationale}
 
-The app deliberately separates \emph{parameter exploration} from \emph{final figure generation}. Interactive dragging and sliders provide immediate visual feedback, while the parameter values correspond directly to arguments in \texttt{sf\_fisheye()}. Once suitable settings are identified, the same values can be reused verbatim in reproducible code pipelines.
+The app deliberately separates \emph{parameter exploration} from \emph{final figure generation}. Interactive dragging and sliders provide immediate visual feedback, while the parameter values correspond directly to arguments in \texttt{fisheye\_fgc()}. Once suitable settings are identified, the same values can be reused verbatim in reproducible code pipelines.
 
 \subsection{Future work}\label{future-work}
 
@@ -405,7 +405,7 @@ vic_all <- dplyr::bind_rows(
   total_trans |> dplyr::mutate(.layer="transfers"))
 
 # Transform all objects simultaneously
-vic_all_w <- sf_fisheye(vic_all, center = metro_center, 
+vic_all_w <- fisheye_fgc(vic_all, center = metro_center, 
                         r_in = 0.2, r_out = 0.3, 
                         zoom = 4, squeeze = 0.35)
 
